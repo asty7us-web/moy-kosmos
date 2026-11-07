@@ -152,6 +152,7 @@ body.opening #opening{display:block}
 /* ── верхняя панель: разделы + «Выбрать» ── */
 .topbar{position:sticky;top:0;z-index:20;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:calc(env(safe-area-inset-top,0px) + 10px) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:8px;
   background:linear-gradient(rgba(6,8,24,.86),rgba(6,8,24,.7));-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line)}
+@media (hover:none){.topbar{background:linear-gradient(rgba(6,8,24,.95),rgba(6,8,24,.88));-webkit-backdrop-filter:none;backdrop-filter:none}}   /* 07.11 плавность прокрутки на телефоне */
 .chips{flex:1;min-width:0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-mask:linear-gradient(90deg,#000 92%,transparent);mask:linear-gradient(90deg,#000 92%,transparent)}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;display:inline-flex;align-items:baseline;gap:6px;padding:8px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-weight:700;font-size:14px;color:var(--ink-2);white-space:nowrap;transition:background .25s,color .25s}
@@ -210,10 +211,11 @@ body.selecting .grp-h .gsel{display:inline}
 .tile.prs{--s:.93}
 .ph{position:relative;display:block;overflow:hidden;border-radius:inherit;background:#10132c;isolation:isolate}
 .tile .ph{aspect-ratio:1}
-.ph img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transform:scale(1.14);filter:blur(14px) brightness(.55) saturate(.7);
-  transition:opacity .7s,filter 1.1s cubic-bezier(.22,1,.36,1),transform 1.3s cubic-bezier(.22,1,.36,1)}
+/* 07.11 плавность: раскрытие без размытия и без перерисовки маски — только прозрачность и масштаб (их видеокарта ведёт без рывков) */
+.ph img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transform:scale(1.14);
+  transition:opacity .7s,transform 1.3s cubic-bezier(.22,1,.36,1)}
 .ph img.ok{opacity:1}
-.rv .ph img{filter:none;transform:none}
+.rv .ph img{transform:none}
 .ph::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;
   background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.95) 0 .8px,transparent 1.7px) var(--sx,0px) var(--sy,0px)/37px 41px,
     radial-gradient(circle at 70% 60%,rgba(214,206,255,.8) 0 .7px,transparent 1.6px) var(--sy,0px) var(--sx,0px)/53px 47px,
@@ -221,9 +223,8 @@ body.selecting .grp-h .gsel{display:inline}
     radial-gradient(110% 90% at var(--nx,30%) var(--ny,20%),rgba(140,110,255,.6),transparent 62%),
     radial-gradient(90% 80% at 85% 92%,rgba(255,92,170,.3),transparent 66%),linear-gradient(160deg,#141846,#060920);
   box-shadow:inset 0 0 0 1px rgba(200,190,255,.16),inset 0 0 26px rgba(120,100,255,.25);
-  -webkit-mask:radial-gradient(circle at var(--mx,50%) var(--my,50%),transparent calc(var(--r) - 24%),#000 var(--r));mask:radial-gradient(circle at var(--mx,50%) var(--my,50%),transparent calc(var(--r) - 24%),#000 var(--r));
-  transition:--r 1.15s cubic-bezier(.22,1,.36,1)}
-.rv .ph::before{--r:175%}
+  transform-origin:var(--mx,50%) var(--my,50%);transition:opacity 1s cubic-bezier(.22,1,.36,1),transform 1.15s cubic-bezier(.22,1,.36,1)}
+.rv .ph::before{opacity:0;transform:scale(1.35)}
 .ph::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .35s;
   background:radial-gradient(circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.35),rgba(255,255,255,0) 58%)}
 .tilt .ph::after{opacity:1}
@@ -238,7 +239,7 @@ body.selecting .ph::before,#s-trash .ph::before,[data-skin="birds"] .ph::before{
 body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!important;transform:none!important}
 @media (hover:hover) and (pointer:fine){
   .tile:hover .ph img,.fcard:hover .ph img{filter:none;transform:none}
-  .tile:hover .ph::before,.fcard:hover .ph::before{--r:175%;transition-duration:.8s}
+  .tile:hover .ph::before,.fcard:hover .ph::before{opacity:0;transform:scale(1.35);transition-duration:.8s}
 }
 /* 07.11 Андрей: «Туманность не очень, убери, добавь ещё 2 варианта более крутых» → Голограмма и Галактика */
 /* 1 — Голограмма: коллекционные карточки 3:4 с радужной фольгой; при раскрытии по фольге пробегает волна,
@@ -253,9 +254,12 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
   transition:opacity .35s}
 [data-view="holo"] .tile.rv .ph::after{opacity:.16}
 [data-view="holo"] .tile.tilt .ph::after{opacity:.62}
-[data-view="holo"] .tile.rv::before{content:"";position:absolute;inset:2px;z-index:4;border-radius:12px;pointer-events:none;mix-blend-mode:screen;
-  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 45%,rgba(180,140,255,.45) 50%,rgba(120,220,255,.35) 55%,transparent 65%) 120% 0/260% 100% no-repeat;
-  animation:mkSweep 1.4s .5s cubic-bezier(.4,0,.2,1) both}
+/* 07.11 плавность: волна по фольге — сдвигом слоя, а не перерисовкой фона */
+@keyframes mkSw{from{transform:translateX(-74%)}to{transform:translateX(37%)}}
+.ph .sw{display:none}
+[data-view="holo"] .tile.rv .ph .sw{display:block;position:absolute;left:0;top:0;bottom:0;width:260%;z-index:4;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 45%,rgba(180,140,255,.45) 50%,rgba(120,220,255,.35) 55%,transparent 65%);
+  transform:translateX(37%);animation:mkSw 1.4s .5s cubic-bezier(.4,0,.2,1) both}
 [data-view="holo"] .tile.tilt,[data-view="holo"] .tile.prs{--s:1.05;box-shadow:0 22px 40px rgba(0,0,0,.6),0 0 26px rgba(190,160,255,.45)}
 [data-view="holo"] .tile.sel .ph{transform:scale(.92)}
 [data-skin="birds"][data-view="holo"] .tile{border:0}
@@ -263,12 +267,12 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
    под пальцем вокруг фото вспыхивает северное сияние */
 [data-view="gal"] .grid{grid-auto-flow:row dense;gap:10px}
 [data-view="gal"] .grid .tile:nth-child(9n+1),[data-view="gal"] .grid .tile:nth-child(9n+6){grid-column:span 2;grid-row:span 2}
-[data-view="gal"] .tile{border-radius:18px;--s:.82;--ty:26px;opacity:.35;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .9s,box-shadow .45s}
+[data-view="gal"] .tile{border-radius:18px;--s:.82;--ty:26px;opacity:.35;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .9s}
 [data-view="gal"] .tile.rv{--s:1;--ty:0px;opacity:1;box-shadow:0 0 0 1px rgba(200,190,255,.18),0 10px 26px rgba(0,0,0,.4)}
 [data-view="gal"] .tile::before{content:"";position:absolute;inset:-7px;z-index:-1;border-radius:24px;pointer-events:none;opacity:0;filter:blur(12px);
-  background:conic-gradient(from var(--a),#6bffcf,#7a8bff,#ff6bd6,#ffd36b,#6bffcf);transition:opacity .4s,--a 2.2s cubic-bezier(.22,1,.36,1)}
-[data-view="gal"] .tile.tilt::before,[data-view="gal"] .tile.prs::before{opacity:.95;--a:360deg}
-[data-view="gal"] .tile.tilt,[data-view="gal"] .tile.prs{--s:1.04;z-index:5;transition:transform .14s linear,box-shadow .3s}
+  background:conic-gradient(#6bffcf,#7a8bff,#ff6bd6,#ffd36b,#6bffcf);transform:scale(.92);transition:opacity .4s,transform .5s cubic-bezier(.22,1,.36,1)}
+[data-view="gal"] .tile.tilt::before,[data-view="gal"] .tile.prs::before{opacity:.95;transform:none}
+[data-view="gal"] .tile.tilt,[data-view="gal"] .tile.prs{--s:1.04;z-index:5;transition:transform .14s linear}
 [data-view="gal"] .tile.sel .ph{transform:scale(.9)}
 [data-skin="birds"][data-view="gal"] .tile::before{display:none}
 /* 2 — Полароиды: карточки в рамке с подписью, лежат чуть вразнобой, фото «проявляется» */
@@ -276,17 +280,20 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
 [data-view="pol"] .tile{--rot:var(--rr,0deg);padding:8px 8px 0;border-radius:3px;background:linear-gradient(#fdfaf3,#ece5d6);box-shadow:0 1px 0 rgba(0,0,0,.1),0 14px 28px rgba(0,0,0,.5)}
 [data-view="pol"] .tile .ph{border-radius:2px}
 [data-view="pol"] .tile .cp{display:block;height:34px;padding:8px 2px 0;font:700 13px/1.1 var(--font);color:#4b4560;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-view="pol"] .tile .ph img{filter:sepia(1) brightness(.3) contrast(.7) blur(5px);transition:opacity .7s,filter 2.4s ease,transform 1.6s var(--ease)}
+[data-view="pol"] .tile .ph img{filter:sepia(1) brightness(.3) contrast(.7);transition:opacity .7s,filter 2.4s ease,transform 1.6s var(--ease)}
 [data-view="pol"] .tile.rv .ph img{filter:none}
 [data-view="pol"] .tile.prs,[data-view="pol"] .tile.tilt{--s:1.04;--ty:-6px;--rot:0deg;box-shadow:0 1px 0 rgba(0,0,0,.1),0 26px 40px rgba(0,0,0,.55)}
 [data-view="pol"] .tile .hf{bottom:42px}[data-view="pol"] .tile .ck{bottom:44px}
 [data-skin="birds"][data-view="pol"] .tile{border:0}
 /* 3 — Иллюминаторы: круглые окна с сияющим кольцом, кольцо крутится под пальцем */
 [data-view="orb"] .grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px}
-[data-view="orb"] .tile{border-radius:50%;padding:4px;background:conic-gradient(from var(--a),#8f7bff,#ff7ac8,#7fd8ff,#ffd27a,#8f7bff);box-shadow:0 0 16px rgba(140,120,255,.35);transition:transform .55s var(--ease),box-shadow .45s,--a 1.6s var(--ease)}
+/* 07.11 плавность: кольцо — отдельный слой, крутится поворотом (без перерисовки каждый кадр) */
+[data-view="orb"] .tile{border-radius:50%;padding:4px;box-shadow:0 0 16px rgba(140,120,255,.35);transition:transform .55s var(--ease),box-shadow .45s}
+[data-view="orb"] .tile::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:50%;pointer-events:none;background:conic-gradient(#8f7bff,#ff7ac8,#7fd8ff,#ffd27a,#8f7bff);transition:transform 1.6s var(--ease)}
 [data-view="orb"] .tile .ph{border-radius:50%}
-[data-view="orb"] .tile.rv{--a:200deg}
-[data-view="orb"] .tile.tilt,[data-view="orb"] .tile.prs{--a:540deg;box-shadow:0 0 30px rgba(170,140,255,.75)}
+[data-view="orb"] .tile.rv::before{transform:rotate(200deg)}
+[data-view="orb"] .tile.tilt::before,[data-view="orb"] .tile.prs::before{transform:rotate(540deg)}
+[data-view="orb"] .tile.tilt,[data-view="orb"] .tile.prs{box-shadow:0 0 30px rgba(170,140,255,.75)}
 [data-view="orb"] .tile .ck{right:50%;margin-right:-12px;bottom:6px}[data-view="orb"] .tile .hf{left:50%;margin-left:-6px;bottom:auto;top:8px}
 [data-skin="birds"][data-view="orb"] .tile{border:0}
 [data-skin="birds"] .tile{border:3px solid #fff;box-shadow:0 3px 0 var(--wink);border-radius:12px}
@@ -579,11 +586,11 @@ function spStars(el) {
     S = Array.from({ length: Math.round(W * H / 2400) }, () => ({ x: Math.random() * W, y: Math.random() * H * 0.78, r: 0.35 + Math.random() * Math.random() * 1.5, p: Math.random() * 6.3, s: 0.5 + Math.random() * 2, z: Math.random(), h: Math.random() < 0.2 ? "#cfd8ff" : Math.random() < 0.1 ? "#ffe2b8" : "#fff" })); };
   const frame = t => {
     raf = 0; if (!el.isConnected) return;
-    if (t - last > 32) {
-      last = t; mx += (tx - mx) * 0.06; my += (ty - my) * 0.06; g.clearRect(0, 0, W, H);
+    /* 07.11 Андрей: «движения плавнее, как будто частота маленькая» — было 30 кадров/с, теперь каждый кадр экрана, скорость по времени */
+    { const k = last ? Math.min(3, (t - last) / 33.3) : 1; last = t; const e = 1 - Math.pow(0.94, k); mx += (tx - mx) * e; my += (ty - my) * e; g.clearRect(0, 0, W, H);
       for (const s of S) { g.globalAlpha = 0.25 + 0.75 * Math.abs(Math.sin(s.p + t / 1000 * s.s)); g.fillStyle = s.h; g.beginPath(); g.arc(s.x + mx * s.z * 14, s.y + my * s.z * 8, s.r, 0, 7); g.fill(); }
-      if (!met && Math.random() < 0.006) { const a = 0.35 + Math.random() * 0.35; met = { x: W * (0.15 + Math.random() * 0.7), y: H * Math.random() * 0.3, a, v: 9 + Math.random() * 6, l: 0 }; }
-      if (met) { met.l++; const x = met.x + Math.cos(met.a) * met.v * met.l, y = met.y + Math.sin(met.a) * met.v * met.l, k = Math.min(1, met.l / 6) * Math.max(0, 1 - met.l / 30);
+      if (!met && Math.random() < 0.006 * k) { const a = 0.35 + Math.random() * 0.35; met = { x: W * (0.15 + Math.random() * 0.7), y: H * Math.random() * 0.3, a, v: 9 + Math.random() * 6, l: 0 }; }
+      if (met) { met.l += k; const x = met.x + Math.cos(met.a) * met.v * met.l, y = met.y + Math.sin(met.a) * met.v * met.l, k = Math.min(1, met.l / 6) * Math.max(0, 1 - met.l / 30);
         const tl = 90, gr = g.createLinearGradient(x - Math.cos(met.a) * tl, y - Math.sin(met.a) * tl, x, y); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(1, "rgba(255,255,255," + k + ")");
         g.globalAlpha = 1; g.strokeStyle = gr; g.lineWidth = 1.6; g.beginPath(); g.moveTo(x - Math.cos(met.a) * tl, y - Math.sin(met.a) * tl); g.lineTo(x, y); g.stroke(); if (met.l > 30) met = null; }
       g.globalAlpha = 1;
@@ -776,7 +783,7 @@ function capOf(p) { if (!p || p.nd) return "Мои фото"; if (!p.d) return n
 function tile(n) {
   const b = h("button", "tile"); b.type = "button"; b.dataset.n = n; const w = when(G.ph[n]); b.setAttribute("aria-label", w.t + ", " + w.d);
   const x = hsh(n); b.style.cssText = `--rr:${((x % 70) / 10 - 3.5).toFixed(1)}deg;--nx:${x % 80 + 10}%;--ny:${(x >> 3) % 70 + 10}%;--sx:${x % 37}px;--sy:${(x >> 2) % 41}px`;
-  const ph = h("span", "ph"); ph.append(lazyImg(n)); b.append(ph, h("i", "ck"), h("span", "cp", capOf(G.ph[n]))); if (isFav(n)) b.append(h("span", "hf", "♥"));
+  const ph = h("span", "ph"); ph.append(lazyImg(n), h("i", "sw")); b.append(ph, h("i", "ck"), h("span", "cp", capOf(G.ph[n]))); if (isFav(n)) b.append(h("span", "hf", "♥"));
   b.onclick = () => { if (SEL) { selToggle(n); return; } if (b.closest("#s-trash")) { askRestore([n]); return; } const l = listOf(b); openPv(l, l.indexOf(n), ph); };
   if (rvIO) rvIO.observe(b); else b.classList.add("rv");
   return b;
@@ -784,7 +791,10 @@ function tile(n) {
 /* тактильность: плитка проседает под пальцем, наклоняется за ним, блик; на Android — лёгкая отдача */
 (() => {
   let t = null, sx = 0, sy = 0;
-  const pos = (e, el) => { const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  /* 07.11 плавность: наклон считается раз в кадр экрана, а не на каждое движение пальца */
+  let pq = null, pr = 0;
+  const pos = (e, el) => { pq = [e.clientX, e.clientY, el]; if (!pr) pr = requestAnimationFrame(() => { pr = 0; const q = pq; pq = null; if (q && q[2].classList.contains("tilt")) pos0(q[0], q[1], q[2]); }); };
+  const pos0 = (cx, cy, el) => { const r = el.getBoundingClientRect(), x = (cx - r.left) / r.width, y = (cy - r.top) / r.height;
     el.style.setProperty("--ry", ((x - 0.5) * 16).toFixed(1) + "deg"); el.style.setProperty("--rx", ((0.5 - y) * 16).toFixed(1) + "deg");
     const ph = el.querySelector(".ph"); if (ph) { ph.style.setProperty("--gx", (x * 100).toFixed(0) + "%"); ph.style.setProperty("--gy", (y * 100).toFixed(0) + "%"); ph.style.setProperty("--mx", (x * 100).toFixed(0) + "%"); ph.style.setProperty("--my", (y * 100).toFixed(0) + "%"); } };
   const off = el => { if (!el) return; el.classList.remove("prs", "tilt"); el.style.removeProperty("--rx"); el.style.removeProperty("--ry"); };
