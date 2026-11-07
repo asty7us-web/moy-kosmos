@@ -492,9 +492,10 @@ const getBin = (u, o) => fetch(u, o).then(r => { if (!r.ok) throw new Error("net
 async function dec(buf, key) { const b = new Uint8Array(buf); return crypto.subtle.decrypt({ name: "AES-GCM", iv: b.slice(0, 12) }, key || KEY, b.slice(12)); }
 async function encr(bytes) { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, KEY, bytes)), out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); return out; }
 const b64big = u => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+const PHOTO = "https://raw.githubusercontent.com/asty7us-web/moy-kosmos/main/data/";   // фото не в выкладке сайта (слишком тяжёлые), берём прямо из хранилища
 function load(n, big) {
   const k = (big ? "f/" : "t/") + n; if (BLOBS.has(k)) return BLOBS.get(k);
-  const u = "data/" + k + ".bin";   // из памяти телефона (sw.js); не расшифровалось — значит, сайт пересобран: берём свежее
+  const u = PHOTO + k + ".bin";   // из памяти телефона (sw.js); не расшифровалось — значит, сайт пересобран: берём свежее
   const p = getBin(u).then(b => dec(b)).catch(e => e && e.message === "net" ? Promise.reject(e) : getBin(u + "?fresh=1", { cache: "reload" }).then(b => dec(b)))
     .then(b => URL.createObjectURL(new Blob([b], { type: "image/jpeg" })));
   p.catch(() => BLOBS.delete(k)); BLOBS.set(k, p); return p;
