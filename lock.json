@@ -1,1 +1,1 @@
-{"v": 2, "kdf": "PBKDF2-SHA256", "iter": 600000, "salt": "bv+x5wyzVKYavYSeFqb8rw==", "chk": "iIbe0x7WINewAGzoghho46URpixgiPdAj40CJu+kq1vLzgpeYw=="}
+{"v": 3, "kdf": "PBKDF2-SHA256", "iter": 600000, "salt": "bv+x5wyzVKYavYSeFqb8rw==", "chk": "bUVzAGlXx3HhDUBW2LmJGwrwlQyt/luPOYPQgAQAPupxs9V7rw==", "b": "2026-11-07T15:14:12", "adm": {"salt": "/+TwYTGeMKNK1z5lHxCXNQ==", "iter": 300000, "chk": "bYiKAk6yB9yNJUGy1BoRUN3C4gGbXz+HDjVqNzC8FlOWWw=="}}
