@@ -240,9 +240,37 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
   .tile:hover .ph img,.fcard:hover .ph img{filter:none;transform:none}
   .tile:hover .ph::before,.fcard:hover .ph::before{--r:175%;transition-duration:.8s}
 }
-/* 1 — Туманность: мягкие плитки с объёмом, наклоняются за пальцем, блик */
-[data-view="neb"] .tile.rv{box-shadow:0 0 0 1px rgba(210,200,255,.2),0 10px 24px rgba(0,0,0,.35)}
-[data-view="neb"] .tile.tilt{box-shadow:0 0 0 1px rgba(210,200,255,.5),0 0 28px rgba(140,120,255,.5)}
+/* 07.11 Андрей: «Туманность не очень, убери, добавь ещё 2 варианта более крутых» → Голограмма и Галактика */
+/* 1 — Голограмма: коллекционные карточки 3:4 с радужной фольгой; при раскрытии по фольге пробегает волна,
+   под пальцем радуга и блик бегут за ним, карточка сильно наклоняется */
+@keyframes mkSweep{from{background-position:120% 0}to{background-position:-60% 0}}
+[data-view="holo"] .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px 12px;padding:4px 2px 10px}
+[data-view="holo"] .tile{padding:2px;border-radius:14px;background:linear-gradient(135deg,#f4f1ff,#8e86b8 30%,#fff 50%,#7c74a6 70%,#e9e4ff);box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-view="holo"] .tile .ph{aspect-ratio:3/4;border-radius:12px}
+[data-view="holo"] .tile .ph::after{opacity:.0;mix-blend-mode:color-dodge;background:
+  radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,255,255,.55),transparent 45%),
+  repeating-linear-gradient(115deg,#ff5fa2 0%,#ffd36b 7%,#6bffb5 14%,#6bc8ff 21%,#b48cff 28%,#ff5fa2 35%) var(--gx,50%) var(--gy,50%)/300% 300%;
+  transition:opacity .35s}
+[data-view="holo"] .tile.rv .ph::after{opacity:.16}
+[data-view="holo"] .tile.tilt .ph::after{opacity:.62}
+[data-view="holo"] .tile.rv::before{content:"";position:absolute;inset:2px;z-index:4;border-radius:12px;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 45%,rgba(180,140,255,.45) 50%,rgba(120,220,255,.35) 55%,transparent 65%) 120% 0/260% 100% no-repeat;
+  animation:mkSweep 1.4s .5s cubic-bezier(.4,0,.2,1) both}
+[data-view="holo"] .tile.tilt,[data-view="holo"] .tile.prs{--s:1.05;box-shadow:0 22px 40px rgba(0,0,0,.6),0 0 26px rgba(190,160,255,.45)}
+[data-view="holo"] .tile.sel .ph{transform:scale(.92)}
+[data-skin="birds"][data-view="holo"] .tile{border:0}
+/* 2 — Галактика: живая мозаика — среди обычных фото крупные «звёзды» 2×2, плитки всплывают из глубины,
+   под пальцем вокруг фото вспыхивает северное сияние */
+[data-view="gal"] .grid{grid-auto-flow:row dense;gap:10px}
+[data-view="gal"] .grid .tile:nth-child(9n+1),[data-view="gal"] .grid .tile:nth-child(9n+6){grid-column:span 2;grid-row:span 2}
+[data-view="gal"] .tile{border-radius:18px;--s:.82;--ty:26px;opacity:.35;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .9s,box-shadow .45s}
+[data-view="gal"] .tile.rv{--s:1;--ty:0px;opacity:1;box-shadow:0 0 0 1px rgba(200,190,255,.18),0 10px 26px rgba(0,0,0,.4)}
+[data-view="gal"] .tile::before{content:"";position:absolute;inset:-7px;z-index:-1;border-radius:24px;pointer-events:none;opacity:0;filter:blur(12px);
+  background:conic-gradient(from var(--a),#6bffcf,#7a8bff,#ff6bd6,#ffd36b,#6bffcf);transition:opacity .4s,--a 2.2s cubic-bezier(.22,1,.36,1)}
+[data-view="gal"] .tile.tilt::before,[data-view="gal"] .tile.prs::before{opacity:.95;--a:360deg}
+[data-view="gal"] .tile.tilt,[data-view="gal"] .tile.prs{--s:1.04;z-index:5;transition:transform .14s linear,box-shadow .3s}
+[data-view="gal"] .tile.sel .ph{transform:scale(.9)}
+[data-skin="birds"][data-view="gal"] .tile::before{display:none}
 /* 2 — Полароиды: карточки в рамке с подписью, лежат чуть вразнобой, фото «проявляется» */
 [data-view="pol"] .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:24px 18px;padding:6px 4px 12px}
 [data-view="pol"] .tile{--rot:var(--rr,0deg);padding:8px 8px 0;border-radius:3px;background:linear-gradient(#fdfaf3,#ece5d6);box-shadow:0 1px 0 rgba(0,0,0,.1),0 14px 28px rgba(0,0,0,.5)}
@@ -769,8 +797,8 @@ function tile(n) {
   ["pointerup", "pointercancel"].forEach(k => document.addEventListener(k, () => { if (t) { const el = t; t = null; el.classList.remove("prs"); if (!HOVER) setTimeout(() => off(el), 120); } }, { passive: true }));
 })();
 /* вид плитки — выбор над лентой, помнится на устройстве */
-const VIEWS = [["neb", "✦ Туманность"], ["pol", "▢ Полароиды"], ["orb", "◯ Иллюминаторы"]];
-let VIEW = LS.get("mk.view", "neb"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "neb"; document.documentElement.dataset.view = VIEW;
+const VIEWS = [["holo", "✧ Голограмма"], ["gal", "✺ Галактика"], ["pol", "▢ Полароиды"], ["orb", "◯ Иллюминаторы"]];
+let VIEW = LS.get("mk.view", "holo"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "holo"; document.documentElement.dataset.view = VIEW;
 function viewBar() {
   const v = h("div", "vsel"); v.setAttribute("role", "group"); v.setAttribute("aria-label", "Вид фото"); v.innerHTML = "<span>Вид фото</span>" + VIEWS.map(([k, t]) => `<button type="button" data-v="${k}" aria-pressed="${k === VIEW}">${t}</button>`).join("");
   v.onclick = e => { const b = e.target.closest("[data-v]"); if (!b || b.dataset.v === VIEW) return; VIEW = b.dataset.v; LS.set("mk.view", VIEW);
