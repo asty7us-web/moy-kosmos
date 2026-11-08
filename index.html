@@ -423,6 +423,15 @@ body.selecting .selbar{transform:none}
 body.selecting .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
 @keyframes tst{0%{opacity:0;transform:translate(-50%,16px)}6%,88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){#spDeco .tw,.gift{animation:none}#spCard .spimg{transition:none}html{scroll-behavior:auto}}
+
+/* 07.11 Андрей: «при смене направления фон сначала едет за тобой» — на телефоне кружки появляются без масштаба и слоёв, только прозрачностью: телефон не тратит силы на десятки анимаций, и космос успевает стоять на месте */
+@media (hover:none){
+  .ph{isolation:auto}
+  .ph img,.rv .ph img{transform:none!important;transition:opacity .6s}
+  .ph::before,.rv .ph::before{transform:none!important;transition:opacity .6s}
+  [data-view="orb"] .tile,[data-view="orb"] .tile::before{transition:none}
+  [data-view="orb"] .tile.rv::before,[data-view="orb"] .tile.tilt::before,[data-view="orb"] .tile.prs::before{transform:none}
+}
 </style>
 </head>
 <body>
@@ -778,7 +787,7 @@ function pump() {
 }
 const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { LQ.add(e.target); io.unobserve(e.target); } }), { rootMargin: "1100px 0px" }) : null;
 let pumpT = 0; addEventListener("scroll", () => { if (!pumpT) pumpT = setTimeout(() => { pumpT = 0; pump(); }, 60); }, { passive: true, capture: true });
-setInterval(pump, 400);
+setInterval(() => { if (LQ.size && LA < 6) pump(); }, 400);
 const HOVER = matchMedia("(hover:hover) and (pointer:fine)").matches;   // на компьютере фото раскрываются под мышкой
 const RVQ = []; let rvT = 0;
 function rvTry(el) {
