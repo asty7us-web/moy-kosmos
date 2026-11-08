@@ -26,7 +26,7 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;position:relative;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @supports(overflow:clip){body{overflow-x:clip}}
-body::before{content:"";position:absolute;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-2;pointer-events:none;-webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent);background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
 [data-skin="birds"] body::before{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene.webp") center/cover}
 @media (max-width:700px){[data-skin="birds"] body::before{background-image:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene-m.webp")}}
 body.noscroll{overflow:hidden}
@@ -35,7 +35,7 @@ img{-webkit-user-drag:none}
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid #cfc6ff;outline-offset:2px}
 [data-skin="birds"] .sp-only,[data-skin="space"] .ab-only{display:none!important}
-#spDeco{position:absolute;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-1;-webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent);pointer-events:none;overflow:hidden}
+#spDeco{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 #spDeco .tw{position:absolute;width:var(--z);height:var(--z);border-radius:50%;background:#fff;box-shadow:0 0 6px 1px rgba(200,215,255,.85);opacity:.15;animation:sp-tw var(--d) ease-in-out infinite;animation-delay:var(--dl)}
 @keyframes sp-tw{0%,100%{opacity:.12;transform:scale(.55)}50%{opacity:1;transform:scale(1)}}
 #spDeco .met{position:absolute;left:0;top:0;width:190px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(214,206,255,.7) 70%,#fff);box-shadow:0 0 8px rgba(190,180,255,.7);opacity:0}
@@ -809,8 +809,8 @@ function tile(n) {
   ["pointerup", "pointercancel"].forEach(k => document.addEventListener(k, () => { if (t) { const el = t; t = null; el.classList.remove("prs"); if (!HOVER) setTimeout(() => off(el), 120); } }, { passive: true }));
 })();
 /* вид плитки — выбор над лентой, помнится на устройстве */
-const VIEWS = [["holo", "✧ Голограмма"], ["gal", "✺ Галактика"], ["pol", "▢ Полароиды"], ["orb", "◯ Иллюминаторы"]];
-let VIEW = LS.get("mk.view", "holo"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "holo"; document.documentElement.dataset.view = VIEW;
+const VIEWS = [["pol", "▢ Полароиды"], ["orb", "◯ Иллюминаторы"]];
+let VIEW = LS.get("mk.view", "pol"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "pol"; document.documentElement.dataset.view = VIEW;
 function viewBar() {
   const v = h("div", "vsel"); v.setAttribute("role", "group"); v.setAttribute("aria-label", "Вид фото"); v.innerHTML = "<span>Вид фото</span>" + VIEWS.map(([k, t]) => `<button type="button" data-v="${k}" aria-pressed="${k === VIEW}">${t}</button>`).join("");
   v.onclick = e => { const b = e.target.closest("[data-v]"); if (!b || b.dataset.v === VIEW) return; VIEW = b.dataset.v; LS.set("mk.view", VIEW);
