@@ -300,7 +300,7 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
 [data-view="pol"] .tile .hf{bottom:42px}[data-view="pol"] .tile .ck{bottom:44px}
 [data-skin="birds"][data-view="pol"] .tile{border:0}
 /* 3 — Иллюминаторы: круглые окна с сияющим кольцом, кольцо крутится под пальцем */
-[data-view="orb"] .grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px}
+[data-view="orb"] .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:20px 16px}
 /* 07.11 плавность: кольцо — отдельный слой, крутится поворотом (без перерисовки каждый кадр) */
 [data-view="orb"] .tile{border-radius:50%;padding:4px;box-shadow:0 0 16px rgba(140,120,255,.35);transition:transform .55s var(--ease),box-shadow .45s}
 [data-view="orb"] .tile::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:50%;pointer-events:none;background:conic-gradient(#8f7bff,#ff7ac8,#7fd8ff,#ffd27a,#8f7bff);transition:transform 1.6s var(--ease)}
@@ -314,8 +314,8 @@ body.selecting .ph img,#s-trash .ph img,[data-skin="birds"] .ph img{filter:none!
 @media (max-width:620px){
   .grid{grid-template-columns:repeat(3,1fr);gap:6px}.tile{border-radius:12px}.grp-h{margin:16px 2px 7px}[data-skin="birds"] .tile{border-width:2px;border-radius:8px}
   [data-view="pol"] .grid{grid-template-columns:repeat(2,1fr);gap:20px 14px}
-  [data-view="orb"] .grid{grid-template-columns:repeat(3,1fr);gap:12px 8px}[data-view="orb"] .tile{padding:3px}
-  [data-view="orb"] .grid .tile:nth-child(3n+2){--ty:22px}[data-view="orb"] .grid{padding-bottom:22px}
+  [data-view="orb"] .grid{grid-template-columns:repeat(2,1fr);gap:16px 12px}[data-view="orb"] .tile{padding:3px}
+  [data-view="orb"] .grid .tile:nth-child(2n){--ty:26px}[data-view="orb"] .grid{padding-bottom:22px}
 }
 
 /* ── сюрприз ── */
@@ -823,8 +823,8 @@ function tile(n) {
   ["pointerup", "pointercancel"].forEach(k => document.addEventListener(k, () => { if (t) { const el = t; t = null; el.classList.remove("prs"); if (!HOVER) setTimeout(() => off(el), 120); } }, { passive: true }));
 })();
 /* вид плитки — выбор над лентой, помнится на устройстве */
-const VIEWS = [["pol", "▢ Полароиды"], ["orb", "◯ Иллюминаторы"]];
-let VIEW = LS.get("mk.view", "pol"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "pol"; document.documentElement.dataset.view = VIEW;
+const VIEWS = [["orb", "◯ Иллюминаторы"]];   // 07.11 Андрей: пока только кружки, крупнее
+let VIEW = LS.get("mk.view", "orb"); if (!VIEWS.some(v => v[0] === VIEW)) VIEW = "orb"; document.documentElement.dataset.view = VIEW;
 function viewBar() {
   const v = h("div", "vsel"); v.setAttribute("role", "group"); v.setAttribute("aria-label", "Вид фото"); v.innerHTML = "<span>Вид фото</span>" + VIEWS.map(([k, t]) => `<button type="button" data-v="${k}" aria-pressed="${k === VIEW}">${t}</button>`).join("");
   v.onclick = e => { const b = e.target.closest("[data-v]"); if (!b || b.dataset.v === VIEW) return; VIEW = b.dataset.v; LS.set("mk.view", VIEW);
@@ -853,7 +853,7 @@ function renderFeed() {
   const feed = $("#feed"), chips = $("#chips"); feed.innerHTML = ""; chips.innerHTML = "";
   const chip = (id, t, n) => { const c = h("button", "chip"); c.type = "button"; c.dataset.s = id; c.innerHTML = t + (n != null ? ` <small>${n}</small>` : ""); c.onclick = () => $("#s-" + id).scrollIntoView({ behavior: RM ? "auto" : "smooth" }); chips.append(c); };
   chip("fav", "♥ Любимые", 0);
-  const fs = h("section", "sec"); fs.id = "s-fav"; fs.innerHTML = '<div class="fav-h"><h2>Самые любимые</h2><p id="favCount"></p></div><div class="favs" id="favBox"></div>'; feed.append(fs); feed.append(viewBar());
+  const fs = h("section", "sec"); fs.id = "s-fav"; fs.innerHTML = '<div class="fav-h"><h2>Самые любимые</h2><p id="favCount"></p></div><div class="favs" id="favBox"></div>'; feed.append(fs); if (VIEWS.length > 1) feed.append(viewBar());
   G.sections.forEach(s => {
     const ps = s.p.filter(n => !HID.has(n)); if (!ps.length) return;
     chip(s.id, s.c || s.t, ps.length);
