@@ -1,0 +1,1 @@
+{"name": "Мой космос", "short_name": "Мой космос", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#060818", "theme_color": "#060818", "icons": [{"src": "assets/ic192.webp", "sizes": "192x192", "type": "image/webp", "purpose": "any"}, {"src": "assets/ic512.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}]}
