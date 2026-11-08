@@ -23,10 +23,10 @@
   --line:rgba(59,29,6,.35);--accent:#ffd21f;--accent-wash:rgba(255,210,31,.25);--font:"Rubik",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--font-h:"Rubik",system-ui,sans-serif}
 @media (max-width:860px){:root{--spbg:url("assets/space-bg-m.webp");--sph:url("assets/space-hero-m.webp");--sbh:max(300px,82vw)}}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;position:relative;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @supports(overflow:clip){body{overflow-x:clip}}
-body::before{content:"";position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-2;pointer-events:none;transform:translateZ(0);backface-visibility:hidden;will-change:transform;background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
+body::before{content:"";position:absolute;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-2;pointer-events:none;-webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent);background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
 [data-skin="birds"] body::before{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene.webp") center/cover}
 @media (max-width:700px){[data-skin="birds"] body::before{background-image:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene-m.webp")}}
 body.noscroll{overflow:hidden}
@@ -35,7 +35,7 @@ img{-webkit-user-drag:none}
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid #cfc6ff;outline-offset:2px}
 [data-skin="birds"] .sp-only,[data-skin="space"] .ab-only{display:none!important}
-#spDeco{position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-1;transform:translateZ(0);backface-visibility:hidden;pointer-events:none;overflow:hidden}
+#spDeco{position:absolute;left:0;right:0;top:0;height:100vh;height:100lvh;z-index:-1;-webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent);pointer-events:none;overflow:hidden}
 #spDeco .tw{position:absolute;width:var(--z);height:var(--z);border-radius:50%;background:#fff;box-shadow:0 0 6px 1px rgba(200,215,255,.85);opacity:.15;animation:sp-tw var(--d) ease-in-out infinite;animation-delay:var(--dl)}
 @keyframes sp-tw{0%,100%{opacity:.12;transform:scale(.55)}50%{opacity:1;transform:scale(1)}}
 #spDeco .met{position:absolute;left:0;top:0;width:190px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(214,206,255,.7) 70%,#fff);box-shadow:0 0 8px rgba(190,180,255,.7);opacity:0}
@@ -481,6 +481,7 @@ body.selecting .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
 <canvas id="confetti" hidden></canvas>
 
 <script>
+try { history.scrollRestoration = "manual"; } catch (e) {}
 "use strict";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const h = (t, c, html) => { const e = document.createElement(t); if (c) e.className = c; if (html != null) e.innerHTML = html; return e; };
@@ -855,7 +856,7 @@ function renderFeed() {
 let chipIO = null;
 function watchChips() {
   if (chipIO) chipIO.disconnect(); if (!("IntersectionObserver" in window)) return;
-  chipIO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const id = e.target.id.slice(2); $$(".chip").forEach(c => c.classList.toggle("on", c.dataset.s === id)); const c = $(`.chip[data-s="${id}"]`); if (c) c.scrollIntoView({ block: "nearest", inline: "center", behavior: RM ? "auto" : "smooth" }); }), { rootMargin: "-45% 0px -50% 0px" });
+  chipIO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const id = e.target.id.slice(2); $$(".chip").forEach(c => c.classList.toggle("on", c.dataset.s === id)); const c = $(`.chip[data-s="${id}"]`); if (c) chips.scrollTo({ left: c.offsetLeft - chips.offsetLeft - (chips.clientWidth - c.offsetWidth) / 2, behavior: RM ? "auto" : "smooth" }); }), { rootMargin: "-45% 0px -50% 0px" });
   $$(".sec").forEach(s => chipIO.observe(s));
 }
 
