@@ -23,10 +23,10 @@
   --line:rgba(59,29,6,.35);--accent:#ffd21f;--accent-wash:rgba(255,210,31,.25);--font:"Rubik",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--font-h:"Rubik",system-ui,sans-serif}
 @media (max-width:860px){:root{--spbg:url("assets/space-bg-m.webp");--sph:url("assets/space-hero-m.webp");--sbh:max(300px,82vw)}}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;height:100%;overflow:hidden}
-body{margin:0;position:relative;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;background:transparent;color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @supports(overflow:clip){body{overflow-x:clip}}
-body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;transform:translateZ(0);z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
 [data-skin="birds"] body::before{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene.webp") center/cover}
 @media (max-width:700px){[data-skin="birds"] body::before{background-image:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene-m.webp")}}
 body.noscroll{overflow:hidden}
@@ -35,7 +35,7 @@ img{-webkit-user-drag:none}
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid #cfc6ff;outline-offset:2px}
 [data-skin="birds"] .sp-only,[data-skin="space"] .ab-only{display:none!important}
-#spDeco{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#spDeco{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;transform:translateZ(0);z-index:-1;pointer-events:none;overflow:hidden}
 #spDeco .tw{position:absolute;width:var(--z);height:var(--z);border-radius:50%;background:#fff;box-shadow:0 0 6px 1px rgba(200,215,255,.85);opacity:.15;animation:sp-tw var(--d) ease-in-out infinite;animation-delay:var(--dl)}
 @keyframes sp-tw{0%,100%{opacity:.12;transform:scale(.55)}50%{opacity:1;transform:scale(1)}}
 #spDeco .met{position:absolute;left:0;top:0;width:190px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(214,206,255,.7) 70%,#fff);box-shadow:0 0 8px rgba(190,180,255,.7);opacity:0}
@@ -1140,7 +1140,7 @@ function doDelete(ns) {
 }
 function doRestore(ns) {
   ns.forEach(n => { HID.delete(n); const wasSyn = SYN.has("d:" + n) || (G.del || []).includes(n); LDEL.delete(n); SYN.delete("d:" + n); if (wasSyn) LUND.add(n); }); lsSave();
-  ghSync(); const y = document.body.scrollTop; renderFeed(); document.body.scrollTop = y; toast("Вернула на место: " + ns.length + " " + pl(ns.length, ["фото", "фото", "фото"]));
+  ghSync(); const y = scrollY; renderFeed(); scrollTo(0, y); toast("Вернула на место: " + ns.length + " " + pl(ns.length, ["фото", "фото", "фото"]));
 }
 function dropTiles(ns) {
   const set = new Set(ns), els = $$("#feed .tile, #s-sur .tile, .fcard").filter(t => set.has(t.dataset.n));
@@ -1186,7 +1186,7 @@ async function admKey(code) {
 }
 function admOn() {
   document.body.classList.add("admin"); $("#selB").hidden = false; $("#admB").textContent = "✎ Режим редактирования · выйти"; renderTrash();
-  srvPoll(0).then(() => { const y = document.body.scrollTop; renderFeed(); document.body.scrollTop = y; ghSync(); });
+  srvPoll(0).then(() => { const y = scrollY; renderFeed(); scrollTo(0, y); ghSync(); });
 }
 function admOff() { ADM = null; LS.set("mk.adm", ""); document.body.classList.remove("admin"); selEnd(); $("#selB").hidden = true; $("#admB").textContent = "✎ Редактировать"; renderTrash(); }
 async function admRestore() {
@@ -1211,7 +1211,7 @@ function applySkin(k, save) {
   const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = k === "birds" ? "#62c0ec" : "#060818";
   if (k === "birds") { birdsOn(); if (SPU.on) spuStop(); } else { birdsOff(); const c = $("#spCard"); if (c._kick) c._kick(); }
 }
-$$("#skin button").forEach(b => b.onclick = () => { applySkin(b.dataset.k, true); document.body.scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" }); });
+$$("#skin button").forEach(b => b.onclick = () => { applySkin(b.dataset.k, true); scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" }); });
 $("#fsig").textContent = `✦ Мой космос · ${new Date().getFullYear()}`;
 
 /* ═════ вход: пароль → ключ → расшифровка списка альбомов ═════ */
