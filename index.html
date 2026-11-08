@@ -23,8 +23,8 @@
   --line:rgba(59,29,6,.35);--accent:#ffd21f;--accent-wash:rgba(255,210,31,.25);--font:"Rubik",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--font-h:"Rubik",system-ui,sans-serif}
 @media (max-width:860px){:root{--spbg:url("assets/space-bg-m.webp");--sph:url("assets/space-hero-m.webp");--sbh:max(300px,82vw)}}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;position:relative;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;height:100%;overflow:hidden}
+body{margin:0;position:relative;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @supports(overflow:clip){body{overflow-x:clip}}
 body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(6,8,24,.2),rgba(6,8,24,.5)),var(--spbg) center/cover}
 [data-skin="birds"] body::before{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(98,192,236,.35)),url("assets/ab-scene.webp") center/cover}
@@ -763,7 +763,7 @@ function pump() {
   }
 }
 const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { LQ.add(e.target); io.unobserve(e.target); } }), { rootMargin: "1100px 0px" }) : null;
-let pumpT = 0; addEventListener("scroll", () => { if (!pumpT) pumpT = setTimeout(() => { pumpT = 0; pump(); }, 60); }, { passive: true });
+let pumpT = 0; addEventListener("scroll", () => { if (!pumpT) pumpT = setTimeout(() => { pumpT = 0; pump(); }, 60); }, { passive: true, capture: true });
 setInterval(pump, 400);
 const HOVER = matchMedia("(hover:hover) and (pointer:fine)").matches;   // на компьютере фото раскрываются под мышкой
 const RVQ = []; let rvT = 0;
@@ -1140,7 +1140,7 @@ function doDelete(ns) {
 }
 function doRestore(ns) {
   ns.forEach(n => { HID.delete(n); const wasSyn = SYN.has("d:" + n) || (G.del || []).includes(n); LDEL.delete(n); SYN.delete("d:" + n); if (wasSyn) LUND.add(n); }); lsSave();
-  ghSync(); const y = scrollY; renderFeed(); scrollTo(0, y); toast("Вернула на место: " + ns.length + " " + pl(ns.length, ["фото", "фото", "фото"]));
+  ghSync(); const y = document.body.scrollTop; renderFeed(); document.body.scrollTop = y; toast("Вернула на место: " + ns.length + " " + pl(ns.length, ["фото", "фото", "фото"]));
 }
 function dropTiles(ns) {
   const set = new Set(ns), els = $$("#feed .tile, #s-sur .tile, .fcard").filter(t => set.has(t.dataset.n));
@@ -1186,7 +1186,7 @@ async function admKey(code) {
 }
 function admOn() {
   document.body.classList.add("admin"); $("#selB").hidden = false; $("#admB").textContent = "✎ Режим редактирования · выйти"; renderTrash();
-  srvPoll(0).then(() => { const y = scrollY; renderFeed(); scrollTo(0, y); ghSync(); });
+  srvPoll(0).then(() => { const y = document.body.scrollTop; renderFeed(); document.body.scrollTop = y; ghSync(); });
 }
 function admOff() { ADM = null; LS.set("mk.adm", ""); document.body.classList.remove("admin"); selEnd(); $("#selB").hidden = true; $("#admB").textContent = "✎ Редактировать"; renderTrash(); }
 async function admRestore() {
@@ -1211,7 +1211,7 @@ function applySkin(k, save) {
   const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = k === "birds" ? "#62c0ec" : "#060818";
   if (k === "birds") { birdsOn(); if (SPU.on) spuStop(); } else { birdsOff(); const c = $("#spCard"); if (c._kick) c._kick(); }
 }
-$$("#skin button").forEach(b => b.onclick = () => { applySkin(b.dataset.k, true); scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" }); });
+$$("#skin button").forEach(b => b.onclick = () => { applySkin(b.dataset.k, true); document.body.scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" }); });
 $("#fsig").textContent = `✦ Мой космос · ${new Date().getFullYear()}`;
 
 /* ═════ вход: пароль → ключ → расшифровка списка альбомов ═════ */
