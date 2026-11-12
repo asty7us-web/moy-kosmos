@@ -8,7 +8,21 @@
      сохранённая; библиотека из памяти сразу, обновление подтягивается к следующему разу (12.11.2026).
    Музыка идёт потоком мимо памяти. */
 const PHOTOS = "mk-v1", SHELL = "mk2-shell", RAW = "https://raw.githubusercontent.com";
-self.addEventListener("install", () => self.skipWaiting());
+/* При установке сразу кладём в память главную, замок, список альбомов и шрифты — чтобы сайт открывался без связи уже после
+   первого захода (иначе первая загрузка проходит мимо этой памяти и без сети сайт открылся бы только со второго раза).
+   Любая неудача здесь установку не срывает. */
+self.addEventListener("install", e => {
+  self.skipWaiting();
+  e.waitUntil((async () => {
+    try {
+      const c = await caches.open(SHELL), sc = new URL(self.registration.scope).pathname;
+      const put = async (url, key) => { try { const r = await fetch(url, { cache: "no-cache" }); if (r.ok) await c.put(key, r); } catch (x) {} };
+      const own = ["lock.json", "data/m.bin", "manifest.webmanifest", "assets/ic192.webp", "assets/mir/planeta.webp"]
+        .concat(["cormorant-cyr", "cormorant-lat", "cormorant-i-cyr", "cormorant-i-lat", "jost-cyr", "jost-lat"].map(f => "assets/fonts/" + f + ".woff2"));
+      await Promise.all([put("./", "page")].concat(own.map(f => put(f, sc + f))));
+    } catch (x) {}
+  })());
+});
 self.addEventListener("activate", e => e.waitUntil((async () => {
   for (const k of await caches.keys()) if (k !== PHOTOS && k !== SHELL) await caches.delete(k);
   const c = await caches.open(PHOTOS);                       // оформление прежней версии из памяти убираем, фото оставляем
