@@ -3,7 +3,9 @@
      фото в памяти остаются зашифрованными;
    • шрифты и значки — в «mk2-shell», берутся из памяти сразу;
    • страница, замок, список альбомов и список удалённых — всегда свежие с сайта, а без связи — последние сохранённые
-     (сайт открывается и без интернета, с теми фото, что уже смотрели).
+     (сайт открывается и без интернета, с теми фото, что уже смотрели);
+   • «Моя планета» (mir.html и assets/mir — библиотека, открытка) — так же: страница свежая с сайта, без связи последняя
+     сохранённая; библиотека из памяти сразу, обновление подтягивается к следующему разу (12.11.2026).
    Музыка идёт потоком мимо памяти. */
 const PHOTOS = "mk-v1", SHELL = "mk2-shell", RAW = "https://raw.githubusercontent.com";
 self.addEventListener("install", () => self.skipWaiting());
@@ -37,6 +39,15 @@ self.addEventListener("fetch", e => {
     e.respondWith(caches.open(SHELL).then(x => x.match(p).then(hit => hit || fetch(req).then(r => { if (r.ok) x.put(p, r.clone()); return r; }))));
     return;
   }
+  if (/\/assets\/mir\/[^/]+$/.test(p)) {                      // «Моя планета»: библиотека и открытка — из памяти сразу, а свежие подтягиваются к следующему разу
+    const got = caches.open(SHELL).then(x => x.match(p).then(hit => {
+      const net = fetch(req).then(r => { if (r.ok) x.put(p, r.clone()); return r; });
+      if (!hit) return net;
+      e.waitUntil(net.catch(() => {})); return hit;
+    }));
+    e.respondWith(got); return;
+  }
   const page = req.mode === "navigate" && (p.endsWith("/") || p.endsWith("/index.html"));
-  if (page || /\/(lock\.json|manifest\.webmanifest|data\/(m|del)\.bin)$/.test(p)) e.respondWith(fresh(req.url, page ? "page" : p));
+  const mir = req.mode === "navigate" && p.endsWith("/mir.html");                          // страница мира — тоже свежая с сайта, без связи последняя сохранённая
+  if (page || mir || /\/(lock\.json|manifest\.webmanifest|data\/(m|del)\.bin)$/.test(p)) e.respondWith(fresh(req.url, page ? "page" : p));
 });

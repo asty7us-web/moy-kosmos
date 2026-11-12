@@ -188,16 +188,21 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 .acts button:active{transform:scale(.955);background:var(--glass-2)}
 .act-i{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:var(--gold);border:1px solid var(--line-2);background:radial-gradient(circle at 30% 24%,rgba(var(--gold-rgb),.24),rgba(var(--gold-rgb),0) 72%)}
 .acts b{font:500 12.5px/1.22 var(--sans);letter-spacing:.02em;color:var(--ink)}
-/* ───────── вход в «Мою планету» ───────── */
-.mir{position:relative;display:block;margin:12px 0 0;border-radius:28px;overflow:hidden;aspect-ratio:16/9;background:var(--ph-bg);color:var(--ink);text-decoration:none;box-shadow:0 18px 44px -18px rgba(0,0,0,.8);transition:transform .25s var(--ease)}
+/* ───────── вход в «Мою планету» (mir.html): открытка мира; подпись — в пустом небе слева, остров и луна справа не закрыты ───────── */
+.mir{position:relative;display:block;margin:12px 0 0;border-radius:28px;overflow:hidden;isolation:isolate;aspect-ratio:16/9;background:#140c38;color:#f7f3ff;text-decoration:none;box-shadow:0 18px 44px -18px rgba(0,0,0,.85);transition:transform .25s var(--ease)}
 .mir:active{transform:scale(.98)}
-.mir img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.mir::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(205deg,rgba(6,5,26,0) 34%,rgba(6,5,26,.9));box-shadow:inset 0 0 0 1px rgba(var(--gold-rgb),.34)}
-.mir-t{position:absolute;z-index:1;left:20px;right:78px;bottom:16px;display:block}
+.mir img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:mirDrift 30s ease-in-out infinite alternate}
+@keyframes mirDrift{from{transform:scale(1.01)}to{transform:scale(1.09) translate3d(-1.6%,-1%,0)}}
+.mir::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(var(--gold-rgb),.36);
+  background:linear-gradient(90deg,rgba(8,5,30,.8),rgba(8,5,30,.44) 34%,rgba(8,5,30,0) 60%),linear-gradient(0deg,rgba(8,5,30,.5),rgba(8,5,30,0) 42%)}
+.mir-t{position:absolute;z-index:1;left:20px;bottom:17px;width:46%;display:block}
 .mir-t i,.mir-t b,.mir-t em{display:block}
-.mir-t b{margin-top:6px;font:600 31px/1 var(--serif);letter-spacing:-.01em}
-.mir-t em{margin-top:7px;font:normal 400 13.5px/1.3 var(--sans);color:var(--ink-2)}
-.mir-go{position:absolute;z-index:1;right:16px;bottom:16px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:21px;color:var(--on-gold);background:linear-gradient(135deg,#fff,var(--gold) 40%,var(--gold-2));box-shadow:0 10px 26px -8px rgba(var(--gold-rgb),.7)}
+.mir-t i{white-space:nowrap}
+.mir-t b{margin-top:7px;font:600 clamp(30px,8.2vw,52px)/.98 var(--serif);letter-spacing:-.012em;text-shadow:0 2px 18px rgba(8,5,30,.7)}
+.mir-t em{margin-top:8px;font:normal 400 13.5px/1.32 var(--sans);color:#d6cff0;text-wrap:balance}
+.mir-go{position:absolute;z-index:1;right:14px;bottom:14px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:21px;color:var(--on-gold);background:linear-gradient(135deg,#fff,var(--gold) 40%,var(--gold-2));box-shadow:0 10px 26px -8px rgba(var(--gold-rgb),.7)}
+@media (max-width:359px){.mir-t{left:16px;bottom:14px;width:47%}.mir-t em{font-size:12.5px}.mir-go{width:40px;height:40px;font-size:19px;right:12px;bottom:12px}}
+@media (min-width:640px){.mir-t{left:28px;bottom:26px}.mir-t em{font-size:15.5px}.mir-go{width:56px;height:56px;font-size:25px;right:24px;bottom:24px}}
 
 /* ───────── разделы главной, ленты ───────── */
 .sec{margin:46px 0 0}
@@ -466,7 +471,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 @media (max-height:520px) and (orientation:landscape){.f-cap b{font-size:30px}.g-head{margin-top:6px}.g-head h2{font-size:28px}.g-field{width:min(54vh,60vw)}.g-bot{padding-top:6px;padding-bottom:calc(var(--sab) + 10px)}}
 
 @media (prefers-reduced-motion:reduce){
-  #skyNeb,#sky .tw,.emblem .sp,.planet.now::after,.planet.lock::after,.c-ring,.eq[aria-pressed="true"] .bars i{animation:none}
+  #skyNeb,#sky .tw,.emblem .sp,.planet.now::after,.planet.lock::after,.c-ring,.eq[aria-pressed="true"] .bars i,.mir img{animation:none}
   .aff-t span,.c-t span,#home.enter .rise,.f-frame.on .f-img,.f-frame.was .f-img{animation-duration:.01s;animation-delay:0s}
   .screen,.cell img,.sheet-box{transition-duration:.01s}
 }
@@ -581,11 +586,13 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
         <button type="button" id="aCalm"><span class="act-i"><svg class="i" viewBox="0 0 24 24"><use href="#i-calm"/></svg></span><b>Минута<br>для себя</b></button>
       </nav>
 
-      <!-- вход в «Мою планету» — мир из кубиков (страница mir.html; её части — site/mir_src, сборка site/mir_make.py) -->
-      <a class="mir rise" id="mirCard" href="mir.html" style="--i:8" aria-label="Моя планета: мир из кубиков">
+      <!-- вход в «Мою планету» — мир из кубиков (страница mir.html; её части — site/mir_src, сборка site/mir_make.py).
+           Открытка assets/mir/planeta.webp снята так, что слева пустое небо, остров и луна справа: подпись стоит в левой половине.
+           Переснимать открытку — с тем же расчётом, иначе текст ляжет на остров. -->
+      <a class="mir rise" id="mirCard" href="mir.html" style="--i:8" aria-label="Моя планета — мой мир из кубиков. Войти">
         <img src="assets/mir/planeta.webp" alt="" width="1200" height="675" decoding="async">
-        <span class="mir-t"><i class="eyebrow">новый мир</i><b>Моя планета</b><em>остров из кубиков, башня до Луны и мои фото</em></span>
-        <span class="mir-go"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-fwd"/></svg></span>
+        <span class="mir-t"><i class="eyebrow">мир из кубиков</i><b>Моя<br>планета</b><em>остров, башня до Луны и мои фото</em></span>
+        <span class="mir-go" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></span>
       </a>
 
       <div id="todayBox"></div>
@@ -692,7 +699,7 @@ const frame = () => new Promise(r => requestAnimationFrame(() => r()));
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const TOUCH = matchMedia("(hover: none)").matches;
-const BUILD = "20261112-0950";
+const BUILD = "20261112-0959";
 
 /* память устройства: не падает в приватном режиме и при переполнении */
 const LS = {
