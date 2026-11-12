@@ -759,7 +759,7 @@ const frame = () => new Promise(r => requestAnimationFrame(() => r()));
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const TOUCH = matchMedia("(hover: none)").matches;
-const BUILD = "20261112-1308";
+const BUILD = "20261112-1400";
 
 /* память устройства: не падает в приватном режиме и при переполнении */
 const LS = {
@@ -1203,6 +1203,9 @@ const Music = (() => {
 const M = { months: [], albums: [], byId: new Map(), order: [], pos: new Map(), albumOf: new Map(), hidden: new Set(), secret: null };
 const P = n => G.ph[n];
 const addMonths = (d, k) => new Date(d.getFullYear(), d.getMonth() + k, d.getDate());
+/* последний день месяца жизни — по календарю, а не «минус 24 часа»: там, где переводят часы, сутки бывают по 23 часа,
+   и вычитание часов давало день раньше (нашёл чат мира 12.11: в поясе США «годик» кончался 7 марта вместо 8-го) */
+const monthEnd = m => { const e = addMonths(BIRTH, m + 1); return new Date(e.getFullYear(), e.getMonth(), e.getDate() - 1); };
 const monthIdx = p => { const a = ageAt(parseD(p.d)); return Math.max(0, a.y * 12 + a.m); };   // сколько мне полных месяцев на фото
 
 function buildModel() {
@@ -1262,11 +1265,11 @@ function groupsOf(id) {
   return [...days, ...[...loose.values()].sort((x, y) => x.month - y.month || (x.approx ? 1 : -1))];
 }
 function periodOf(a) {                          // «с такого-то по такое-то число»
-  const s = addMonths(BIRTH, a.m), e = new Date(addMonths(BIRTH, a.m + 1) - 864e5);
+  const s = addMonths(BIRTH, a.m), e = monthEnd(a.m);
   return `${s.getDate()} ${MONG[s.getMonth()]}${s.getFullYear() !== e.getFullYear() ? " " + s.getFullYear() : ""} – ${e.getDate()} ${MONG[e.getMonth()]} ${e.getFullYear()}`;
 }
 function monthSpan(a) {                         // коротко для подписи планеты: «месяц – месяц год»
-  const s = addMonths(BIRTH, a.m), e = new Date(addMonths(BIRTH, a.m + 1) - 864e5);
+  const s = addMonths(BIRTH, a.m), e = monthEnd(a.m);
   return s.getMonth() === e.getMonth() ? `${MON[s.getMonth()]} ${s.getFullYear()}` : `${MON[s.getMonth()]}${s.getFullYear() !== e.getFullYear() ? " " + s.getFullYear() : ""} – ${MON[e.getMonth()]} ${e.getFullYear()}`;
 }
 
