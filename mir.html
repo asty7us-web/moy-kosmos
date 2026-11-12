@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-0915. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-0934. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -226,6 +226,28 @@ svg.i.f{fill:currentColor;stroke:none}
 .row.on .sw::after{transform:translateX(20px)}
 .note{padding:8px 4px 2px;font-size:13px;color:var(--ink3);font-weight:600;line-height:1.45}
 
+/* гардероб */
+#ward{position:fixed;left:0;right:0;bottom:0;z-index:20;height:47%;display:flex;flex-direction:column;border-radius:26px 26px 0 0;background:linear-gradient(180deg,#1b1450,#120c38);box-shadow:0 -10px 50px rgba(0,0,0,.55),inset 0 0 0 1.5px var(--line);animation:ovIn .32s var(--ease)}
+.ward-h{flex:none;display:flex;align-items:center;gap:10px;padding:12px 14px 8px 20px}
+.ward-h h2{flex:1;font-size:20px;font-weight:800;color:var(--gold)}
+#wardTabs{gap:5px}
+#wardTabs button{flex:1;padding:0 4px;font-size:13px}
+.ward-b{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:2px 14px calc(var(--sab) + 16px)}
+.w-sec{margin:8px 4px 8px;font-size:13px;font-weight:800;color:var(--ink2)}
+.w-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:9px;margin-bottom:8px}
+.w-grid.w-wide{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.w-it{position:relative;aspect-ratio:1;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.12);font-size:13px;font-weight:800;text-align:center;line-height:1.12;padding:4px 6px;color:var(--ink)}
+.w-wide .w-it{aspect-ratio:auto;min-height:50px}
+.w-it.c{box-shadow:inset 0 0 0 3px rgba(255,255,255,.28)}
+.w-it.on{box-shadow:inset 0 0 0 3px var(--gold2),0 0 16px rgba(255,215,106,.55)}
+.w-it.c.on{box-shadow:inset 0 0 0 3px #fff,0 0 0 3px var(--gold2),0 0 16px rgba(255,215,106,.6)}
+.w-it.lock{color:var(--ink3)}
+.w-it.c.lock{opacity:.5}
+.w-it svg{font-size:15px;flex:none}
+.w-it.c svg{font-size:20px;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.8))}
+.w-it:active{transform:scale(.94)}
+@media (orientation:landscape) and (max-height:520px){#ward{left:auto;top:0;width:46%;height:auto;border-radius:26px 0 0 26px}.ward-b{padding-right:calc(var(--sar) + 14px)}}
+
 /* сюрприз */
 #secret{align-items:center;justify-content:center;text-align:center;padding:calc(var(--sat) + 20px) 22px calc(var(--sab) + 20px);
   background:radial-gradient(90% 70% at 50% 40%,rgba(255,215,106,.34),rgba(31,18,80,.94) 56%,rgba(6,5,26,.98) 100%)}
@@ -259,6 +281,7 @@ svg.i.f{fill:currentColor;stroke:none}
   <symbol id="i-gift" viewBox="0 0 24 24"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1-3-5-3.5-5-1s3 1 5 1zm0 0c1-3 5-3.5 5-1s-3 1-5 1z"/></symbol>
   <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 4l4 2.5L16 4l5 3-2 4-2.5-1V20h-9V10L5 11 3 7z"/></symbol>
   <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="6.5" cy="11" r="2"/><circle cx="10" cy="6.8" r="2"/><circle cx="14.5" cy="6.8" r="2"/><circle cx="18" cy="11" r="2"/><path d="M12 12c-3 0-5.4 2.8-5.4 5.2 0 1.6 1.4 2.3 2.8 2.1 1-.2 1.8-.6 2.6-.6s1.6.4 2.6.6c1.4.2 2.8-.5 2.8-2.1 0-2.4-2.4-5.2-5.4-5.2z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 3c3.5 2.5 5 6.5 4.5 11l-2 2.5h-5l-2-2.5C7 9.5 8.5 5.5 12 3zM9.5 16.5L8 21l4-2 4 2-1.5-4.5"/><circle cx="12" cy="10" r="1.8"/></symbol>
 </defs></svg>
 
@@ -342,6 +365,13 @@ svg.i.f{fill:currentColor;stroke:none}
   </div>
 </div>
 
+<!-- гардероб: мир не останавливается, человечек виден над панелью -->
+<div id="ward" hidden>
+  <div class="ward-h"><h2>Гардероб</h2><button class="btn sm" id="wardOk" type="button">Готово</button></div>
+  <div class="tabs" id="wardTabs"></div>
+  <div class="ward-b" id="wardB"></div>
+</div>
+
 <!-- сюрприз из сундука -->
 <div class="ov" id="secret" hidden>
   <h2 id="secH">Сюрприз!</h2>
@@ -369,7 +399,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-0915";
+const BUILD = "20261112-0934";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -740,13 +770,17 @@ function renderOnce() { if (renderer && Loop.frames) renderer.render(scene, came
 
 /* подстройка чёткости под скорость телефона */
 const Perf = (() => {
-  let sum = 0, n = 0, hold = 0, ups = 0, fps = 60;
+  let sum = 0, n = 0, hold = 0, ups = 0, fps = 60, before = 0, prev = 1;
   function tick(dt) {
     sum += dt; n++; hold -= dt;
     if (n < 45) return;
     const avg = sum / n; sum = 0; n = 0; fps = 1 / avg;
     if (View.lock || hold > 0) return;
-    if (avg > 1 / 38 && View.scale > .56) { View.scale = Math.max(.55, View.scale - .12); hold = 2.5; resize(); Bus.emit("quality"); }
+    if (before) {                       // только что уменьшали картинку: помогло ли?
+      if (avg > before * .88) { View.scale = prev; View.lock = true; before = 0; resize(); return; }   // не помогло: дело не в чёткости (например, режим экономии держит 30 кадров) — возвращаем как было
+      before = 0;
+    }
+    if (avg > 1 / 38 && View.scale > .56) { before = avg; prev = View.scale; View.scale = Math.max(.55, View.scale - .12); hold = 2.5; resize(); Bus.emit("quality"); }
     else if (avg < 1 / 57 && View.scale < 1 && ups < 3) { View.scale = Math.min(1, View.scale + .08); hold = 5; ups++; resize(); }
   }
   return { tick, get fps() { return fps; } };
@@ -961,6 +995,7 @@ function isPath(x, z) {
   if (m >= 19 && m < 22) return 1;                                         // бульвар вокруг острова
   if ((ax < 2 && az < 22) || (az < 2 && ax < 22)) return 1;                 // четыре дороги от площади
   if (ax < 2 && z < 0 && z > -31) return 1;                                 // дорога к мосту и башне
+  if ((x >= -13 && x < -10 && z >= -9.5 && z < -2) || (x >= 10 && x < 13 && z >= -8.5 && z < -2)) return 1;   // тропинки к музею и гардеробу
   for (const s of SLOTS) if (s.stop && x >= s.stub[0] && x < s.stub[2] && z >= s.stub[1] && z < s.stub[3]) return 1;
   return 0;
 }
@@ -1508,7 +1543,11 @@ function buildAvatar() {
   if (has("phones")) { bx(head, .66, .06, .12, 0x3a2d7a, 0, .66, 0); for (const s of [-1, 1]) { bx(head, .08, .22, .22, 0xff8fc7, s * .34, .3, 0); bx(head, .03, .1, .1, 0x7ff3ff, s * .385, .3, 0, true); } }
   if (has("pack")) { bx(body, .34, .36, .14, 0xff8fc7, 0, .72, -.23); bx(body, .14, .14, .03, 0xffe07a, 0, .74, -.31); }
   if (has("cape")) { const p = pivot(body, 0, .94, -.17); bx(p, .52, .62, .04, 0x6b4fd8, 0, -.31, 0); bx(p, .08, .08, .02, 0xffe07a, -.12, -.2, -.03, true); bx(p, .06, .06, .02, 0xffe07a, .1, -.4, -.03, true); bx(p, .05, .05, .02, 0xffffff, .02, -.12, -.03, true); AV.sway.push({ g: p, k: .8, ax: "x" }); }
-  if (has("wings") || Wings.on) {
+  if (has("scarf")) { bx(body, .56, .12, .36, 0xff6fb5, 0, .95, 0); bx(body, .14, .3, .06, 0xff6fb5, .14, .78, .17); bx(body, .14, .06, .065, 0xffffff, .14, .68, .17); }
+  if (has("hat")) { bx(head, .66, .2, .64, 0x6fe3c4, 0, .63, 0); bx(head, .68, .09, .66, 0xffffff, 0, .53, 0); bx(head, .18, .18, .18, 0xffffff, 0, .8, 0); }
+  if (has("flower")) { bx(head, .18, .18, .06, 0xff8fc7, -.22, .5, .31); bx(head, .08, .08, .08, 0xffe07a, -.22, .5, .33, true); }
+  if (has("party")) { bx(head, .32, .14, .32, 0xff6fb5, 0, .7, 0); bx(head, .23, .14, .23, 0x7ff3ff, 0, .84, 0); bx(head, .14, .14, .14, 0xffe07a, 0, .98, 0); bx(head, .1, .1, .1, 0xffffff, 0, 1.09, 0, true); }
+  if (has("wings") && Wings.on) {
     AV.wings = [];
     for (const s of [-1, 1]) { const p = pivot(body, s * .1, .82, -.17); bx(p, .5, .16, .03, 0xffe9a0, s * .28, .1, 0, true); bx(p, .38, .16, .03, 0xfff6d0, s * .24, -.05, 0, true); bx(p, .24, .14, .03, 0xffffff, s * .17, -.19, 0, true); p.userData.s = s; AV.wings.push(p); }
   }
@@ -1545,6 +1584,7 @@ function avatarVis(dt) {
   AV.body.scale.set(1 - q * .5, 1 + q, 1 - q * .5); AV.body.position.y = AN.by; AV.body.rotation.x = run * .13 * (PL.grounded ? 1 : .4);
   for (const s of AV.sway) { const tg = clamp(run * .55 * s.k - PL.vy * .035 * s.k, -.5, 1.3) + Math.sin(t * 3 + (s.side || 0)) * .04; s.g.rotation.x += (tg - s.g.rotation.x) * (1 - Math.exp(-7 * dt)); }
   if (AV.wings) for (const w of AV.wings) w.rotation.y = w.userData.s * (-.35 + Math.sin(t * (PL.glide ? 14 : 3)) * (PL.glide ? .3 : .12));
+  if (PL.glide || (LOOK.acc.includes("trail") && PL.grounded && run > .4)) { AN.tr = (AN.tr || 0) - dt; if (AN.tr <= 0) { AN.tr = .06; FX.one(PL.x + (Math.random() - .5) * .5, PL.y + .15 + Math.random() * .5, PL.z + (Math.random() - .5) * .5, 0, .8, 0, .8, .42, [0xffe28a, 0xff9fd0, 0x8af6ff, 0xffffff][Math.floor(Math.random() * 4)], -.6); } }
   /* лицо */
   if (AV.moodT > 0) { AV.moodT -= dt; setFace(AV.mood); }
   else { AV.blink -= dt; if (AV.blink < 0) AV.blink = 2.4 + Math.random() * 3; setFace(AV.blink < .13 ? "blink" : "norm"); }
@@ -2311,7 +2351,7 @@ const Stars = (() => {
     Aff.show(AFF[s.aff], `Звезда ${n} из ${list.length}`, () => { if (n >= list.length) allFound(); else Bus.emit("star-closed", n); });
   }
   function allFound() {
-    Wings.on = true; if (!Save.d.own.includes("wings")) Save.d.own.push("wings"); Save.now(); buildAvatar();
+    Wings.on = true; if (!Save.d.own.includes("wings")) Save.d.own.push("wings"); if (!LOOK.acc.includes("wings")) LOOK.acc.push("wings"); Save.d.look = Object.assign({}, LOOK); Save.now(); buildAvatar();
     Snd.play("fanfare"); UI.banner("Все 36 звёзд!", "Твоя вселенная собрана", 4200);
     for (let i = 0; i < 8; i++) setTimeout(() => { FX.burst(PL.x + (Math.random() - .5) * 14, PL.y + 6 + Math.random() * 6, PL.z + (Math.random() - .5) * 14, 46, { speed: 9, life: 1.5, grav: 3, size: .8, colors: [[0xffe28a, 0xffffff], [0xff9fd0, 0xffffff], [0x8af6ff, 0xffffff], [0xb99bff, 0xffe28a]][i % 4] }); Snd.play("boom"); }, 300 + i * 420);
     setTimeout(() => UI.hint("Награда — <b>звёздные крылья</b>! Зажми прыжок в воздухе — и пари над островом.", 10000), 2400);
@@ -2413,6 +2453,286 @@ const Chest = (() => {
   return { build, vis, open, get opened() { return opened; }, showSecret };
 })();
 
+/* ══════ 75_town.js ══════ */
+/* Городок на острове (второй этап): беседка-гардероб, домик-музей любимых фото, подарок дня на площади и украшения
+   ко дню рождения. Любимые фото — только те, что она отметила сердечком сама (общий список с основной страницей). */
+const Town = (() => {
+  const MUS = { x0: -17, x1: -6, z0: -17, z1: -11 }, WR = { x: 11, z: -12 }, GF = { x: 3.5, z: -3.5 };
+  const frames = []; let empty = null, gift = null, giftT = -1, favKey = "", balloons = [], bday = false;
+  /* фото как картинка для рамки: обрезка по размеру рамки, лицо чуть выше середины */
+  function photoTex(im, want) {
+    const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = LOW ? 1 : 4;
+    const a = im.naturalWidth / im.naturalHeight;
+    if (a > want) { t.repeat.set(want / a, 1); t.offset.set((1 - want / a) / 2, 0); } else { t.repeat.set(1, a / want); t.offset.set(0, (1 - a / want) * .62); }
+    t.needsUpdate = true; return t;
+  }
+  function build() {
+    const { x0, x1, z0, z1 } = MUS;
+    /* домик-музей: пол, три стены, крыша ступеньками; спереди (к площади) открыт — камера остаётся снаружи */
+    for (let k = z0; k < z1 + 2; k++) for (let i = x0; i < x1; i++) vset(i, -1, k, B.PLANK);
+    for (let j = 0; j < 4; j++) {
+      for (let i = x0; i < x1; i++) vset(i, j, z0, B.WALL);
+      for (let k = z0; k < z1; k++) { vset(x0, j, k, B.WALL); vset(x1 - 1, j, k, B.WALL); }
+      vset(x0, j, z1 - 1, B.WOOD); vset(x1 - 1, j, z1 - 1, B.WOOD);
+    }
+    for (let n = 0; n < 4; n++) for (let k = z0 - 1 + n; k < z1 + 1 - n; k++) for (let i = x0 - 1; i < x1 + 1; i++) vset(i, 4 + n, k, n === 3 ? B.ROOF_P : B.ROOF_V);
+    for (const i of [x0 + 3, x1 - 4]) { vset(i, 3, z0 + 3, B.LAMP); WORLD.lamps.push({ x: i + .5, y: 3.3, z: z0 + 3.5, c: 0xffe9a8, s: 4, k: .3 }); }
+    /* беседка-гардероб: круглый подиум, четыре колонны, крыша-шатёр */
+    for (let k = WR.z - 4; k < WR.z + 4; k++) for (let i = WR.x - 4; i < WR.x + 4; i++) { const d = Math.hypot(i + .5 - WR.x, k + .5 - WR.z); if (d < 3.5) vset(i, -1, k, d < 1.3 ? B.TILE_C : (i + k) & 1 ? B.TILE_B : B.TILE_A); }
+    for (const [i, k] of [[WR.x - 3, WR.z - 3], [WR.x + 2, WR.z - 3], [WR.x - 3, WR.z + 2], [WR.x + 2, WR.z + 2]]) for (let j = 0; j < 4; j++) vset(i, j, k, B.MOON);
+    for (let n = 0; n < 4; n++) for (let k = WR.z - 4 + n; k < WR.z + 4 - n; k++) for (let i = WR.x - 4 + n; i < WR.x + 4 - n; i++) { if (n === 0 && (i === WR.x - 4 || i === WR.x + 3) && (k === WR.z - 4 || k === WR.z + 3)) continue; vset(i, 4 + n, k, n === 3 ? B.GOLD : B.ROOF_P); }
+    WORLD.lamps.push({ x: WR.x, y: 3.6, z: WR.z, c: 0xffc8ec, s: 5, k: .28 });
+    /* подарок дня: тумба на площади */
+    vset(Math.floor(GF.x), 0, Math.floor(GF.z), B.MOON);
+  }
+  function after() {
+    const { x0, x1, z0 } = MUS;
+    /* рамки музея: три на дальней стене и по одной на боковых */
+    empty = canvasTex(160, 208, (g, w, h) => {
+      g.fillStyle = "#241a5e"; g.fillRect(0, 0, w, h); g.setLineDash([8, 8]); g.strokeStyle = "rgba(243,220,174,.55)"; g.lineWidth = 3; g.strokeRect(12, 12, w - 24, h - 24);
+      g.fillStyle = "rgba(255,127,181,.9)"; g.font = "64px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("♡", w / 2, h / 2 - 12);
+      g.fillStyle = "rgba(243,220,174,.8)"; g.font = "700 15px system-ui,sans-serif"; g.fillText("место для", w / 2, h - 52); g.fillText("любимого фото", w / 2, h - 32);
+    });
+    const spots = [[x0 + 2.5, z0 + 1.03, 0], [x0 + 5.5, z0 + 1.03, 0], [x1 - 2.5, z0 + 1.03, 0], [x0 + 1.03, z0 + 3.6, Math.PI / 2], [x1 - 1.03, z0 + 3.6, -Math.PI / 2]];
+    for (const [x, z, ry] of spots) {
+      const g = new THREE.Group(); g.position.set(x, 2.05, z); g.rotation.y = ry; scene.add(g);
+      bx(g, 2.3, 2.9, .08, 0xffd45e, 0, 0, -.02); bx(g, 2.14, 2.74, .09, 0x3a2d7a, 0, 0, -.01);
+      const mat = new THREE.MeshBasicMaterial({ map: empty }), m = new THREE.Mesh(new THREE.PlaneGeometry(2, 2.6), mat); m.position.z = .045; g.add(m);
+      frames.push({ mat, n: "" });
+    }
+    Game.label("Музей любимых фото", (x0 + x1) / 2, 9.3, MUS.z1 - 1.5, .9);
+    Spots.add({ x: (x0 + x1) / 2, y: 1, z: z0 + 3.4, r: 3.4, text: () => { const n = Fav.list().length; return n ? `Мои любимые фото · ${n}` : "Как наполнить музей?"; },
+      act: () => { const l = Fav.list().slice().reverse(); if (l.length) Viewer.open(l, 0, null, refresh); else UI.hint("Открой любое фото в альбоме и нажми на <b>сердечко</b> — оно появится в рамке музея.", 8000); } });
+    Bus.on("fav", refresh); Bus.on("resume", refresh); refresh();
+    /* зеркало в беседке и место гардероба */
+    const mg = new THREE.Group(); mg.position.set(WR.x, 0, WR.z - 2.75); scene.add(mg);
+    bx(mg, 2.3, 3.3, .16, 0xffd45e, 0, 1.75, 0); bx(mg, .5, .2, .7, 0xffd45e, -.8, .1, 0); bx(mg, .5, .2, .7, 0xffd45e, .8, .1, 0);
+    const mir = new THREE.Mesh(new THREE.PlaneGeometry(2, 3), new THREE.MeshBasicMaterial({ map: canvasTex(64, 96, (g, w, h) => { const q = g.createLinearGradient(0, 0, w, h); q.addColorStop(0, "#e8f6ff"); q.addColorStop(.45, "#a9c8ff"); q.addColorStop(.55, "#d6e6ff"); q.addColorStop(1, "#8fa6f0"); g.fillStyle = q; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.moveTo(8, 10); g.lineTo(26, 10); g.lineTo(10, 44); g.lineTo(8, 44); g.fill(); }) }));
+    mir.position.set(0, 1.75, .09); mg.add(mir);
+    Game.label("Гардероб", WR.x, 9.4, WR.z, .8);
+    Spots.add({ x: WR.x, y: 1, z: WR.z, r: 2.7, text: "Гардероб", act: () => Ward.open(0) });
+    /* подарок дня */
+    gift = new THREE.Group(); gift.position.set(GF.x, 1, GF.z); scene.add(gift);
+    bx(gift, .8, .62, .8, 0xff6fb5, 0, .31, 0); bx(gift, .84, .64, .16, 0xffe07a, 0, .31, 0); bx(gift, .16, .64, .84, 0xffe07a, 0, .31, 0);
+    const lid = new THREE.Group(); lid.position.y = .62; gift.add(lid); gift.userData.lid = lid;
+    bx(lid, .9, .2, .9, 0xff8fc7, 0, .1, 0); bx(lid, .94, .22, .16, 0xffe07a, 0, .1, 0); bx(lid, .16, .22, .94, 0xffe07a, 0, .1, 0); bx(lid, .3, .16, .12, 0xffe07a, -.14, .3, 0); bx(lid, .3, .16, .12, 0xffe07a, .14, .3, 0);
+    dynAdd({ kind: "gift", x0: GF.x - .4, y0: 1, z0: GF.z - .4, x1: GF.x + .4, y1: 1.8, z1: GF.z + .4 });
+    WORLD.lamps.push({ x: GF.x, y: 1.6, z: GF.z, c: 0xff9fd0, s: 3.4, k: .4 });
+    Spots.add({ x: GF.x, y: 1, z: GF.z, r: 2.4, when: () => giftT < 0, text: () => Gifts.ready() ? "Открыть подарок дня" : "Новый подарок — завтра", act: () => Gifts.ready() ? openGift() : UI.toast(`Сегодняшний подарок уже открыт. Дней подряд: <b>${Save.d.gift.streak || 1}</b>`) });
+    /* день рождения: шарики, торт на фонтане, поздравление */
+    const now = new Date(); bday = (now.getMonth() === BIRTH.getMonth() && now.getDate() === BIRTH.getDate()) || (DEV && LS.get("mir.bday") === "1");
+    if (bday) party(now.getFullYear() - BIRTH.getFullYear());
+  }
+  /* в рамках — последние любимые; меняются сразу, как только она ставит или снимает сердечко */
+  function refresh() {
+    const l = Fav.list().slice().reverse(), key = l.slice(0, frames.length).join(","); if (key === favKey) return; favKey = key;
+    frames.forEach((f, i) => {
+      const n = l[i] || ""; if (f.n === n) return; f.n = n;
+      if (!n) { f.mat.map = empty; f.mat.needsUpdate = true; return; }
+      Ph.image(n, false).then(im => { if (f.n !== n) return; f.mat.map = photoTex(im, 2 / 2.6); f.mat.needsUpdate = true; if (Loop.paused.size) renderOnce(); }, () => { f.n = ""; favKey = ""; });
+    });
+  }
+  function openGift() {
+    if (giftT >= 0 || !Gifts.ready()) return;
+    giftT = 0; Snd.play("gift"); mood("joy", 2.4); buzz(30);
+    FX.burst(GF.x, 2, GF.z, 44, { speed: 6, up: 4, life: 1.1, colors: [0xff9fd0, 0xffe28a, 0x8af6ff, 0xffffff, 0xb99bff] });
+    setTimeout(() => { giftT = -1; Gifts.take(bday); }, 900);
+  }
+  function party(age) {
+    const cols = [0xff6fb5, 0x7ff3ff, 0xffe07a, 0xb99bff, 0x7ff0c4, 0xff9ecb];
+    for (let i = 0; i < 16; i++) {
+      const a = i / 16 * TAU, r = 7.4 + (i % 2) * 1.6, g = new THREE.Group(); g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); scene.add(g);
+      const h = 2.6 + (i % 3) * .7; bx(g, .04, h, .04, 0xffffff, 0, h / 2, 0); bx(g, .7, .84, .7, cols[i % cols.length], 0, h + .4, 0); bx(g, .16, .12, .16, cols[i % cols.length], 0, h - .04, 0);
+      balloons.push({ g, ph: i * 1.3 });
+    }
+    const c = new THREE.Group(); c.position.set(0, 1, 0); scene.add(c);
+    bx(c, 2.2, .7, 2.2, 0xffe1ee, 0, .35, 0); bx(c, 2.26, .14, 2.26, 0xff8fc7, 0, .7, 0); bx(c, 1.4, .6, 1.4, 0xfff6d8, 0, 1.06, 0); bx(c, 1.46, .12, 1.46, 0xb99bff, 0, 1.36, 0);
+    const n = clamp(age, 1, 18);
+    for (let i = 0; i < n; i++) { const a = i / n * TAU, x = Math.cos(a) * .52, z = Math.sin(a) * .52; bx(c, .07, .3, .07, cols[i % cols.length], x, 1.56, z); bx(c, .09, .1, .09, 0xffe28a, x, 1.76, z, true); WORLD.lamps.push({ x, y: 2.8, z, c: 0xffd27a, s: 1.1, k: .5 }); }
+    Game.label("С днём рождения!", 0, 6.2, 0, 1.1);
+    Bus.on("intro-end", () => { UI.banner("С днём рождения!", `Сегодня тебе ${tY(age)}`, 5200); Snd.play("fanfare"); });
+  }
+  let confT = 0;
+  function vis(dt) {
+    const t = Loop.t;
+    if (gift) {
+      const ready = Gifts.ready(), lid = gift.userData.lid;
+      gift.position.y = 1 + (ready ? Math.abs(Math.sin(t * 2.4)) * .12 : 0); gift.rotation.y = ready ? Math.sin(t * 1.2) * .25 : 0;
+      const open = !ready || giftT >= 0; lid.position.y += ((open ? .95 : .62) - lid.position.y) * Math.min(1, dt * 8); lid.rotation.z += ((open ? .5 : 0) - lid.rotation.z) * Math.min(1, dt * 8); lid.position.x = open ? .34 : 0;
+    }
+    for (const b of balloons) { b.g.position.y = Math.sin(t * 1.1 + b.ph) * .18; b.g.rotation.z = Math.sin(t * .8 + b.ph) * .06; }
+    if (bday) { confT -= dt; if (confT <= 0) { confT = .5; const a = Math.random() * TAU, r = Math.random() * 8; FX.burst(Math.cos(a) * r, 9 + Math.random() * 3, Math.sin(a) * r, 8, { speed: 1.6, grav: 2.2, life: 2.6, size: .4, colors: [0xff6fb5, 0x7ff3ff, 0xffe07a, 0xb99bff, 0xffffff] }); } }
+  }
+  return { build, after, vis, refresh, photoTex, get bday() { return bday; } };
+})();
+
+/* подарок дня: раз в календарный день — аффирмация дня и вещица для гардероба (пока они не кончатся) */
+const Gifts = (() => {
+  const POOL = ["cat", "bow", "hair_pink", "glasses", "scarf", "trail", "hat", "flower"];
+  const NAMES = { cat: "питомец «Лунный котёнок»", bow: "бант", hair_pink: "розовый цвет волос", glasses: "очки", scarf: "шарф", trail: "звёздный след", hat: "шапка с помпоном", flower: "цветок в волосах", party: "праздничный колпак" };
+  const g = Save.d.gift;
+  const ready = () => g.day !== dayNo();
+  function take(bday) {
+    if (!ready()) return;
+    const d = dayNo(); g.streak = g.day === d - 1 ? (g.streak || 1) + 1 : 1; g.day = d; g.n = (g.n || 0) + 1;
+    let item = bday && !Save.d.own.includes("party") ? "party" : POOL.find(x => !Save.d.own.includes(x)) || "";
+    if (item) Save.d.own.push(item);
+    Save.now();
+    Aff.show(AFF[(d * 7 + 3) % AFF.length], bday ? "Подарок на день рождения" : `Подарок дня · дней подряд: ${g.streak}`, () => {
+      if (item === "cat") { Pet.set("cat"); UI.banner("Лунный котёнок!", "Теперь он бегает за тобой", 3600); Snd.play("fanfare"); }
+      else if (item) { UI.toast(`В подарке — <b>${NAMES[item]}</b>. Примерь в гардеробе!`, 5200); Snd.play("record"); }
+      else UI.toast("Аффирмация дня — твой подарок. Завтра будет новая!", 4200);
+      Bus.emit("gift", item);
+    });
+  }
+  return { ready, take, NAMES };
+})();
+
+/* ══════ 76_ward.js ══════ */
+/* Гардероб: причёска, цвета, одежда, украшения, питомец. Часть вещей открыта сразу, часть — за успехи:
+   звёзды, этажи башни, сундук, подарки дня. Пока гардероб открыт, камера смотрит на человечка спереди, мир не стоит —
+   всё меняется на глазах; пальцем по экрану человечка можно покрутить. */
+const Ward = (() => {
+  const HAIR = [["tail", "Хвост"], ["tails", "Два хвостика"], ["bob", "Каре"], ["buns", "Пучки"], ["long", "Длинные"]];
+  const HAIRC = [[0x7a4a36, "каштановые"], [0x2b2230, "чёрные"], [0xb07a4e, "русые"], [0xf2d28b, "светлые"], [0xc8553d, "рыжие"], [0x5aa9ff, "голубые", { flag: 1 }], [0xff8fc7, "розовые", { gift: "hair_pink" }], [0x9d7bff, "сиреневые", { stars: 9 }], [0x6fe3c4, "мятные", { stars: 15 }], [0xe6e6f5, "серебряные", { flag: 3 }]];
+  const SKIN = [[0xffe6cf], [0xffd9b8], [0xf3c79a], [0xd9a273], [0x9c6a43]];
+  const OUTFIT = [["hoodie", "Худи"], ["tee", "Футболка"], ["dress", "Платье"], ["space", "Скафандр", { flag: 2 }]];
+  const TOPC = [[0xa78bff], [0xff8fc7], [0x6fe3c4], [0x5aa9ff], [0xffd45e], [0xff7a6b], [0xffffff], [0x3a2d7a], [0x2b2230, "", { flag: 4 }], [0xffe9a0, "", { flag: 5 }]];
+  const BOTC = [[0x4f6bd6], [0x3a2d7a], [0xff8fc7], [0x6fe3c4], [0xffffff], [0x2b2230]];
+  const SHOEC = [[0xff8fc7], [0xffffff], [0x6fe3c4], [0xffd45e], [0x5aa9ff], [0x2b2230]];
+  const ACC = [["ears", "Кошачьи ушки"], ["bow", "Бант", { gift: "bow" }], ["glasses", "Очки", { gift: "glasses" }], ["scarf", "Шарф", { gift: "scarf" }], ["hat", "Шапка с помпоном", { gift: "hat" }], ["flower", "Цветок", { gift: "flower" }], ["trail", "Звёздный след", { gift: "trail" }],
+    ["phones", "Наушники", { stars: 3 }], ["pack", "Рюкзак-звезда", { stars: 6 }], ["cape", "Звёздный плащ", { stars: 12 }], ["crown", "Корона", { chest: 1 }], ["party", "Праздничный колпак", { gift: "party" }], ["wings", "Звёздные крылья", { stars: 36 }]];
+  const PETS = [["", "Без питомца"], ["cat", "Лунный котёнок", { gift: "cat" }], ["bunny", "Звёздный зайка", { flag: 1 }], ["fox", "Лисёнок", { stars: 18 }], ["robot", "Робо-шарик", { stars: 24 }], ["dragon", "Дракончик", { chest: 1 }]];
+  const TABS = [["hair", "Причёска"], ["wear", "Одежда"], ["acc", "Украшения"], ["pet", "Питомец"]];
+  let on = false, tab = "hair", ang = 0;
+  const box = $("#wardB"), bar = $("#wardTabs");
+  const ok = n => !n || (n.stars ? Stars.found() >= n.stars : n.flag ? Save.d.flag >= n.flag : n.chest ? !!Save.d.chest : n.gift ? Save.d.own.includes(n.gift) : true);
+  const why = n => n.stars ? `Откроется за ${n.stars} ${pl(n.stars, "звезду", "звезды", "звёзд")} — у тебя ${Stars.found()}` : n.flag ? `Откроется, когда пройдёшь ${n.flag}-й этаж башни` : n.chest ? "Лежит в сундуке на вершине башни" : n.gift === "party" ? "Подарок на день рождения" : "Прячется в подарке дня на площади";
+  /* все вещи с условием — чтобы сообщать о новых и показывать, что ещё можно открыть */
+  const gated = () => [...HAIRC.filter(a => a[2]).map(a => ["hc" + a[0], a[1] + " волосы", a[2]]), ...OUTFIT.filter(a => a[2]).map(a => ["of" + a[0], a[1], a[2]]), ...TOPC.filter(a => a[2]).map(a => ["tc" + a[0], a[0] === 0x2b2230 ? "чёрный цвет одежды" : "золотой цвет одежды", a[2]]),
+    ...ACC.filter(a => a[2]).map(a => ["ac" + a[0], a[1], a[2]]), ...PETS.filter(a => a[2]).map(a => ["pt" + a[0], "питомец «" + a[1] + "»", a[2]])];
+  function news(quiet) {
+    const seen = Save.d.seen.items || (Save.d.seen.items = []), fresh = gated().filter(g => ok(g[2]) && !seen.includes(g[0]));
+    if (!fresh.length) return; for (const f of fresh) seen.push(f[0]); Save.put();
+    if (!quiet) UI.toast(`Новое в гардеробе: <b>${fresh.map(f => f[1].toLowerCase()).join(", ")}</b>`, 5200);
+  }
+  function save() { Save.d.look = Object.assign({}, LOOK, { acc: LOOK.acc.slice() }); Save.put(); buildAvatar(); }
+  const hex = c => "#" + c.toString(16).padStart(6, "0");
+  function grid(title, items, cur, pick, wide) {
+    box.append(el("div", "w-sec", title)); const g = el("div", "w-grid" + (wide ? " w-wide" : ""));
+    for (const it of items) {
+      const v = it[0], open = ok(it[2]), b = el("button", "w-it" + (wide ? "" : " c") + (cur(v) ? " on" : "") + (open ? "" : " lock")); b.type = "button";
+      if (wide) b.innerHTML = esc(it[1]) + (open ? "" : ico("lock")); else { b.style.background = hex(v); if (!open) b.innerHTML = ico("lock"); b.setAttribute("aria-label", it[1] || "цвет"); }
+      b.onclick = () => { if (!open) { Snd.play("warn"); UI.toast(why(it[2]), 3600); return; } Snd.play("click"); pick(v); show(); };
+      g.append(b);
+    }
+    box.append(g);
+  }
+  function show() {
+    bar.innerHTML = ""; for (const [id, name] of TABS) { const b = el("button", id === tab ? "on" : "", name); b.type = "button"; b.onclick = () => { tab = id; Snd.play("click"); box.scrollTop = 0; show(); }; bar.append(b); }
+    const top = box.scrollTop; box.innerHTML = "";
+    if (tab === "hair") {
+      grid("Причёска", HAIR, v => LOOK.style === v, v => { LOOK.style = v; save(); }, true);
+      grid("Цвет волос", HAIRC, v => LOOK.hair === v, v => { LOOK.hair = v; save(); });
+      grid("Цвет кожи", SKIN, v => LOOK.skin === v, v => { LOOK.skin = v; save(); });
+    } else if (tab === "wear") {
+      grid("Одежда", OUTFIT, v => LOOK.outfit === v, v => { LOOK.outfit = v; save(); }, true);
+      grid("Цвет верха", TOPC, v => LOOK.top === v, v => { LOOK.top = v; save(); });
+      grid("Цвет низа", BOTC, v => LOOK.bottom === v, v => { LOOK.bottom = v; save(); });
+      grid("Обувь", SHOEC, v => LOOK.shoes === v, v => { LOOK.shoes = v; save(); });
+    } else if (tab === "acc") {
+      grid("Украшения — можно надеть несколько", ACC, v => LOOK.acc.includes(v), v => { const i = LOOK.acc.indexOf(v); if (i >= 0) LOOK.acc.splice(i, 1); else LOOK.acc.push(v); save(); }, true);
+    } else {
+      grid("Кто бегает рядом", PETS, v => Pet.kind === v, v => Pet.set(v), true);
+      box.append(el("div", "note", "Котёнок прячется в подарке дня на площади, остальные приходят за звёзды и башню."));
+    }
+    box.scrollTop = top;
+  }
+  function open(face) {
+    if (on) return;
+    if (PL.frozen || !PL.grounded || PL.gd || PL.dead > 0) { UI.toast("Гардероб открывается, когда стоишь на земле"); return; }
+    /* человечек поворачивается лицом туда, где камере просторнее всего (чтобы она не упёрлась в стену) */
+    if (face != null) PL.yaw = face;
+    else { let best = PL.yaw, room = -1; for (let n = 0; n < 12; n++) { const a = PL.yaw + n * TAU / 12, sx = Math.sin(a), sz = Math.cos(a); let d = .5; for (; d < 6; d += .25) if (camHit(PL.x + sx * d, PL.y + 1.3, PL.z + sz * d) || camHit(PL.x + sx * d, PL.y + .5, PL.z + sz * d)) break; if (d > room + .3) { room = d; best = a; } } PL.yaw = best; }
+    on = true; ang = 0; PL.frozen = true; Ctl.on = false; PL.vx = PL.vz = 0; UI.hintOff();
+    $("#hud").hidden = true; $("#pad").hidden = true; $("#prompt").hidden = true; $("#ward").hidden = false; Input.modal(true); Snd.play("open"); show(); news(true);
+    Cam.mode = "cine";
+    Cam.cine = dt => {
+      ang = clamp(ang + Ctl.lookX * .01, -1.1, 1.1); Ctl.lookX = Ctl.lookY = Ctl.zoom = 0;
+      const a = PL.yaw + ang, d = View.portrait ? 4.6 : 3.7, k = 1 - Math.exp(-7 * dt);
+      _v.set(PL.x + Math.sin(a) * d, PL.y + 1.35, PL.z + Math.cos(a) * d); camera.position.lerp(_v, k);
+      _v2.set(PL.x, PL.y + (View.portrait ? -.55 : .85), PL.z); if (!View.portrait) { _v2.x += Math.cos(a) * 1.3; _v2.z -= Math.sin(a) * 1.3; }   // панель снизу — человечек выше; панель справа — человечек левее
+      camera.lookAt(_v2);
+    };
+  }
+  function close() {
+    if (!on) return; on = false; $("#ward").hidden = true; $("#hud").hidden = false; Input.showPad(); Input.modal(false);
+    PL.frozen = false; Ctl.on = true; Cam.cine = null; Cam.mode = "orbit"; Cam.yaw = PL.yaw + Math.PI + ang * 0; camSnap(); Snd.play("close"); Save.now();
+  }
+  function menu(m) {
+    m.append(el("div", "s-top", "Причёска, цвета, одежда, украшения и питомец. Гардероб стоит на острове — беседка справа от дороги к башне. А можно открыть его прямо здесь."));
+    const b = el("button", "btn", ico("shirt") + "Открыть гардероб"); b.type = "button"; b.style.cssText = "width:100%;margin:2px 0 14px"; b.onclick = () => { Menu.close(); setTimeout(open, 60); }; m.append(b);
+    const todo = gated().filter(g => !ok(g[2]));
+    if (todo.length) { m.append(el("div", "note", `<b style="color:var(--gold)">Что ещё можно открыть</b>`)); const l = el("div", "s-list"); for (const g of todo) l.append(el("div", "s-it no", `<span class="k">${ico("lock")}</span><span>${esc(cap(g[1]))}<small>${esc(why(g[2]))}</small></span>`)); m.append(l); }
+    else m.append(el("div", "note", "Все вещи гардероба открыты!"));
+  }
+  function init() {
+    Menu.tab("ward", "Наряды", menu, 3);
+    $("#wardOk").onclick = close; Bus.on("esc", () => { if (on) close(); });
+    Bus.on("star-closed", () => news()); Bus.on("flag", () => news()); Bus.on("chest", () => news()); Bus.on("gift", () => news(true));
+    news(true);
+  }
+  return { open, close, init, get on() { return on; } };
+})();
+
+/* ══════ 77_pet.js ══════ */
+/* Питомец: маленький друг из кубиков бегает следом, подпрыгивает на ходу, а над пропастью летит рядом. */
+const Pet = (() => {
+  let kind = Save.d.pet || "", g = null, P2 = {}, x = 0, y = 0, z = 0, yaw = 0, hop = 0, placed = false, fly = false;
+  function model(k) {
+    const r = new THREE.Group(); P2 = {};
+    const body = (c, c2) => { bx(r, .34, .26, .5, c, 0, .31, 0); for (const sx of [-1, 1]) for (const sz of [-1, 1]) bx(r, .09, .2, .09, c2 || c, sx * .1, .1, sz * .17); };
+    const head = (c, yy = .52, zz = .3) => { const h = pivot(r, 0, yy, zz); bx(h, .34, .3, .3, c, 0, 0, 0); for (const s of [-1, 1]) bx(h, .06, .08, .02, 0x33215c, s * .09, .02, .155); P2.head = h; return h; };
+    const tail = (c, len, yy = .38, c2) => { const t = pivot(r, 0, yy, -.25); bx(t, .09, .09, len, c, 0, .04, -len / 2); if (c2) bx(t, .11, .11, .12, c2, 0, .04, -len); P2.tail = t; };
+    if (k === "cat") { body(0xe9e4ff); const h = head(0xe9e4ff); for (const s of [-1, 1]) { bx(h, .1, .12, .08, 0xe9e4ff, s * .11, .2, 0); bx(h, .05, .06, .02, 0xffa6d6, s * .11, .19, .045); } bx(h, .05, .04, .02, 0xffa6d6, 0, -.04, .155); bx(h, .08, .08, .02, 0xffe07a, 0, .1, .155, true); tail(0xe9e4ff, .34, .4, 0xb99bff); }
+    else if (k === "fox") { body(0xff9a4a, 0x4a2d24); bx(r, .2, .14, .2, 0xffffff, 0, .24, .18); const h = head(0xff9a4a); for (const s of [-1, 1]) { bx(h, .1, .14, .08, 0xff9a4a, s * .11, .21, 0); bx(h, .06, .06, .08, 0x4a2d24, s * .11, .29, 0); } bx(h, .16, .12, .14, 0xffffff, 0, -.07, .2); bx(h, .05, .04, .02, 0x33215c, 0, -.03, .275); tail(0xff9a4a, .4, .38, 0xffffff); }
+    else if (k === "bunny") { body(0xffffff); const h = head(0xffffff); for (const s of [-1, 1]) { const e = pivot(h, s * .09, .15, 0); bx(e, .08, .32, .06, 0xffffff, 0, .16, 0); bx(e, .04, .22, .02, 0xffb6d9, 0, .16, .035); (P2.ears || (P2.ears = [])).push(e); } bx(h, .05, .04, .02, 0xff8fc7, 0, -.04, .155); bx(r, .14, .14, .14, 0xffffff, 0, .36, -.3); }
+    else if (k === "dragon") { bx(r, .32, .28, .5, 0x6fe3c4, 0, .3, 0); bx(r, .2, .1, .4, 0xfff2b0, 0, .17, 0); const h = head(0x6fe3c4, .56, .32); for (const s of [-1, 1]) bx(h, .06, .14, .06, 0xffd45e, s * .1, .22, -.06); bx(h, .2, .12, .16, 0x8ff0d8, 0, -.07, .2); tail(0x6fe3c4, .42, .32, 0xffd45e); P2.wings = []; for (const s of [-1, 1]) { const w = pivot(r, s * .16, .46, -.02); bx(w, .36, .04, .28, 0xb99bff, s * .2, 0, 0); w.userData.s = s; P2.wings.push(w); } fly = true; }
+    else if (k === "robot") { bx(r, .42, .42, .42, 0xdfe6ff, 0, .5, 0); bx(r, .3, .14, .02, 0x33215c, 0, .54, .215); for (const s of [-1, 1]) bx(r, .08, .08, .02, 0x7ff3ff, s * .08, .54, .225, true); bx(r, .04, .16, .04, 0x8d86b8, 0, .79, 0); const a = pivot(r, 0, .9, 0); bx(a, .1, .1, .1, 0xff6fb5, 0, 0, 0, true); bx(a, .5, .03, .08, 0xb99bff, 0, -.06, 0); P2.prop = a; for (const s of [-1, 1]) bx(r, .08, .2, .2, 0x8d86b8, s * .25, .46, 0); fly = true; }
+    return r;
+  }
+  function set(k) {
+    kind = k; Save.d.pet = k; Save.put(); fly = false; placed = false;
+    if (g) { scene.remove(g); g = null; }
+    if (!k) return;
+    g = model(k); scene.add(g); vis(0);
+    FX.burst(x, y + .5, z, 22, { speed: 3.4, life: .8, colors: [0xff9fd0, 0xffe28a, 0xffffff] }); Snd.play("gift");
+  }
+  function init() { if (kind) { g = model(kind); scene.add(g); } }
+  function vis(dt) {
+    if (!g) return;
+    const s = Math.sin(PL.yaw), c = Math.cos(PL.yaw), tx = PL.x - s * 1.25 + c * .95, tz = PL.z - c * 1.25 - s * .95, dx = tx - x, dz = tz - z, d = Math.hypot(dx, dz), t = Loop.t;
+    let moving = false;
+    if (!placed || d > 15) { x = tx; z = tz; y = PL.y; yaw = PL.yaw; placed = true; }
+    else if (d > .3) { const sp = Math.min(d * 3.4, 10) * dt; x += dx / d * sp; z += dz / d * sp; yaw += angDiff(yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 12); moving = true; }
+    else yaw += angDiff(yaw, PL.yaw) * Math.min(1, dt * 4);
+    /* высота: земля под лапами, если она рядом по высоте; иначе летит около человечка */
+    let gy = null; const i = Math.floor(x), k = Math.floor(z);
+    for (let j = Math.floor(PL.y + 1.4); j >= Math.floor(PL.y - 2.6); j--) if (vget(i, j, k) && !vget(i, j + 1, k)) { gy = j + 1; break; }
+    const air = fly || gy == null, want = air ? Math.max(gy == null ? -1e9 : gy + .45, PL.y + .35) : gy;
+    y = dt ? damp(y, want, air ? 6 : 12, dt) : want;
+    hop += dt * (moving ? 12 : 3);
+    g.position.set(x, y + (air ? Math.sin(t * 3) * .08 : moving ? Math.abs(Math.sin(hop)) * .14 : 0), z); g.rotation.y = yaw; g.rotation.x = air && moving ? .18 : 0;
+    g.visible = !(PL.dead > 0) && Cam.mode !== "intro";
+    if (P2.tail) P2.tail.rotation.y = Math.sin(t * (moving ? 9 : 3)) * .5;
+    if (P2.head) P2.head.rotation.z = moving ? 0 : Math.sin(t * 1.4) * .12;
+    if (P2.ears) for (const e of P2.ears) e.rotation.x = -Math.abs(Math.sin(hop)) * (moving ? .5 : .08);
+    if (P2.wings) for (const w of P2.wings) w.rotation.z = w.userData.s * (.2 + Math.sin(t * 14) * .5);
+    if (P2.prop) P2.prop.rotation.y = t * 18;
+  }
+  return { set, init, vis, get kind() { return kind; } };
+})();
+
 /* ══════ 85_game.js ══════ */
 /* Игра целиком: прилёт, подсказки, переносы, кнопки верхней строки, настройки. */
 const Game = (() => {
@@ -2435,7 +2755,7 @@ const Game = (() => {
       WORLD.decor.push([tp.x, y + .08, tp.z, 1.4, .16, 1.4, 0x7ff3ff]); WORLD.lamps.push({ x: tp.x, y: y + .5, z: tp.z, c: 0x7ff3ff, s: 3.4 });
       Spots.add({ x: tp.x, y: y + .8, z: tp.z, r: 1.9, text: tp.text, act: () => jump(tp.to.x, (groundTop(tp.to.x, tp.to.z, 6) ?? 0), tp.to.z, tp.to.yaw) });
     }
-    Menu.tab("opt", "Настройки", optMenu, 9);
+    Menu.tab("opt", "Настройки", optMenu, 9); Ward.init(); Pet.init();
     $("#hMenu").onclick = () => Menu.open(); $("#hHome").onclick = () => { Snd.play("click"); home(); };
     $("#skip").onclick = () => { introSkip(); $("#skip").hidden = true; };
     Bus.on("respawn", why => { UI.fade(false); mood("oops", 1); });
@@ -2461,7 +2781,7 @@ const Game = (() => {
     PL.frozen = true; Ctl.on = false;
     $("#load").classList.add("off"); $("#title").classList.add("on"); $("#skip").hidden = false;
     Cam.onIntroEnd = () => {
-      PL.frozen = false; Ctl.on = true; $("#title").classList.remove("on"); $("#skip").hidden = true; $("#hud").hidden = false; Input.showPad(); Alley.loadCovers();
+      Bus.emit("intro-end"); PL.frozen = false; Ctl.on = true; $("#title").classList.remove("on"); $("#skip").hidden = true; $("#hud").hidden = false; Input.showPad(); Alley.loadCovers();
       if (first) UI.hint(TOUCH ? "Слева — <b>джойстик</b>, справа — <b>прыжок</b>.<br>Води пальцем по экрану — смотри вокруг." : "Ходить — <b>WASD</b> или стрелки, прыжок — <b>пробел</b>.<br>Осмотреться — мышь с зажатой кнопкой.", 9000);
       else UI.toast("С возвращением на твою планету!");
     };
@@ -2469,7 +2789,7 @@ const Game = (() => {
   }
   function step(dt) { Alley.step(dt); Stars.step(dt); Tower.step(dt); }
   function vis(dt) {
-    Tower.vis(dt); Stars.vis(dt); Chest.vis(dt);
+    Tower.vis(dt); Stars.vis(dt); Chest.vis(dt); Town.vis(dt); Pet.vis(dt);
     for (const l of labels) { const d = camera.position.distanceTo(l.sp.position); l.sp.material.opacity = clamp((d - 15) / 9, 0, 1) * clamp((120 - d) / 40, 0, 1); l.sp.visible = l.sp.material.opacity > .01 && Cam.mode !== "intro"; }
   }
   return { build, start, step, vis, home, jump, label };
@@ -2558,7 +2878,7 @@ if (DEV) {
   }
   Bus.on("respawn", () => { if (Ctl.bot) Bot.reset = true; });
   Object.assign(W.__mir, {
-    Tower, Stars, Chest, Alley, Bot, Album, Viewer, Menu, Spots, Fav, M,
+    Tower, Stars, Chest, Alley, Bot, Album, Viewer, Menu, Spots, Fav, M, Town, Ward, Pet, Gifts, LOOK, buildAvatar,
     /* пройти этаж k ботом без отрисовки: вернуть, получилось ли, время и число падений */
     botRun(k, maxSec = 150) {
       const f = Tower.flags[k - 1]; Tower.leave(); placePlayer(f.spawn.x, f.spawn.y, f.spawn.z, f.spawn.yaw);
