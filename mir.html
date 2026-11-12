@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-0941. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1147. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -118,6 +118,7 @@ svg.i.f{fill:currentColor;stroke:none}
 /* ───────── подсказка-кнопка у предмета, сообщения ───────── */
 #prompt{position:fixed;left:50%;bottom:calc(var(--sab) + 176px);z-index:6;transform:translateX(-50%);max-width:min(88vw,420px);min-height:50px;padding:0 22px;border-radius:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-weight:800;font-size:16px;color:#2b1c06;background:linear-gradient(180deg,#ffe9b0,#f1c765);box-shadow:0 4px 0 #b98a2e,0 10px 30px rgba(0,0,0,.45);animation:promptIn .28s var(--ease)}
+#prompt.two{white-space:normal;width:max-content;line-height:1.2;text-wrap:balance}
 #prompt:active{transform:translateX(-50%) translateY(3px);box-shadow:0 1px 0 #b98a2e}
 @keyframes promptIn{from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.9)}to{opacity:1;transform:translateX(-50%)}}
 @media (orientation:landscape) and (max-height:520px){#prompt{bottom:calc(var(--sab) + 20px)}}
@@ -163,6 +164,7 @@ svg.i.f{fill:currentColor;stroke:none}
 .alb-h{flex:none;display:flex;align-items:center;gap:10px;padding:calc(var(--sat) + 10px) calc(var(--sar) + 12px) 10px calc(var(--sal) + 12px);border-bottom:1px solid var(--line);background:rgba(11,8,40,.9)}
 .alb-h .tt{flex:1;min-width:0}
 .alb-h h2{font-size:21px;font-weight:800;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alb-h h2.sm{font-size:15.5px}
 .alb-h p{font-size:13px;color:var(--ink3);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .alb-b{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:4px calc(var(--sar) + 10px) calc(var(--sab) + 30px) calc(var(--sal) + 10px)}
 .alb-day{margin:16px 4px 8px;font-size:14px;font-weight:800;color:var(--ink2);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
@@ -399,7 +401,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-0941";
+const BUILD = "20261112-1147";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -501,7 +503,9 @@ const Ph = (() => {
   function one(k) {
     const u = PHOTO_BASE + k + ".bin";
     // не расшифровалось — файл на сайте заменили, а в памяти телефона старый: берём свежий
-    return getBin(u).then(b => aesDec(b)).catch(e => { if (e instanceof NetErr) throw e; return getBin(u + "?fresh=1", { cache: "reload" }).then(b => aesDec(b)); })
+    const load = () => getBin(u).then(b => aesDec(b)).catch(e => { if (e instanceof NetErr) throw e; return getBin(u + "?fresh=1", { cache: "reload" }).then(b => aesDec(b)); });
+    // связь моргнула — через секунду пробуем ещё раз (иначе плитка или обложка остаётся пустой); фото на сайте нет вовсе — не повторяем
+    return load().catch(e => { if (!(e instanceof NetErr) || e.status === 404) throw e; return wait(1200).then(load); })
       .then(b => URL.createObjectURL(new Blob([b], { type: "image/jpeg" })));
   }
   function get(n, isBig) {
@@ -546,9 +550,17 @@ function ageText(date) {                     // точный возраст в �
 }
 const monthIdx = p => { const a = ageAt(parseD(p.d)); return Math.max(0, a.y * 12 + a.m); };
 const addMonths = (d, k) => new Date(d.getFullYear(), d.getMonth() + k, d.getDate());
-function periodOf(m) {                       // «9 мая – 8 июня 2014»
-  const s = addMonths(BIRTH, m), e = new Date(addMonths(BIRTH, m + 1) - 864e5);
+function periodOf(m, m2 = m) {               // «9 мая – 8 июня 2014»; для нескольких месяцев подряд — от начала первого до конца последнего
+  const s = addMonths(BIRTH, m), e = addMonths(BIRTH, m2 + 1); e.setDate(e.getDate() - 1);      // «минус день» по календарю: вычитать 24 часа нельзя — там, где переводят часы, получался не тот день
   return `${s.getDate()} ${MONG[s.getMonth()]}${s.getFullYear() !== e.getFullYear() ? " " + s.getFullYear() : ""} – ${e.getDate()} ${MONG[e.getMonth()]} ${e.getFullYear()}`;
+}
+/* название для нескольких месяцев сразу (от a до z полных месяцев): «Первые 2 месяца», «7–8 месяцев», «1 год 7–8 месяцев»;
+   если коротко не сказать — «1 год 11 месяцев — 2 года» */
+function spanTitle(a, z, short) {
+  const ya = Math.floor(a / 12), ra = a % 12, rz = z % 12, mw = n => pl(n, "месяц", "месяца", "месяцев");
+  if (a === 0 && z < 12) return z === 11 ? (short ? "Первый год" : "Мой первый год") : (short ? "Первые " : "Мои первые ") + (z + 1) + " " + mw(z + 1);
+  if (ya === Math.floor(z / 12) && ra > 0) { const s = (ya ? tY(ya) + " " : "") + ra + "–" + rz + " " + mw(rz); return short ? cap(s) : "Мне " + s; }
+  return monthTitle(a, true) + " — " + monthTitle(z, true).toLowerCase();
 }
 
 function buildModel() {
@@ -573,13 +585,14 @@ function buildModel() {
 }
 const listOf = a => a.all.filter(n => !M.hidden.has(n));
 
-/* остановки аллеи: по одной на месяц и «Сейчас». Если фото добавят и месяцев станет больше мест — соседние месяцы делят один портал */
+/* остановки аллеи: по одной на месяц и «Сейчас». Если фото добавят и месяцев станет больше, чем мест, — заняты все места,
+   а соседние месяцы делят один портал: поровну, и первыми объединяются поздние месяцы (ранние дольше остаются по одному) */
 function alleyStops(maxMonths) {
-  const ms = M.months.filter(a => listOf(a).length), out = [], per = Math.max(1, Math.ceil(ms.length / maxMonths));
-  for (let i = 0; i < ms.length; i += per) {
-    const part = ms.slice(i, i + per), a = part[0], z = part[part.length - 1];
+  const ms = M.months.filter(a => listOf(a).length), out = [], k = Math.min(maxMonths, ms.length), base = k ? Math.floor(ms.length / k) : 0, big = k ? ms.length - base * k : 0;
+  for (let g = 0, i = 0; g < k; g++) {
+    const part = ms.slice(i, i += base + (g >= k - big ? 1 : 0)), a = part[0], z = part[part.length - 1];
     out.push(part.length === 1 ? { id: a.id, title: a.title, short: a.short, sub: periodOf(a.m), parts: part }
-      : { id: a.id + "_" + z.id, title: a.short + " — " + z.short.toLowerCase(), short: a.short + " — " + z.short.toLowerCase(), sub: "", parts: part });
+      : { id: a.id + "_" + z.id, title: spanTitle(a.m, z.m), short: spanTitle(a.m, z.m, true), sub: periodOf(a.m, z.m), parts: part });
   }
   if (listOf(M.now).length) out.push({ id: "now", title: "Я сейчас", short: "Сейчас", sub: "фото последних лет", parts: [M.now] });
   return out;
@@ -1623,8 +1636,9 @@ const Input = (() => {
   function joyEnd() { jid = null; kx = ky = 0; knob.style.transform = ""; joy.classList.remove("on"); joy.style.left = joy.style.top = joy.style.bottom = ""; }
   touch.addEventListener("pointerdown", e => {
     if (e.pointerType === "touch" || e.pointerType === "pen") {
-      pad.hidden = false;
-      if (jid == null && e.clientX < View.w * .46 && e.clientY > View.h * .22) {
+      const play = Ctl.on && !modal;                       // человечком сейчас управляют; в гардеробе, на прилёте и у сундука джойстик не показываем — палец только крутит вид
+      if (play) pad.hidden = false;
+      if (play && jid == null && e.clientX < View.w * .46 && e.clientY > View.h * .22) {
         jid = e.pointerId; jx = e.clientX; jy = e.clientY; const r = joy.offsetWidth / 2;
         joy.style.left = (jx - r) + "px"; joy.style.top = (jy - r) + "px"; joy.style.bottom = "auto"; joy.classList.add("on"); joySet(0, 0);
       } else { look.set(e.pointerId, { x: e.clientX, y: e.clientY }); pinch = 0; }
@@ -1708,16 +1722,18 @@ function introStart(fast) {
   Cam.it = 0; Cam.dur = fast ? 4.2 : 8; Cam.mode = "intro";
 }
 function introSkip() { if (Cam.mode === "intro") Cam.dur = Math.min(Cam.dur, 1.2 / Math.max(.05, 1 - Cam.it)); }      // остаток пути — за секунду
+const lookDrop = () => { Ctl.lookX = Ctl.lookY = Ctl.zoom = 0; };       // пока камерой управляет не человек (прилёт, облёт), движения пальца не копятся — иначе потом вид дёрнется
 function camVis(dt) {
   if (Cam.mode === "intro") {
+    lookDrop();
     Cam.it = Math.min(1, Cam.it + dt / Cam.dur);
     const u = Cam.it < .5 ? 2 * Cam.it * Cam.it : 1 - Math.pow(-2 * Cam.it + 2, 2) / 2;
     Cam.curve.getPoint(u, camera.position); _v.copy(Cam.la).lerp(Cam.lb, smooth(clamp((u - .25) / .75, 0, 1))); camera.lookAt(_v);
     if (Cam.it >= 1) { Cam.mode = "orbit"; Cam.manualT = Loop.t; if (Cam.onIntroEnd) { const f = Cam.onIntroEnd; Cam.onIntroEnd = null; f(); } }
     return;
   }
-  if (Cam.mode === "cine" && Cam.cine) { Cam.cine(dt); return; }
-  if (Cam.mode !== "orbit") return;
+  if (Cam.mode === "cine" && Cam.cine) { Cam.cine(dt); lookDrop(); return; }
+  if (Cam.mode !== "orbit") { lookDrop(); return; }
   if (Ctl.lookX || Ctl.lookY) { Cam.yaw -= Ctl.lookX * .0054; Cam.pitch = clamp(Cam.pitch + Ctl.lookY * .0042, -.42, 1.3); Ctl.lookX = Ctl.lookY = 0; Cam.manualT = Loop.t; }
   if (Ctl.zoom) { Cam.dist = clamp(Cam.dist * Math.exp(Ctl.zoom * .0011), 3.6, 17); Ctl.zoom = 0; Cam.userZoom = true; }
   const sp = Math.hypot(PL.vx, PL.vz);
@@ -1759,14 +1775,14 @@ const UI = (() => {
   function open(id) {
     const o = $("#" + id); if (!o.hidden) return;
     o.hidden = false; o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
-    stack.push(id); Input.modal(true); pause("ui:" + id); hintOff();
+    stack.push(id); Input.modal(true); pause("ui:" + id); hintOff(); Bus.emit("win");
   }
   function close(id) {
     const o = $("#" + id); if (o.hidden) return;
-    o.hidden = true; const i = stack.lastIndexOf(id); if (i >= 0) stack.splice(i, 1); Input.modal(false); resume("ui:" + id);
+    o.hidden = true; const i = stack.lastIndexOf(id); if (i >= 0) stack.splice(i, 1); Input.modal(false); resume("ui:" + id); Bus.emit("win");
   }
   const top = () => stack[stack.length - 1] || "";
-  return { toast, banner, hint, hintOff, fade, open, close, top };
+  return { toast, banner, hint, hintOff, fade, open, close, top, get depth() { return stack.length; } };
 })();
 
 /* места, у которых появляется кнопка-подсказка («Лифт», «Сундук», «Подарок»): ближайшее в радиусе */
@@ -1780,7 +1796,11 @@ const Spots = (() => {
       const d = Math.hypot(PL.x - s.x, (PL.y + .8 - s.y) * .7, PL.z - s.z); if (d < (s.r || 2.4) && d < bd) { bd = d; best = s; }
     }
     cur = best; const t = best ? (typeof best.text === "function" ? best.text() : best.text) : "";
-    if (t !== shown) { shown = t; if (t) { btn.innerHTML = t; btn.hidden = false; btn.style.animation = "none"; void btn.offsetWidth; btn.style.animation = ""; } else btn.hidden = true; }
+    if (t !== shown) {
+      shown = t;
+      if (t) { btn.classList.remove("two"); btn.innerHTML = t; btn.hidden = false; if (btn.scrollWidth > btn.clientWidth + 1) btn.classList.add("two"); btn.style.animation = "none"; void btn.offsetWidth; btn.style.animation = ""; }   // не влезло в строку — в две
+      else btn.hidden = true;
+    }
   }
   function act() { if (cur && !Input.isModal) { Snd.play("click"); cur.act(); } }
   btn.addEventListener("click", act); Bus.on("act", act);
@@ -1820,20 +1840,36 @@ const Alley = (() => {
     if (now) SLOTS[SLOTS.length - 1].stop = now;
   }
   const count = st => st.parts.reduce((a, p) => a + listOf(p).length, 0);
+  const signFont = fs => `800 ${fs}px ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,sans-serif`;
+  let fitG = null;
+  /* как уместить надпись на табличке: [размер букв, ширина, строки]. Обычно одна строка; длинное «с — по» (портал на несколько
+     месяцев) — в две строки, чтобы буквы не мельчали */
+  function signFit(text, g) {
+    g = g || fitG || (fitG = D.createElement("canvas").getContext("2d"));
+    const wd = (t, fs) => { g.font = signFont(fs); return g.measureText(t).width; };
+    let fs = 52, lines = [text]; while (wd(text, fs) > 460 && fs > 34) fs -= 3;
+    if (wd(text, fs) > 460) {
+      const cut = text.indexOf(" — "); if (cut > 0) lines = [text.slice(0, cut + 2), text.slice(cut + 3)];
+      const wide = f => Math.max(...lines.map(l => wd(l, f)));
+      fs = 34; while (wide(fs) > 460 && fs > 18) fs -= 2;
+    }
+    return [fs, Math.round(Math.max(...lines.map(l => wd(l, fs)))), lines];
+  }
   function signTex(text, colorCss) {
     return canvasTex(512, 96, (g) => {
       const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
       g.clearRect(0, 0, 512, 96); g.fillStyle = "rgba(255,250,236,.96)"; rr(6, 8, 500, 80, 26); g.fill(); g.strokeStyle = colorCss; g.lineWidth = 6; rr(6, 8, 500, 80, 26); g.stroke();
-      g.fillStyle = "#2c1d5a"; g.textAlign = "center"; g.textBaseline = "middle"; let fs = 52; g.font = `800 ${fs}px ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,sans-serif`;
-      while (g.measureText(text).width > 460 && fs > 24) { fs -= 3; g.font = `800 ${fs}px ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,sans-serif`; }
-      g.fillText(text, 256, 50);
+      const [fs, , lines] = signFit(text, g);
+      g.fillStyle = "#2c1d5a"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = signFont(fs);
+      if (lines.length > 1) { g.fillText(lines[0], 256, 32); g.fillText(lines[1], 256, 67); } else g.fillText(text, 256, 50);
     }, { aniso: 4 });
   }
   function build() {
     const ph0 = canvasTex(96, 128, (g, w, h) => { const q = g.createLinearGradient(0, 0, w, h); q.addColorStop(0, "#3a2a86"); q.addColorStop(1, "#7a3f9a"); g.fillStyle = q; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(255,230,160,.85)"; g.font = "56px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("✦", w / 2, h / 2); });
     SLOTS.forEach((s, n) => {
       if (!s.stop) return;
-      const st = s.stop, list = [].concat(...st.parts.map(listOf)), cover = coverOf(list, st.parts.length === 1 ? st.parts[0].id : "");
+      const st = s.stop, list = [].concat(...st.parts.map(listOf));
+      const cover = st.parts.map(a => G.cover && G.cover[a.id]).find(c => c && list.includes(c)) || coverOf(list, "");     // обложка, выбранная для месяца (у портала на несколько месяцев — для первого из них)
       const mat = new THREE.MeshBasicMaterial({ map: ph0 }), mesh = new THREE.Mesh(new THREE.PlaneGeometry(3, 4), mat);
       mesh.position.set(s.photo[0], s.photo[1], s.photo[2]); mesh.rotation.y = s.ry; scene.add(mesh);
       const c = BT[PF[n]].side, sign = new THREE.Mesh(new THREE.PlaneGeometry(4.5, .85), new THREE.MeshBasicMaterial({ map: signTex(st.short, "#" + c.getHexString(THREE.SRGBColorSpace)), transparent: true }));
@@ -1875,7 +1911,7 @@ const Alley = (() => {
       }
     }
   }
-  return { plan, build, step, loadCovers, get portals() { return portals; }, enter };
+  return { plan, build, step, loadCovers, get portals() { return portals; }, enter, signFit };
 })();
 
 /* ══════ 56_album.js ══════ */
@@ -1919,8 +1955,10 @@ const Album = (() => {
       }
     }
     if (!total) body.append(el("div", "alb-empty", "Здесь пока нет фото"));
-    $("#albT").textContent = stop.title; $("#albS").textContent = tF(total) + (stop.sub ? " · " + stop.sub : "");
+    const head = $("#albT"); head.classList.remove("sm");
+    head.textContent = stop.title; $("#albS").textContent = tF(total) + (stop.sub ? " · " + stop.sub : "");
     body.scrollTop = 0; UI.open("album");
+    if (head.scrollWidth > head.clientWidth + 1) head.classList.add("sm");            // длинное название (портал на несколько месяцев) — буквами помельче
   }
   function close() {
     if ($("#album").hidden) return;
@@ -2222,7 +2260,7 @@ const Tower = (() => {
     /* крутилки */
     for (const s of sweeps) {
       s.a = s.a0 + (Loop.t + dt) * s.w;
-      if (PL.hitCool > 0 || PL.y >= s.y1 || PL.y + PH <= s.y0) continue;
+      if (PL.frozen || PL.hitCool > 0 || PL.y >= s.y1 || PL.y + PH <= s.y0) continue;      // пока человечек «на паузе» (гардероб), перекладина его не бьёт
       const dx = PL.x - s.cx, dz = PL.z - s.cz; if (dx * dx + dz * dz > (s.r + .6) * (s.r + .6)) continue;
       for (let n = 0; n < 2; n++) {
         const a = s.a + n * Math.PI, ux = Math.cos(a), uz = Math.sin(a), q = clamp(dx * ux + dz * uz, .2, s.r), d = Math.hypot(dx - ux * q, dz - uz * q);
@@ -2286,11 +2324,13 @@ const AFF = [
 const Aff = (() => {
   let cb = null, t0 = 0;
   function show(text, capt, f) {
+    if (!$("#aff").hidden) { const prev = cb; cb = () => { if (prev) prev(); show(text, capt, f); }; return; }      // одна аффирмация уже на экране — эта покажется следом, ничего не теряется
     cb = f || null; $("#affT").innerHTML = text.split(" ").map((w, i) => `<span style="animation-delay:${(.3 + i * .09).toFixed(2)}s">${esc(w)}</span>`).join(" ");
     $("#affN").textContent = capt || ""; t0 = performance.now(); UI.open("aff");
   }
-  function close() { if ($("#aff").hidden || performance.now() - t0 < 700) return; UI.close("aff"); Snd.play("click"); const f = cb; cb = null; if (f) f(); }
-  $("#aff").addEventListener("click", close); Bus.on("ok", () => { if (UI.top() === "aff") close(); });
+  /* случайное касание в первые мгновения окно не закрывает; кнопка «Назад» телефона (force) — закрывает сразу */
+  function close(force) { if ($("#aff").hidden || (force !== true && performance.now() - t0 < 700)) return; UI.close("aff"); Snd.play("click"); const f = cb; cb = null; if (f) f(); }
+  $("#aff").addEventListener("click", close); Bus.on("ok", () => { if (UI.top() === "aff") close(); }); Bus.on("aff-close", () => close(true));
   return { show };
 })();
 
@@ -2429,8 +2469,8 @@ const Chest = (() => {
     cine = -1; opened = true; Save.d.chest = 1; Save.d.crown = 1;
     LS.set("mk2.secret", "1"); LS.set("doch.prize", "1");                    // основная страница увидит: тайный альбом открыт
     if (!LOOK.acc.includes("crown")) LOOK.acc.push("crown"); Save.d.look = Object.assign({}, LOOK); if (!Save.d.own.includes("crown")) Save.d.own.push("crown"); Save.now();
-    buildAvatar(); PL.frozen = false; Ctl.on = true; $("#hud").hidden = false; Input.showPad(); Bus.emit("chest");
-    showSecret(true);
+    buildAvatar(); PL.frozen = false; Ctl.on = true; $("#hud").hidden = false; Input.showPad();
+    showSecret(true); Bus.emit("chest");                                       // сначала окно сюрприза: сообщение о новых вещах гардероба подождёт, пока оно закроется
   }
   function showSecret(first) {
     const list = listOf(M.secret), fan = $("#secFan"); fan.innerHTML = "";
@@ -2512,6 +2552,7 @@ const Town = (() => {
     const mir = new THREE.Mesh(new THREE.PlaneGeometry(2, 3), new THREE.MeshBasicMaterial({ map: canvasTex(64, 96, (g, w, h) => { const q = g.createLinearGradient(0, 0, w, h); q.addColorStop(0, "#e8f6ff"); q.addColorStop(.45, "#a9c8ff"); q.addColorStop(.55, "#d6e6ff"); q.addColorStop(1, "#8fa6f0"); g.fillStyle = q; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.moveTo(8, 10); g.lineTo(26, 10); g.lineTo(10, 44); g.lineTo(8, 44); g.fill(); }) }));
     mir.position.set(0, 1.75, .09); mg.add(mir);
     CAMBOX.push([WR.x - 1.3, 0, WR.z - 3, WR.x + 1.3, 3.6, WR.z - 2.5]);
+    dynAdd({ kind: "mirror", x0: WR.x - 1.15, y0: 0, z0: WR.z - 2.83, x1: WR.x + 1.15, y1: 3.4, z1: WR.z - 2.67 });      // зеркало твёрдое: сквозь него не пройти
     Game.label("Гардероб", WR.x, 9.4, WR.z, .8);
     Spots.add({ x: WR.x, y: 1, z: WR.z, r: 2.7, text: "Гардероб", act: () => Ward.open(0) });
     /* подарок дня */
@@ -2614,9 +2655,12 @@ const Ward = (() => {
   /* все вещи с условием — чтобы сообщать о новых и показывать, что ещё можно открыть */
   const gated = () => [...HAIRC.filter(a => a[2]).map(a => ["hc" + a[0], a[1] + " волосы", a[2]]), ...OUTFIT.filter(a => a[2]).map(a => ["of" + a[0], a[1], a[2]]), ...TOPC.filter(a => a[2]).map(a => ["tc" + a[0], a[0] === 0x2b2230 ? "чёрный цвет одежды" : "золотой цвет одежды", a[2]]),
     ...ACC.filter(a => a[2]).map(a => ["ac" + a[0], a[1], a[2]]), ...PETS.filter(a => a[2]).map(a => ["pt" + a[0], "питомец «" + a[1] + "»", a[2]])];
+  let late = false;
   function news(quiet) {
     const seen = Save.d.seen.items || (Save.d.seen.items = []), fresh = gated().filter(g => ok(g[2]) && !seen.includes(g[0]));
-    if (!fresh.length) return; for (const f of fresh) seen.push(f[0]); Save.put();
+    if (!fresh.length) return;
+    if (!quiet && UI.top()) { late = true; return; }                          // поверх мира открыто окно (сюрприз, альбом) — скажем, когда оно закроется
+    for (const f of fresh) seen.push(f[0]); Save.put();
     if (!quiet) UI.toast(`Новое в гардеробе: <b>${fresh.map(f => f[1].toLowerCase()).join(", ")}</b>`, 5200);
   }
   function save() { Save.d.look = Object.assign({}, LOOK, { acc: LOOK.acc.slice() }); Save.put(); buildAvatar(); }
@@ -2658,7 +2702,7 @@ const Ward = (() => {
     if (face != null) PL.yaw = face;
     else { let best = PL.yaw, room = -1; for (let n = 0; n < 12; n++) { const a = PL.yaw + n * TAU / 12, sx = Math.sin(a), sz = Math.cos(a); let d = .5; for (; d < 6; d += .25) if (camHit(PL.x + sx * d, PL.y + 1.3, PL.z + sz * d) || camHit(PL.x + sx * d, PL.y + .5, PL.z + sz * d)) break; if (d > room + .3) { room = d; best = a; } } PL.yaw = best; }
     on = true; ang = 0; PL.frozen = true; Ctl.on = false; PL.vx = PL.vz = 0; UI.hintOff();
-    $("#hud").hidden = true; $("#pad").hidden = true; $("#prompt").hidden = true; $("#ward").hidden = false; Input.modal(true); Snd.play("open"); show(); news(true);
+    $("#hud").hidden = true; $("#pad").hidden = true; $("#prompt").hidden = true; $("#ward").hidden = false; Input.modal(true); Snd.play("open"); show(); news(true); Bus.emit("win");
     Cam.mode = "cine";
     Cam.cine = dt => {
       ang = clamp(ang + Ctl.lookX * .01, -1.1, 1.1); Ctl.lookX = Ctl.lookY = Ctl.zoom = 0;
@@ -2670,7 +2714,7 @@ const Ward = (() => {
   }
   function close() {
     if (!on) return; on = false; $("#ward").hidden = true; $("#hud").hidden = false; Input.showPad(); Input.modal(false);
-    PL.frozen = false; Ctl.on = true; Cam.cine = null; Cam.mode = "orbit"; Cam.yaw = PL.yaw + Math.PI + ang * 0; camSnap(); Snd.play("close"); Save.now();
+    PL.frozen = false; Ctl.on = true; Cam.cine = null; Cam.mode = "orbit"; Cam.yaw = PL.yaw + Math.PI; camSnap(); Snd.play("close"); Save.now(); Bus.emit("win");
   }
   function menu(m) {
     m.append(el("div", "s-top", "Причёска, цвета, одежда, украшения и питомец. Гардероб стоит на острове — беседка справа от дороги к башне. А можно открыть его прямо здесь."));
@@ -2683,6 +2727,7 @@ const Ward = (() => {
     Menu.tab("ward", "Наряды", menu, 3);
     $("#wardOk").onclick = close; Bus.on("esc", () => { if (on) close(); });
     Bus.on("star-closed", () => news()); Bus.on("flag", () => news()); Bus.on("chest", () => news()); Bus.on("gift", () => news(true));
+    Bus.on("win", () => { if (late) setTimeout(() => { if (late && !UI.top()) { late = false; news(); } }, 450); });      // окна закрылись — отложенное сообщение о новых вещах
     news(true);
   }
   return { open, close, init, get on() { return on; } };
@@ -2734,6 +2779,41 @@ const Pet = (() => {
     if (P2.prop) P2.prop.rotation.y = t * 18;
   }
   return { set, init, vis, get kind() { return kind; } };
+})();
+
+/* ══════ 80_back.js ══════ */
+/* Кнопка «Назад» телефона и жест «назад»: закрывают верхнее окно мира (фото → альбом → мир; меню, аффирмация, сюрприз,
+   гардероб), а не уводят со страницы. Пока открыто окно, в истории браузера лежит по одной записи на каждое; окон нет —
+   записей нет, и «Назад», как обычно, возвращает на основную страницу. Окно закрыли крестиком — его запись убирается сама.
+   Сколько записей лежит, видно по history.state.mirWin. Сверка идёт в конце каждого действия, поэтому «закрыли одно окно и
+   тут же открыли другое» обходится без шагов по истории. */
+const Back = (() => {
+  const H = W.history; let busy = false, timer = 0, queued = false;
+  const pos = () => { try { const s = H.state; return s && s.mirWin > 0 ? s.mirWin | 0 : 0; } catch (e) { return 0; } };
+  const depth = () => UI.depth + (Ward.on ? 1 : 0);
+  function closeTop() {
+    const t = UI.top();
+    if (t === "viewer") Bus.emit("viewer-close"); else if (t === "album") Bus.emit("album-close"); else if (t === "menu") Menu.close();
+    else if (t === "aff") Bus.emit("aff-close"); else if (t === "secret") Bus.emit("secret-close"); else if (t) UI.close(t); else if (Ward.on) Ward.close();
+  }
+  function sync() {
+    queued = false; if (busy) return;
+    const p = pos(), d = depth();
+    try {
+      if (d > p) for (let n = p + 1; n <= d; n++) H.pushState({ mirWin: n }, "");
+      else if (d < p) { busy = true; clearTimeout(timer); timer = setTimeout(() => { busy = false; }, 1500); H.go(d - p); }     // свой шаг назад: дождёмся его и сверимся ещё раз
+    } catch (e) { busy = false; }
+  }
+  const touch = () => { if (!queued) { queued = true; Promise.resolve().then(sync); } };
+  addEventListener("popstate", () => {
+    if (busy) { busy = false; clearTimeout(timer); }                       // это был наш собственный шаг
+    else { const p = pos(); for (let d = depth(), n = 0; d > p && n < 8; n++) { closeTop(); const now = depth(); if (now >= d) break; d = now; } }      // нажали «Назад»: закрываем верхнее окно
+    sync();
+  });
+  addEventListener("pageshow", e => { if (e.persisted) touch(); });
+  Bus.on("win", touch);
+  touch();                                                                 // страницу перезагрузили при открытом окне — лишние записи убираем
+  return { get pos() { return pos(); }, get depth() { return depth(); }, get busy() { return busy; } };
 })();
 
 /* ══════ 85_game.js ══════ */
@@ -2837,7 +2917,7 @@ if (DEV) {
     get ready() { return READY; },
     PL, Cam, Ctl, Save, View, Loop, WORLD, Dyn, THREE, scene, camera, vget, B, BT,
     info() { const r = renderer.info.render; return { x: +PL.x.toFixed(2), y: +PL.y.toFixed(2), z: +PL.z.toFixed(2), g: PL.grounded, mode: Cam.mode, fps: Math.round(Perf.fps), calls: r.calls, tris: r.triangles, scale: View.scale, t: +Loop.t.toFixed(2), stars: Save.d.stars.length, flag: Save.d.flag, worldTris: WORLD.tris, frozen: PL.frozen, paused: [...Loop.paused] }; },
-    tp(x, y, z, yaw) { placePlayer(x, y, z, yaw); camSnap(); },
+    tp(x, y, z, yaw) { placePlayer(x, y, z, yaw); camSnap(); UI.fade(false); },      // затемнение после падения снимаем сами: возврата к флажку уже не будет
     look(yaw, pitch, dist) { Cam.yaw = yaw; if (pitch != null) Cam.pitch = pitch; if (dist != null) { Cam.dist = dist; Cam.userZoom = true; } Cam.manualT = Loop.t + 1e6; camSnap(); },
     skip() { if (Cam.mode === "intro") { Cam.it = 1; } },
     /* прогнать игру вперёд без отрисовки */
@@ -2881,7 +2961,12 @@ if (DEV) {
   }
   Bus.on("respawn", () => { if (Ctl.bot) Bot.reset = true; });
   Object.assign(W.__mir, {
-    Tower, Stars, Chest, Alley, Bot, Album, Viewer, Menu, Spots, Fav, M, Town, Ward, Pet, Gifts, LOOK, buildAvatar,
+    Tower, Stars, Chest, Alley, Bot, Album, Viewer, Menu, Spots, Fav, M, Town, Ward, Pet, Gifts, LOOK, buildAvatar, UI, Back, SLOTS,
+    /* как аллея разложит по порталам месяцы с такими номерами (для проверки случая «месяцев больше, чем мест») */
+    stopsFor(ms) {
+      const keep = M.months; M.months = ms.map(m => ({ id: "m" + m, kind: "month", m, all: ["_" + m], title: monthTitle(m), short: monthTitle(m, true) }));
+      try { return alleyStops(SLOTS.length - 1).filter(s => s.id !== "now").map(s => ({ id: s.id, short: s.short, title: s.title, sub: s.sub, parts: s.parts.map(a => a.m) })); } finally { M.months = keep; }
+    },
     /* пройти этаж k ботом без отрисовки: вернуть, получилось ли, время и число падений */
     botRun(k, maxSec = 150) {
       const f = Tower.flags[k - 1]; Tower.leave(); placePlayer(f.spawn.x, f.spawn.y, f.spawn.z, f.spawn.yaw);
