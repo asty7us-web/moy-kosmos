@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1342. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1539. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -342,6 +342,135 @@ svg.i.f{fill:currentColor;stroke:none}
 .ph-box{display:flex;flex-direction:column;align-items:center;gap:16px;max-height:100%}
 .ph-box img{max-width:100%;max-height:calc(100vh - 150px);border-radius:14px;border:5px solid #fff;box-shadow:0 14px 44px rgba(0,0,0,.6);background:#110b33}
 .ph-box .btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* ───────── игровой вид окон и кнопок (Андрей 12.11: «интерфейс в плане всяких всплывающих окон и прочего — как в играх,
+   к которым она привыкла»). Свой рисунок в том же жанре: крупные панели с белой окантовкой и «толщиной», яркие шапки,
+   круглый красный крестик, окна выпрыгивают, кнопки сочные и объёмные, надписи с обводкой. ───────── */
+:root{--out:#150c45;--o3:-3px -3px 0 var(--out),3px -3px 0 var(--out),-3px 3px 0 var(--out),3px 3px 0 var(--out),0 -3px 0 var(--out),0 3px 0 var(--out),-3px 0 0 var(--out),3px 0 0 var(--out);--o2:-2px -2px 0 var(--out),2px -2px 0 var(--out),-2px 2px 0 var(--out),2px 2px 0 var(--out),0 -2px 0 var(--out),0 2px 0 var(--out),-2px 0 0 var(--out),2px 0 0 var(--out);--pan1:#4a35c9;--pan2:#2b1d86;--hd1:#ff7ac4;--hd2:#8a6cff;--ok1:#7df0a0;--ok2:#27b86a;--no1:#ff7a8e;--no2:#e23d5a}
+@keyframes popIn{0%{opacity:0;transform:scale(.55)}55%{opacity:1;transform:scale(1.06)}78%{transform:scale(.97)}100%{transform:none}}
+@keyframes sheetIn{0%{opacity:0;transform:translateY(46px) scale(.94)}60%{opacity:1;transform:translateY(-6px) scale(1.01)}100%{transform:none}}
+@keyframes wob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+/* кнопки: объёмные, с белой окантовкой и обводкой текста */
+.btn{min-height:52px;border-radius:18px;font-weight:900;font-size:17px;letter-spacing:.01em;color:#3a2400;background:linear-gradient(180deg,#fff3a8,#ffc93c);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.75),0 0 0 3px var(--out),0 7px 0 3px var(--out),0 14px 22px rgba(0,0,0,.35)}
+.btn:active{transform:translateY(5px);box-shadow:inset 0 0 0 3px rgba(255,255,255,.75),0 0 0 3px var(--out),0 2px 0 3px var(--out)}
+.btn.vio{color:#fff;background:linear-gradient(180deg,var(--ok1),var(--ok2));text-shadow:0 2px 0 rgba(0,70,30,.55);box-shadow:inset 0 0 0 3px rgba(255,255,255,.6),0 0 0 3px var(--out),0 7px 0 3px var(--out),0 14px 22px rgba(0,0,0,.35)}
+.btn.vio:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.6),0 0 0 3px var(--out),0 2px 0 3px var(--out)}
+.btn.ghost{color:#fff;background:linear-gradient(180deg,#7d6bf0,#5540cf);text-shadow:0 2px 0 rgba(20,10,70,.6);box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),0 0 0 3px var(--out),0 6px 0 3px var(--out)}
+.btn.ghost:active{transform:translateY(4px);box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),0 0 0 3px var(--out),0 2px 0 3px var(--out)}
+.btn.sm{min-height:42px;border-radius:15px;font-size:15px}
+.btn.wb{color:#fff;background:linear-gradient(180deg,#e63fc8,#7a1fa8);text-shadow:0 2px 0 rgba(60,0,70,.6);box-shadow:inset 0 0 0 3px rgba(255,255,255,.55),0 0 0 3px var(--out),0 7px 0 3px var(--out),0 14px 22px rgba(0,0,0,.35)}
+.btn:disabled{filter:saturate(.3);opacity:.6}
+
+/* верхняя строка */
+.chip{height:46px;border-radius:16px;background:linear-gradient(180deg,#3b2aa6,#241770);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.85),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out);font-weight:900}
+.rbtn{width:46px;height:46px;border-radius:15px;background:linear-gradient(180deg,#5a46d6,#3524a0);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.85),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out);color:#fff}
+.rbtn:active{transform:translateY(4px);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.85),0 0 0 2.5px var(--out),0 1px 0 2.5px var(--out)}
+.rbtn.gold{background:linear-gradient(180deg,#fff3a8,#ffc93c);color:#3a2400}
+#hud{gap:9px;padding-top:calc(var(--sat) + 10px)}
+.hud-r{gap:9px}
+#hRun,#hQuest{min-height:46px}
+
+/* кнопка у предмета, сообщения, крупные надписи */
+#prompt{min-height:56px;border-radius:18px;font-weight:900;font-size:17px;color:#fff;background:linear-gradient(180deg,var(--ok1),var(--ok2));text-shadow:0 2px 0 rgba(0,70,30,.6);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),0 0 0 3px var(--out),0 7px 0 3px var(--out),0 14px 26px rgba(0,0,0,.45);animation:popIn .34s var(--ease)}
+#prompt:active{transform:translateX(-50%) translateY(5px);box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),0 0 0 3px var(--out),0 2px 0 3px var(--out)}
+@keyframes promptIn{0%{opacity:0;transform:translateX(-50%) scale(.6)}60%{opacity:1;transform:translateX(-50%) scale(1.07)}100%{transform:translateX(-50%)}}
+#prompt{animation-name:promptIn}
+#toast div{padding:11px 18px;border-radius:16px;color:#2a1a55;background:#fff;font-weight:800;box-shadow:0 0 0 3px var(--out),0 6px 0 3px var(--out),0 12px 22px rgba(0,0,0,.35);animation:popIn .4s var(--ease)}
+#toast div b{color:#7a3fe0}
+#hint{border-radius:18px;background:linear-gradient(180deg,#3b2aa6,#241770);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.8),0 0 0 2.5px var(--out),0 6px 0 2.5px var(--out);font-weight:800}
+#hint b{color:var(--gold2)}
+#banner b{font-weight:900;color:#fff;text-shadow:var(--o3),0 7px 0 var(--out)}
+#banner span{font-weight:900;color:var(--gold2);text-shadow:var(--o2),0 4px 0 var(--out)}
+#banner.on{animation:popIn .5s var(--ease)}
+
+/* окна: меню, гардероб, приз, сюрприз, снимок */
+#menu{background:rgba(10,6,40,.6)}
+.sheet,#ward{background:linear-gradient(180deg,var(--pan1),var(--pan2));box-shadow:inset 0 0 0 4px #fff,0 0 0 4px var(--out),0 -8px 40px rgba(0,0,0,.5);border-radius:28px 28px 0 0}
+#menu .sheet{animation:sheetIn .38s var(--ease)}
+#ward{animation:sheetIn .38s var(--ease)}
+@media (min-width:600px) and (min-height:560px){.sheet{border-radius:28px;box-shadow:inset 0 0 0 4px #fff,0 0 0 4px var(--out),0 10px 0 4px var(--out),0 26px 50px rgba(0,0,0,.5);animation:popIn .4s var(--ease)!important}}
+.sheet-h,.ward-h{margin:4px 4px 8px;padding:12px 12px 12px 18px;border-radius:24px 24px 14px 14px;background:linear-gradient(90deg,var(--hd1),var(--hd2));box-shadow:inset 0 -4px 0 rgba(20,10,70,.25)}
+.sheet-h h2,.ward-h h2{font-size:22px;font-weight:900;color:#fff;text-shadow:var(--o2),0 4px 0 var(--out);letter-spacing:.01em}
+.ward-h p{color:#fff;opacity:.92;font-weight:800;text-shadow:0 1px 0 rgba(20,10,70,.6)}
+#menuX,#vX{background:linear-gradient(180deg,var(--no1),var(--no2));border-radius:50%;width:42px;height:42px;font-size:21px;box-shadow:inset 0 0 0 3px #fff,0 0 0 3px var(--out),0 4px 0 3px var(--out)}
+#menuX svg,#vX svg{stroke-width:3.4}
+.tabs button{height:40px;border-radius:14px;font-weight:900;color:#fff;background:rgba(20,10,70,.45);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.tabs button.on{color:#3a2400;background:linear-gradient(180deg,#fff3a8,#ffc93c);box-shadow:inset 0 0 0 2.5px #fff,0 0 0 2.5px var(--out),0 4px 0 2.5px var(--out)}
+.tabs{padding-bottom:12px}
+.row,.s-it{border-radius:16px;background:rgba(20,10,70,.42);box-shadow:inset 0 0 0 2px rgba(255,255,255,.22);font-weight:800}
+button.row:active,button.s-it:active{transform:translateY(2px)}
+.row.on .sw{background:linear-gradient(180deg,var(--ok1),var(--ok2))}
+.sw{box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.note{color:#d9d2ff}
+.s-top{color:#efeaff;font-weight:700}
+.w-sec{color:#fff;font-weight:900;font-size:14px;text-shadow:0 2px 0 rgba(20,10,70,.6)}
+.w-it{border-radius:15px;background:rgba(20,10,70,.42);box-shadow:inset 0 0 0 2px rgba(255,255,255,.3);font-weight:900}
+.w-it.on{color:#3a2400;background:linear-gradient(180deg,#fff3a8,#ffc93c);box-shadow:inset 0 0 0 2.5px #fff,0 0 0 2.5px var(--out),0 4px 0 2.5px var(--out)}
+.w-it.c{box-shadow:inset 0 0 0 3px rgba(255,255,255,.55),0 0 0 2px var(--out)}
+.w-it.c.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 3px var(--out),0 0 0 6px var(--gold2)}
+.w-card{border-radius:18px;background:linear-gradient(180deg,#5a46d6,#3a289f);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.55),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out);margin-bottom:5px}
+.w-card b{color:#fff;font-weight:900;text-shadow:0 2px 0 rgba(20,10,70,.6)}
+.w-card small{color:#e6dfff}
+.w-card.r1{background:linear-gradient(180deg,#4aa8ff,#2a62d6);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.7),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out)}
+.w-card.r2{background:linear-gradient(180deg,#c07bff,#7a3fe0);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.7),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out)}
+.w-card.r3{background:linear-gradient(180deg,#ffd86a,#ff9a3a);box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.8),0 0 0 2.5px var(--out),0 5px 0 2.5px var(--out)}
+.w-card.r3 b{color:#3a2400;text-shadow:none}.w-card.r3 small{color:#5a3a00}
+.w-card u{color:#fff!important;background:rgba(20,10,70,.55);padding:2px 6px;border-radius:8px;top:5px;right:5px}
+.w-card.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 3px var(--out),0 0 0 7px var(--ok1),0 5px 0 7px var(--out)}
+.w-card.on::after{content:"✓";position:absolute;left:6px;top:5px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;background:var(--ok2);box-shadow:0 0 0 2px #fff}
+.w-card:active{transform:translateY(4px)}
+.w-cards{gap:10px 9px}
+#wardOk{color:#fff;background:linear-gradient(180deg,var(--ok1),var(--ok2));text-shadow:0 2px 0 rgba(0,70,30,.55)}
+/* приз и сюрприз — выпрыгивающая карточка */
+.pz{padding:20px 18px 18px;border-radius:28px;background:linear-gradient(180deg,var(--pan1),var(--pan2));box-shadow:inset 0 0 0 4px #fff,0 0 0 4px var(--out),0 10px 0 4px var(--out),0 26px 50px rgba(0,0,0,.5);animation:popIn .5s var(--ease)}
+.pz-g{animation:wob 1.6s ease-in-out infinite}
+.pz h2{color:#fff;text-shadow:var(--o3),0 6px 0 var(--out)}
+.pz p{font-weight:700}
+.pz-f input{background:#fff;color:#2a1a55;box-shadow:inset 0 0 0 3px var(--out);font-weight:800}
+.pz-f input::placeholder{color:#8a80b5}
+.pz-f input:focus{box-shadow:inset 0 0 0 3px #7a3fe0}
+#secret h2{color:#fff;text-shadow:var(--o3),0 6px 0 var(--out)}
+.ph-box img{border:6px solid #fff;box-shadow:0 0 0 4px var(--out),0 10px 0 4px var(--out),0 24px 44px rgba(0,0,0,.5)}
+/* кнопки действий справа */
+#bDown,#bRide,#bAct{background:linear-gradient(180deg,#5a46d6,#3524a0);box-shadow:inset 0 0 0 3px rgba(255,255,255,.85),0 0 0 3px var(--out),0 5px 0 3px var(--out)}
+#bRide.on{background:linear-gradient(180deg,var(--ok1),var(--ok2));box-shadow:inset 0 0 0 3px #fff,0 0 0 3px var(--out),0 5px 0 3px var(--out)}
+#bAct{color:#ffe07a;text-shadow:0 2px 0 var(--out)}
+#bAct.on{background:linear-gradient(180deg,#fff3a8,#ffc93c);color:#3a2400;text-shadow:none}
+#wheel{border-radius:22px;background:linear-gradient(180deg,var(--pan1),var(--pan2));box-shadow:inset 0 0 0 3px #fff,0 0 0 3px var(--out),0 7px 0 3px var(--out),0 16px 34px rgba(0,0,0,.5);animation:popIn .3s var(--ease)}
+#wheel button{background:rgba(20,10,70,.45);box-shadow:inset 0 0 0 2px rgba(255,255,255,.3);color:#fff;font-weight:900}
+#skip{color:#fff}
+@media (prefers-reduced-motion:reduce){.pz-g,#banner.on,#toast div,#prompt{animation:none}}
+
+/* поправки по снимкам: кнопка у предмета стоит левее кнопок справа и вмещает длинную надпись в две строки; подсказка выше кнопок;
+   уведомления компактнее; вкладки меню помещаются без прокрутки; у снимка кнопки в один ряд и не уходят за край */
+#prompt.two{padding-top:7px;padding-bottom:7px;line-height:1.15}
+@media (orientation:portrait) and (max-width:620px){
+  #prompt{left:calc(50vw - 54px);max-width:min(calc(100vw - 133px),420px)}
+  #hint{bottom:calc(var(--sab) + 304px)}
+}
+#toast div{padding:9px 16px;font-size:14.5px}
+.tabs button{padding:0 12px}
+.ph-box img{max-height:calc(100vh - 200px)}
+.ph-box .btns .btn{min-height:46px;padding:0 13px;font-size:15px}
+
+/* приз: по центру, а если окно выше экрана (телефон лёжа) — начало не обрезается и всё прокручивается; лёжа окно компактнее */
+#prize{justify-content:flex-start}
+.pz{margin:auto 0;flex:none}
+@media (orientation:landscape) and (max-height:520px){
+  .pz{width:min(100%,600px);padding:12px 16px 14px;gap:8px;border-radius:22px}
+  .pz-g{display:none}
+  .pz h2{font-size:24px}
+  .pz p{font-size:13.5px;line-height:1.3}
+  .pz .btn{min-height:44px}
+  .pz .btn.sm{min-height:38px}
+  .pz-f input{height:44px}
+  .pz-st{min-height:16px}
+}
+/* кольцо жестов открыто — подсказка не лежит поверх него */
+body:has(#wheel:not([hidden])) #hint{opacity:0}
 </style>
 </head>
 <body>
@@ -466,7 +595,7 @@ svg.i.f{fill:currentColor;stroke:none}
     <h2 id="pzH">Ты выиграла подарок от папы!</h2>
     <p>Выбери на Wildberries всё, что хочешь, и сложи в корзину. Потом в корзине нажми «Поделиться корзиной», скопируй ссылку и пришли её папе.</p>
     <a class="btn wb" id="pzWB" href="https://www.wildberries.ru/" target="_blank" rel="noopener">Открыть Wildberries</a>
-    <div class="pz-f"><input id="pzIn" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Вставь сюда ссылку на корзину"><button class="btn sm ghost" id="pzPaste" type="button">Вставить</button></div>
+    <div class="pz-f"><input id="pzIn" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ссылка на корзину"><button class="btn sm ghost" id="pzPaste" type="button">Вставить</button></div>
     <button class="btn vio" id="pzSend" type="button">Отправить папе</button>
     <p class="pz-st" id="pzSt"></p>
     <button class="btn ghost sm" id="pzX" type="button">Закрыть</button>
@@ -481,7 +610,7 @@ svg.i.f{fill:currentColor;stroke:none}
 <!-- сюрприз из сундука -->
 <div class="ov" id="secret" hidden>
   <h2 id="secH">Сюрприз!</h2>
-  <p id="secP">Тайный альбом «Мы с Ульяной» открыт</p>
+  <p id="secP">Тайный альбом открыт</p>
   <div class="fan" id="secFan"></div>
   <div class="btns"><button class="btn" id="secGo" type="button">Смотреть альбом</button><button class="btn ghost" id="secX" type="button">Дальше</button></div>
 </div>
@@ -505,7 +634,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-1342";
+const BUILD = "20261112-1539";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -628,9 +757,9 @@ const Ph = (() => {
   return { get, image };
 })();
 
-/* ───── модель: месяцы жизни считаются по календарю от дня рождения — «мне 3 месяца» начинается ровно 9-го числа ───── */
+/* ───── модель: месяцы жизни считаются по календарю от дня рождения — «мне 3 месяца» начинается в то же число, что и день рождения ───── */
 const M = { months: [], now: null, secret: null, hidden: new Set() };
-let BIRTH = new Date(2014, 1, 9);
+let BIRTH = new Date(2000, 0, 1);   // условная дата; настоящая приходит только из зашифрованных данных (G.birth)
 const P = n => G.ph[n];
 function ageAt(date) {
   let y = date.getFullYear() - BIRTH.getFullYear(), m = date.getMonth() - BIRTH.getMonth(), d = date.getDate() - BIRTH.getDate();
@@ -654,7 +783,7 @@ function ageText(date) {                     // точный возраст в �
 }
 const monthIdx = p => { const a = ageAt(parseD(p.d)); return Math.max(0, a.y * 12 + a.m); };
 const addMonths = (d, k) => new Date(d.getFullYear(), d.getMonth() + k, d.getDate());
-function periodOf(m, m2 = m) {               // «9 мая – 8 июня 2014»; для нескольких месяцев подряд — от начала первого до конца последнего
+function periodOf(m, m2 = m) {               // «число месяца – число следующего»; для нескольких месяцев подряд — от начала первого до конца последнего
   const s = addMonths(BIRTH, m), e = addMonths(BIRTH, m2 + 1); e.setDate(e.getDate() - 1);      // «минус день» по календарю: вычитать 24 часа нельзя — там, где переводят часы, получался не тот день
   return `${s.getDate()} ${MONG[s.getMonth()]}${s.getFullYear() !== e.getFullYear() ? " " + s.getFullYear() : ""} – ${e.getDate()} ${MONG[e.getMonth()]} ${e.getFullYear()}`;
 }
@@ -668,13 +797,13 @@ function spanTitle(a, z, short) {
 }
 
 function buildModel() {
-  BIRTH = parseD(G.birth || "2014-02-09");
+  if (G.birth) BIRTH = parseD(G.birth);
   const byM = new Map();
   for (const s of G.sections || []) if (/^m\d+$/.test(s.id)) for (const n of s.p) { const p = P(n); if (p && p.d) { const m = monthIdx(p); if (!byM.has(m)) byM.set(m, []); byM.get(m).push(n); } }
   M.months = [...byM.keys()].sort((a, b) => a - b).map(m => ({ id: "m" + m, kind: "month", m, all: byM.get(m), title: monthTitle(m), short: monthTitle(m, true) }));
   const now = (G.sections || []).find(s => s.id === "now");
   M.now = { id: "now", kind: "now", all: now ? now.p.filter(P) : [], title: "Я сейчас", short: "Сейчас" };
-  M.secret = { id: "secret", kind: "secret", all: (G.surprise || []).filter(P), title: "Мы с Ульяной", short: "Тайный альбом" };
+  M.secret = { id: "secret", kind: "secret", all: (G.surprise || []).filter(P), title: G.st || "Тайный альбом", short: "Тайный альбом" };
   /* скрытые фото: общий список с сайта + то, что только что убрали или вернули на этом устройстве (только читаю) */
   const h = new Set((G.del || []).filter(P));
   let want = LS.json("mk2.want", null);
@@ -718,10 +847,10 @@ function coverOf(list, id) {
   const exact = list.filter(n => P(n).ap === 0 && P(n).h >= P(n).w), tall = list.filter(n => P(n).h >= P(n).w), pool = exact.length ? exact : tall.length ? tall : list;
   return pool[Math.floor(pool.length * .4)];
 }
-/* подпись к фото: { t: «Мне 3 месяца», s: «8 мая 2014, 14:35» } */
+/* подпись к фото: { t: «Мне 3 месяца», s: «день и месяц, год, время» } */
 function photoWhen(n, album) {
   const p = P(n);
-  if (!p || !p.d) return album && album.kind === "secret" ? { t: "Мы с Ульяной", s: "тайный альбом" } : { t: "Я сейчас", s: "фото последних лет" };
+  if (!p || !p.d) return album && album.kind === "secret" ? { t: M.secret ? M.secret.title : "Тайный альбом", s: "тайный альбом" } : { t: "Я сейчас", s: "фото последних лет" };
   const d = parseD(p.d), t = monthTitle(monthIdx(p));
   if (p.ap === 0) return { t, s: `${d.getDate()} ${MONG[d.getMonth()]} ${d.getFullYear()}` + (p.tm ? ", " + p.tm : "") };
   return { t, s: (p.ap === 1 ? "≈ " : "") + MON[d.getMonth()] + " " + d.getFullYear() };
@@ -1113,7 +1242,7 @@ for (const s of SLOTS) {
   if (s.side === "E") Object.assign(s, { ax: "z", f: 24, bk: 25, dir: [-1, 0], photo: [24.98, 2, c + .5], ry: -Math.PI / 2, niche: [24, 0, c - 1, 25, 4, c + 2], stand: [22.4, 0, c + .5], stub: [22, c - 1, 24, c + 2] });
   if (s.side === "W") Object.assign(s, { ax: "z", f: -25, bk: -26, dir: [1, 0], photo: [-24.98, 2, c + .5], ry: Math.PI / 2, niche: [-25, 0, c - 1, -24, 4, c + 2], stand: [-22.4, 0, c + .5], stub: [-24, c - 1, -22, c + 2] });
 }
-const R0 = rng(20140209);                                    // зерно мира — день рождения
+const R0 = rng(0x13350b1);                                   // зерно мира: не менять — от него вся расстановка
 const EDG = [R0() * TAU, R0() * TAU, R0() * TAU];
 const edgeN = a => Math.sin(a * 3 + EDG[0]) * .5 + Math.sin(a * 5 + EDG[1]) * .3 + Math.sin(a * 9 + EDG[2]) * .2;
 function mainF(x, z) { const A = 30.2 + edgeN(Math.atan2(z, x)) * 1.1, u = Math.abs(x) / A, v = Math.abs(z) / A; return 1 - (u * u * u * u + v * v * v * v); }
@@ -2306,7 +2435,8 @@ const UI = (() => {
   const toastBox = $("#toast"), fadeEl = $("#fade"), hintEl = $("#hint"), stack = [];
   let banT = 0, hintT = 0;
   function toast(html, ms = 2800) {
-    const d = el("div", "", html); toastBox.append(d); while (toastBox.children.length > 3) toastBox.firstChild.remove();
+    for (const o of toastBox.children) if (o.dataset.h === html && !o.classList.contains("out")) return;      // то же самое уже висит — второй раз не показываю
+    const d = el("div", "", html); d.dataset.h = html; toastBox.append(d); while (toastBox.children.length > 3) toastBox.firstChild.remove();
     setTimeout(() => { d.classList.add("out"); setTimeout(() => d.remove(), 400); }, ms);
   }
   function banner(b, s, ms = 2400) { $("#banB").textContent = b; $("#banS").textContent = s || ""; $("#banner").classList.add("on"); clearTimeout(banT); banT = setTimeout(() => $("#banner").classList.remove("on"), ms); }
@@ -2997,7 +3127,7 @@ const Stars = (() => {
 })();
 
 /* ══════ 70_chest.js ══════ */
-/* Сюрприз: сундук на вершине башни. Открыла — луч до неба, салют, и открывается тайный альбом «Мы с Ульяной».
+/* Сюрприз: сундук на вершине башни. Открыла — луч до неба, салют, и открывается тайный альбом (его название — только в зашифрованных данных).
    Ставятся метки в памяти устройства (их читает основная страница — там альбом тоже откроется), человечку — корона. */
 const Chest = (() => {
   const C = TOWER_C, Y = 51; let lid = null, beam = null, glow = null, opened = false, cine = -1, fw = 0, lidA = 0;
@@ -3038,7 +3168,7 @@ const Chest = (() => {
   }
   function showSecret(first) {
     const list = listOf(M.secret), fan = $("#secFan"); fan.innerHTML = "";
-    $("#secH").textContent = first ? "Сюрприз!" : "Тайный альбом"; $("#secP").textContent = first ? "Тайный альбом «Мы с Ульяной» открыт. А ещё у тебя теперь корона!" : "«Мы с Ульяной»";
+    $("#secH").textContent = first ? "Сюрприз!" : "Тайный альбом"; $("#secP").textContent = first ? "Тайный альбом" + (G.st ? " «" + G.st + "»" : "") + " открыт. А ещё у тебя теперь корона!" : (G.st ? "«" + G.st + "»" : "Листай и вспоминай");
     list.slice(0, 5).forEach((n, i) => {
       const k = list.length > 1 ? i / (Math.min(5, list.length) - 1) - .5 : 0, b = el("button"); b.type = "button";
       b.style.cssText = `--r:${(k * 22).toFixed(1)}deg;--y:${(Math.abs(k) * 26).toFixed(0)}px;--d:${(.15 + i * .14).toFixed(2)}s`;
@@ -3047,7 +3177,7 @@ const Chest = (() => {
     });
     UI.open("secret"); if (first) Snd.play("fanfare");
   }
-  function closeSecret(say) { if ($("#secret").hidden) return; UI.close("secret"); if (say) UI.toast("Альбом «Мы с Ульяной» теперь открыт и в <b>Моём космосе</b>", 4200); }
+  function closeSecret(say) { if ($("#secret").hidden) return; UI.close("secret"); if (say) UI.toast("Альбом" + (G.st ? " «" + G.st + "»" : "") + " теперь открыт и в <b>Моём космосе</b>", 4200); }
   function vis(dt) {
     const t = Loop.t;
     if (cine >= 0) {
@@ -3934,16 +4064,18 @@ const Prize = (() => {
     out.set(iv); out.set(ct, 12); let s = ""; for (let i = 0; i < out.length; i++) s += String.fromCharCode(out[i]); return btoa(s);
   }
   async function send() {
-    if (busy) return; let url = inp.value.trim(), host = "";
+    if (busy) return; const raw = inp.value.trim(), m = raw.match(/https?:\/\/[^\s<>"']+/i); let url = m ? m[0].replace(/[.,;:!?)»]+$/, "") : raw, host = "";      // из приложения ссылка часто приходит вместе со словами — беру только её
     try { const u = new URL(url); if (u.protocol === "https:" || u.protocol === "http:") { host = u.hostname.toLowerCase(); url = u.href; } } catch (e) {}      // адрес — в выверенном виде: без пробелов и лишних знаков
     if (!host) { say("Вставь ссылку на корзину — она начинается с https://", 1); return; }
+    if (url.length > 500) { say("Ссылка слишком длинная. В Wildberries нажми «Поделиться» и скопируй ссылку оттуда.", 1); return; }      // длиннее папе в Telegram не уйдёт
+    if (url !== raw) inp.value = url;
     if (!/(^|\.)(wildberries\.ru|wb\.ru)$/.test(host) && force !== url) { force = url; say("Это не похоже на ссылку Wildberries. Если всё верно — нажми «Отправить папе» ещё раз.", 1); return; }
     if (Date.now() - (Q.sentT || 0) < 20000) { say("Ссылка только что отправлена. Подожди немного.", 1); return; }
     busy = true; say("Отправляю…");
     try {
-      const body = await pack({ gift: { url: url.slice(0, 600), t: Date.now(), n: (Q.sent || 0) + 1 } }); last = body;
+      const body = await pack({ gift: { url, t: Date.now(), n: (Q.sent || 0) + 1 } }); last = body;
       if (!LOCAL) { if (!G.relay) throw new Error("relay"); const r = await fetch("https://ntfy.sh/" + G.relay, { method: "POST", body }); if (!r.ok) throw new Error("relay"); }   // при просмотре на своём компьютере записки не уходят
-      Q.sent = (Q.sent || 0) + 1; Q.sentT = Date.now(); Q.url = url.slice(0, 600); Save.now();
+      Q.sent = (Q.sent || 0) + 1; Q.sentT = Date.now(); Q.url = url; Save.now();
       say("Ссылка улетела папе! Он получит её в Telegram.", 2); Snd.play("fanfare"); buzz(40);
     } catch (e) { say("Не получилось отправить — проверь интернет и попробуй ещё раз.", 1); }
     busy = false;
