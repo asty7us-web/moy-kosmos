@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1147. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1330. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -401,7 +401,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-1147";
+const BUILD = "20261112-1330";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -1693,6 +1693,41 @@ const Input = (() => {
   };
 })();
 
+/* ══════ 41_tap.js ══════ */
+/* Нажатия вторым пальцем. Пока один палец держит джойстик (или просто лежит на экране), телефон не присылает «click»
+   от другого пальца — и кнопки молчат: «Гардероб», «Открыть сундук», меню, вещи в гардеробе (так на настоящем телефоне
+   «не работал» гардероб). Здесь такое касание доводится до нажатия: коснулась кнопки и отпустила на том же месте, а click
+   от телефона не пришёл — отправляем его сами. Одиночные касания не трогаем: у них click приходит как обычно. */
+(() => {
+  const down = new Map(); let lastClick = -1e9, synth = null;
+  const finger = e => e.pointerType === "touch" || e.pointerType === "pen";
+  addEventListener("pointerdown", e => {
+    if (!finger(e)) return;
+    for (const p of down.values()) p.multi = true;                         // к лежащему пальцу добавился ещё один
+    down.set(e.pointerId, { x: e.clientX, y: e.clientY, multi: down.size > 0, el: e.target });
+  }, true);
+  addEventListener("click", e => {
+    const now = performance.now();
+    if (e.isTrusted && synth && now - synth.t < 500 && Math.hypot(e.clientX - synth.x, e.clientY - synth.y) < 30) { e.stopImmediatePropagation(); e.preventDefault(); return; }   // телефон всё же прислал свой click следом — второй раз не нажимаем
+    lastClick = now;
+  }, true);
+  const up = e => {
+    const p = down.get(e.pointerId); if (!p) return; down.delete(e.pointerId);
+    if (e.type !== "pointerup" || !p.multi) return;                        // палец был один — click придёт сам
+    const t = performance.now(), x = e.clientX, y = e.clientY;
+    if (Math.hypot(x - p.x, y - p.y) > 14) return;                         // палец уехал — это не нажатие (вела пальцем, листала)
+    const el = D.elementFromPoint(x, y);
+    if (!el || !(el === p.el || el.contains(p.el) || (p.el.contains && p.el.contains(el)))) return;
+    if (el.closest("#touch, #pad, #vStage, #gl")) return;                  // там пальцы обрабатываются по-своему
+    setTimeout(() => {
+      if (lastClick >= t || !el.isConnected) return;                       // click пришёл сам
+      synth = { t: performance.now(), x, y };
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: W, clientX: x, clientY: y }));
+    }, 60);
+  };
+  addEventListener("pointerup", up, true); addEventListener("pointercancel", up, true);
+})();
+
 /* ══════ 45_camera.js ══════ */
 /* Камера: летит следом за человечком, вращается пальцем, не проваливается в стены и сама понемногу встаёт за спину.
    При входе — «прилёт»: камера летит из космоса к острову. Для праздников (сундук) — облёт вокруг точки. */
@@ -2031,7 +2066,7 @@ const Tower = (() => {
   const C = TOWER_C, FH = 10, NF = 5;
   const NAMES = ["Облачные ступеньки", "Летучие платформы", "Лавовый мост", "Мерцающие кристаллы", "Звёздная дорожка"];
   const flags = [], mids = [], sweeps = [], visList = [], ways = [], starAt = {};
-  const run = { on: false, flag: 0, mid: null, t: -1, deaths: 0 };
+  const run = { on: false, flag: 0, mid: null, t: -1, deaths: 0, side: false };
   let TB = null;
 
   /* ───── подвижные кусочки ───── */
@@ -2212,6 +2247,12 @@ const Tower = (() => {
     /* лифт у подножия: к любому флажку, до которого уже добиралась */
     Spots.add({ x: C.x - 2.5, y: 1, z: C.z + 2.5, r: 2.2, when: () => Save.d.flag > 0, text: () => "Лифт башни", act: () => Menu.open("tower") });
     WORLD.decor.push([C.x - 2.5, .08, C.z + 2.5, 1.6, .16, 1.6, 0x7ff3ff]); WORLD.lamps.push({ x: C.x - 2.5, y: .5, z: C.z + 2.5, c: 0x7ff3ff, s: 3 });
+    /* такой же лифт — на площадке каждого этажа (в углу без звезды): вниз и на любой открытый этаж можно уехать, а не только спрыгнуть */
+    for (let f = 1; f < NF; f++) {
+      const px = C.x - 2.6, pz = C.z + (f % 2 ? -2.6 : 2.6), y = f * FH;
+      Spots.add({ x: px, y: y + 1, z: pz, r: 1.8, text: "Лифт башни", act: () => Menu.open("tower") });
+      WORLD.decor.push([px, y + .08, pz, 1.5, .16, 1.5, 0x7ff3ff]); WORLD.lamps.push({ x: px, y: y + .5, z: pz, c: 0x7ff3ff, s: 3 });
+    }
     Menu.tab("tower", "Башня", menu, 2);
   }
   function raise(f, instant) { f.on = true; if (instant) f.up = 1; f.cloth.material = matOf(f.c); }
@@ -2226,7 +2267,7 @@ const Tower = (() => {
   }
   function reach(k) {
     const f = flags[k];
-    if (!run.on) { run.on = true; run.flag = k; run.mid = null; run.t = -1; run.deaths = 0; if (!f.f.on) raise(f.f); if (k === 0 && !Save.d.seen.tower) { Save.d.seen.tower = 1; Save.put(); UI.hint("Башня до Луны! Упадёшь — вернёшься к флажку. Жизней нет, пробуй сколько хочешь. Домой — кнопка с домиком.", 9000); } UI.banner(k >= NF ? "Вершина" : "Этаж " + (k + 1), k >= NF ? "Лунная терраса" : NAMES[k]); hud(); return; }
+    if (!run.on) { run.on = true; run.flag = k; run.mid = null; run.t = -1; run.deaths = 0; if (!f.f.on) raise(f.f); if (k === 0 && !Save.d.seen.tower) { Save.d.seen.tower = 1; Save.put(); UI.hint("Сорвёшься с дорожки — вернёшься к флажку, жизней нет. Вниз — лифт на площадке или спрыгни с неё в сторону.", 10000); } UI.banner(k >= NF ? "Вершина" : "Этаж " + (k + 1), k >= NF ? "Лунная терраса" : NAMES[k]); hud(); return; }
     if (k === run.flag) { if (run.t >= 0) { run.t = -1; run.mid = null; hud(); } return; }
     if (k < run.flag) { run.flag = k; run.mid = null; run.t = -1; hud(); return; }
     const fair = k === run.flag + 1 && run.t >= 0, ms = Math.round(run.t * 1000), fl = run.flag + 1;
@@ -2252,10 +2293,15 @@ const Tower = (() => {
     }
     if (run.on && PL.dead <= 0) {
       const f = flags[run.flag];
-      if (run.t < 0) { if (run.flag < NF && (Math.abs(PL.x - C.x) > 4.05 || Math.abs(PL.z - C.z) > 4.05 || PL.y > f.y + 2.4 || PL.y < f.y - .6)) run.t = 0; }
-      else run.t += dt;
+      if (run.t < 0) {      // ушла с площадки: на дорожку этажа (она всегда начинается с восточного края) или в сторону
+        if (run.flag < NF && (Math.abs(PL.x - C.x) > 4.05 || Math.abs(PL.z - C.z) > 4.05 || PL.y > f.y + 2.4 || PL.y < f.y - .6)) { run.t = 0; run.side = !(PL.x - C.x > 4.05); }
+      } else { run.t += dt; if (run.side && PL.grounded && PL.x - C.x > 4.05 && PL.y > f.y - .6) run.side = false; }      // всё-таки встала на дорожку этого этажа — дальше обычные правила
       const base = run.mid ? run.mid.y : f.y;
-      if (run.flag < NF && PL.y < base - 3.5 && !PL.frozen) die("fall");
+      if (run.flag < NF && PL.y < base - 3.5 && !PL.frozen) {
+        /* сорвалась с дорожки — возвращаем к флажку; спрыгнула с площадки в сторону — значит, хочет вниз: пусть летит */
+        if (run.side && !run.mid && run.flag > 0) { leave(); UI.toast("Спрыгнула с башни! Наверх — <b>лифт</b> у подножия"); }      // с нижней площадки падать некуда, кроме пропасти — оттуда, как раньше, к флажку
+        else die("fall");
+      }
     }
     /* крутилки */
     for (const s of sweeps) {
@@ -2286,12 +2332,14 @@ const Tower = (() => {
   function menu(box) {
     const reached = Save.d.flag;
     box.append(el("div", "s-top", reached >= NF ? "Башня пройдена до самой Луны! Можно улучшать время этажей." : reached ? `Дошла до флажка <b>${reached}</b> из ${NF}. Лифт у подножия везёт к любому открытому флажку.` : "Башня стоит на севере, за мостом. Пять этажей до самой Луны — а наверху сундук с сюрпризом."));
+    if (run.on && run.flag > 0) { const r = el("button", "row", `${ico("home")}<span>Вниз, к подножию башни</span><span class="v">ехать</span>`); r.type = "button"; r.onclick = () => goFlag(0); box.append(r); }      // она сейчас на башне — спуск одной кнопкой
     for (let f = 1; f <= NF; f++) {
       const b = Save.d.best[f], open = reached >= f - 1 && reached > 0, r = el("button", "row", `${ico("flag")}<span>Этаж ${f}<small style="display:block;font-size:12px;color:var(--ink3)">${NAMES[f - 1]}</small></span><span class="v${b ? "" : " no"}">${b ? fmtTime(b) : open ? "ехать" : "закрыт"}</span>`);
       r.type = "button"; r.disabled = !open; if (!open) r.style.opacity = ".5"; r.onclick = () => goFlag(f - 1); box.append(r);
     }
     if (reached >= NF) { const r = el("button", "row", `${ico("star", "f")}<span>Вершина — Лунная терраса</span><span class="v">ехать</span>`); r.type = "button"; r.onclick = () => goFlag(NF); box.append(r); }
     box.append(el("div", "note", "Время этажа считается от ухода с площадки до следующего флажка. Упала до малого флажка — время начинается заново."));
+    box.append(el("div", "note", "Спуститься: лифт стоит на площадке каждого этажа. А можно просто спрыгнуть с площадки в сторону — не туда, где начинается дорожка."));
   }
   $("#hFlag").onclick = () => { Snd.play("click"); toFlag(); };
   return { build, step, vis, run, flags, mids, ways, starAt, goFlag, leave, NAMES, hud, C, mover, trampoline };
@@ -2925,6 +2973,9 @@ if (DEV) {
     lock(scale) { View.lock = true; View.scale = scale || 1; resize(); },
     render() { for (let i = 0; i < VIS.length; i++) VIS[i](1 / 60); renderer.render(scene, camera); }
   };
+
+  /* метка mir.hold=1: прилёт не кончается сам (проверка пропускает его командой skip) — чтобы проверять касания на прилёте, не гоняясь за временем */
+  if (LS.get("mir.hold") === "1") { const iv = setInterval(() => { if (Cam.mode === "intro") { Cam.dur = 1e6; clearInterval(iv); } else if (Cam.mode === "orbit") clearInterval(iv); }, 20); }
 
   /* ───── проверочный бот: проходит этаж башни по записанному пути ───── */
   const Bot = { k: 0, wi: 0, go: false, t: 0, lastJ: -9, deaths: 0, done: false, reset: false };
