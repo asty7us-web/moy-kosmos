@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-0934. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-0941. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -399,7 +399,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-0934";
+const BUILD = "20261112-0941";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -584,9 +584,20 @@ function alleyStops(maxMonths) {
   if (listOf(M.now).length) out.push({ id: "now", title: "Я сейчас", short: "Сейчас", sub: "фото последних лет", parts: [M.now] });
   return out;
 }
-/* обложка: подходящее вертикальное фото из середины (как на основной странице) */
-function coverOf(list) {
+/* где на фото лицо (в процентах от левого верхнего угла) — лежит в зашифрованном списке; нет — чуть выше середины */
+function focusOf(n) { const f = G.focus && G.focus[n]; return f ? { x: f[0], y: f[1] } : { x: 50, y: P(n) && P(n).h >= P(n).w ? 30 : 50 }; }
+/* фото как картинка для рамки нужной формы: обрезка вокруг лица */
+function photoTex(im, want, n) {
+  const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = LOW ? 1 : 4;
+  const a = im.naturalWidth / im.naturalHeight, f = focusOf(n);
+  if (a > want) { const r = want / a; t.repeat.set(r, 1); t.offset.set(clamp(f.x / 100 - r / 2, 0, 1 - r), 0); }
+  else { const r = a / want; t.repeat.set(1, r); t.offset.set(0, clamp(1 - f.y / 100 - r / 2, 0, 1 - r)); }
+  t.needsUpdate = true; return t;
+}
+/* обложка: та же, что выбрана для основной страницы; нет такой — подходящее фото из середины */
+function coverOf(list, id) {
   if (!list.length) return null;
+  const c = id && G.cover && G.cover[id]; if (c && list.includes(c)) return c;
   const exact = list.filter(n => P(n).ap === 0 && P(n).h >= P(n).w), tall = list.filter(n => P(n).h >= P(n).w), pool = exact.length ? exact : tall.length ? tall : list;
   return pool[Math.floor(pool.length * .4)];
 }
@@ -1679,7 +1690,8 @@ function camOffset(out, dist) { const cp = Math.cos(Cam.pitch); return out.set(M
 function camSnap() { Cam.tx = PL.x; Cam.ty = PL.y + 1.5; Cam.tz = PL.z; Cam.cur = Cam.dist; }
 /* сколько можно отъехать от человечка в сторону камеры, пока не упрёмся в кубики. Луч «толстый» (пять лучей рядом),
    чтобы камера не застревала в узких щелях между блоками */
-const camHit = (x, y, z) => CAM_HIT[vget(Math.floor(x), Math.floor(y), Math.floor(z))];
+const CAMBOX = [];                                    // предметы не из кубиков, за которые камера тоже не заезжает (зеркало гардероба)
+const camHit = (x, y, z) => { if (CAM_HIT[vget(Math.floor(x), Math.floor(y), Math.floor(z))]) return 1; for (const b of CAMBOX) if (x > b[0] && x < b[3] && y > b[1] && y < b[4] && z > b[2] && z < b[5]) return 1; return 0; };
 function camRoom(dx, dy, dz, max) {
   const rx = Math.cos(Cam.yaw) * .42, rz = -Math.sin(Cam.yaw) * .42;
   for (let d = .6; d <= max; d += .22) {
@@ -1821,7 +1833,7 @@ const Alley = (() => {
     const ph0 = canvasTex(96, 128, (g, w, h) => { const q = g.createLinearGradient(0, 0, w, h); q.addColorStop(0, "#3a2a86"); q.addColorStop(1, "#7a3f9a"); g.fillStyle = q; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(255,230,160,.85)"; g.font = "56px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("✦", w / 2, h / 2); });
     SLOTS.forEach((s, n) => {
       if (!s.stop) return;
-      const st = s.stop, list = [].concat(...st.parts.map(listOf)), cover = coverOf(list);
+      const st = s.stop, list = [].concat(...st.parts.map(listOf)), cover = coverOf(list, st.parts.length === 1 ? st.parts[0].id : "");
       const mat = new THREE.MeshBasicMaterial({ map: ph0 }), mesh = new THREE.Mesh(new THREE.PlaneGeometry(3, 4), mat);
       mesh.position.set(s.photo[0], s.photo[1], s.photo[2]); mesh.rotation.y = s.ry; scene.add(mesh);
       const c = BT[PF[n]].side, sign = new THREE.Mesh(new THREE.PlaneGeometry(4.5, .85), new THREE.MeshBasicMaterial({ map: signTex(st.short, "#" + c.getHexString(THREE.SRGBColorSpace)), transparent: true }));
@@ -1841,10 +1853,7 @@ const Alley = (() => {
     while (active < 3 && queue.length) {
       const p = queue.shift(); active++; p.loaded = true;
       Ph.image(p.cover, false).then(im => {
-        const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = LOW ? 1 : 4;
-        const a = im.naturalWidth / im.naturalHeight, want = 3 / 4;
-        if (a > want) { t.repeat.set(want / a, 1); t.offset.set((1 - want / a) / 2, 0); } else { t.repeat.set(1, a / want); t.offset.set(0, (1 - a / want) * .62); }
-        t.needsUpdate = true; p.mat.map = t; p.mat.needsUpdate = true;
+        p.mat.map = photoTex(im, 3 / 4, p.cover); p.mat.needsUpdate = true;
       }).catch(() => { p.loaded = false; }).then(() => { active--; pump(); });
     }
   }
@@ -2459,13 +2468,6 @@ const Chest = (() => {
 const Town = (() => {
   const MUS = { x0: -17, x1: -6, z0: -17, z1: -11 }, WR = { x: 11, z: -12 }, GF = { x: 3.5, z: -3.5 };
   const frames = []; let empty = null, gift = null, giftT = -1, favKey = "", balloons = [], bday = false;
-  /* фото как картинка для рамки: обрезка по размеру рамки, лицо чуть выше середины */
-  function photoTex(im, want) {
-    const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = LOW ? 1 : 4;
-    const a = im.naturalWidth / im.naturalHeight;
-    if (a > want) { t.repeat.set(want / a, 1); t.offset.set((1 - want / a) / 2, 0); } else { t.repeat.set(1, a / want); t.offset.set(0, (1 - a / want) * .62); }
-    t.needsUpdate = true; return t;
-  }
   function build() {
     const { x0, x1, z0, z1 } = MUS;
     /* домик-музей: пол, три стены, крыша ступеньками; спереди (к площади) открыт — камера остаётся снаружи */
@@ -2509,6 +2511,7 @@ const Town = (() => {
     bx(mg, 2.3, 3.3, .16, 0xffd45e, 0, 1.75, 0); bx(mg, .5, .2, .7, 0xffd45e, -.8, .1, 0); bx(mg, .5, .2, .7, 0xffd45e, .8, .1, 0);
     const mir = new THREE.Mesh(new THREE.PlaneGeometry(2, 3), new THREE.MeshBasicMaterial({ map: canvasTex(64, 96, (g, w, h) => { const q = g.createLinearGradient(0, 0, w, h); q.addColorStop(0, "#e8f6ff"); q.addColorStop(.45, "#a9c8ff"); q.addColorStop(.55, "#d6e6ff"); q.addColorStop(1, "#8fa6f0"); g.fillStyle = q; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.moveTo(8, 10); g.lineTo(26, 10); g.lineTo(10, 44); g.lineTo(8, 44); g.fill(); }) }));
     mir.position.set(0, 1.75, .09); mg.add(mir);
+    CAMBOX.push([WR.x - 1.3, 0, WR.z - 3, WR.x + 1.3, 3.6, WR.z - 2.5]);
     Game.label("Гардероб", WR.x, 9.4, WR.z, .8);
     Spots.add({ x: WR.x, y: 1, z: WR.z, r: 2.7, text: "Гардероб", act: () => Ward.open(0) });
     /* подарок дня */
@@ -2529,7 +2532,7 @@ const Town = (() => {
     frames.forEach((f, i) => {
       const n = l[i] || ""; if (f.n === n) return; f.n = n;
       if (!n) { f.mat.map = empty; f.mat.needsUpdate = true; return; }
-      Ph.image(n, false).then(im => { if (f.n !== n) return; f.mat.map = photoTex(im, 2 / 2.6); f.mat.needsUpdate = true; if (Loop.paused.size) renderOnce(); }, () => { f.n = ""; favKey = ""; });
+      Ph.image(n, false).then(im => { if (f.n !== n) return; f.mat.map = photoTex(im, 2 / 2.6, n); f.mat.needsUpdate = true; if (Loop.paused.size) renderOnce(); }, () => { f.n = ""; favKey = ""; });
     });
   }
   function openGift() {
@@ -2563,7 +2566,7 @@ const Town = (() => {
     for (const b of balloons) { b.g.position.y = Math.sin(t * 1.1 + b.ph) * .18; b.g.rotation.z = Math.sin(t * .8 + b.ph) * .06; }
     if (bday) { confT -= dt; if (confT <= 0) { confT = .5; const a = Math.random() * TAU, r = Math.random() * 8; FX.burst(Math.cos(a) * r, 9 + Math.random() * 3, Math.sin(a) * r, 8, { speed: 1.6, grav: 2.2, life: 2.6, size: .4, colors: [0xff6fb5, 0x7ff3ff, 0xffe07a, 0xb99bff, 0xffffff] }); } }
   }
-  return { build, after, vis, refresh, photoTex, get bday() { return bday; } };
+  return { build, after, vis, refresh, get bday() { return bday; } };
 })();
 
 /* подарок дня: раз в календарный день — аффирмация дня и вещица для гардероба (пока они не кончатся) */
