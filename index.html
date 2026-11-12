@@ -402,22 +402,71 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 .f-end p:not(.eyebrow){max-width:24ch;font:700 18px/1.35 var(--text);color:var(--ink-2);text-wrap:balance}
 .f-end .row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
 
-/* ───────── минута для себя ───────── */
-#calm{position:fixed;inset:0;z-index:60;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 46%,rgba(var(--n1),.2),rgba(4,3,15,.55) 78%);-webkit-user-select:none;user-select:none}
-.c-ring{position:absolute;left:50%;top:50%;width:min(80vw,62vh,380px);aspect-ratio:1;margin:calc(min(80vw,62vh,380px)/-2) 0 0 calc(min(80vw,62vh,380px)/-2);border-radius:50%;border:1.5px solid var(--line-2);box-shadow:0 0 90px rgba(var(--ac-rgb),.4),inset 0 0 70px rgba(var(--n2),.16);animation:breath 10s ease-in-out infinite}
-.c-ring.b{border-color:rgba(var(--ac-rgb),.2);box-shadow:none;animation-name:breathB}
-@keyframes breath{0%,100%{transform:scale(.8);opacity:.5}42%,58%{transform:scale(1.08);opacity:1}}
-@keyframes breathB{0%,100%{transform:scale(.94);opacity:.3}42%,58%{transform:scale(1.26);opacity:.75}}
-.c-stage{position:relative;display:grid;place-items:center;width:min(74vw,340px);min-height:200px;text-align:center}
-.c-t{grid-area:1/1;font:800 clamp(25px,7.2vw,40px)/1.15 var(--text);letter-spacing:-.022em;text-wrap:balance;text-shadow:0 2px 24px rgba(5,6,25,.9),0 0 40px rgba(var(--ac-rgb),.45)}
-.c-t span{display:inline-block;animation:wordIn 1.1s var(--ease) both;animation-delay:calc(var(--k)*80ms + 200ms)}
-.c-t.out{animation:fadeOut .45s ease both}
-.c-top{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(var(--sat) + 12px) max(14px,var(--sar)) 0 max(14px,var(--sal))}
+/* ───────── минута для себя: выбор дыхания и светящийся шар (цвет у каждого дыхания свой — переменная --ch) ───────── */
+#calm{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;overflow:hidden;--ch:262;-webkit-user-select:none;user-select:none;touch-action:manipulation;
+  background:radial-gradient(120% 62% at 50% 40%,hsla(var(--ch),95%,62%,.24),hsla(var(--ch),95%,62%,0) 70%),linear-gradient(180deg,rgba(5,7,24,.44),rgba(5,7,24,.08) 46%,rgba(5,7,24,.52))}
+.c-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.c-top{position:relative;z-index:5;flex:none;display:flex;align-items:center;gap:12px;padding:calc(var(--sat) + 12px) max(14px,var(--sar)) 0 max(14px,var(--sal))}
+.c-hole{flex:none;width:44px}
 .c-dots{flex:1;display:flex;justify-content:center;gap:9px;color:var(--sun)}
-.c-dots svg{width:11px;height:11px;opacity:.22;transform:scale(.8);transition:opacity .6s,transform .6s var(--ease)}
+.c-dots svg{width:12px;height:12px;opacity:.24;transform:scale(.8);transition:opacity .6s,transform .6s var(--ease);filter:drop-shadow(0 0 5px rgba(var(--sun-rgb),.7))}
 .c-dots svg.on{opacity:1;transform:none}
-.c-br{position:absolute;left:0;right:0;bottom:calc(var(--sab) + 54px);text-align:center;font:800 12px/1 var(--text);letter-spacing:.3em;text-transform:uppercase;color:var(--ac)}
-.c-end{position:absolute;left:0;right:0;bottom:calc(var(--sab) + 34px);display:flex;justify-content:center;gap:10px}
+/* выбор */
+.c-pick{position:relative;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:3vh max(20px,var(--sal)) calc(var(--sab) + 22px) max(20px,var(--sar));text-align:center;scrollbar-width:none}
+.c-pick::-webkit-scrollbar{display:none}
+.c-pick .eyebrow{color:var(--ink-2);text-shadow:0 2px 12px rgba(5,6,25,.95)}
+.c-pick h2{margin:10px 0 0;max-width:11em;font:700 clamp(25px,7.4vw,38px)/1.08 var(--disp);letter-spacing:-.025em;text-wrap:balance;background:linear-gradient(180deg,#fff 40%,var(--ac) 130%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 4px 18px rgba(5,6,25,.7))}
+.c-list{width:min(100%,460px);margin:22px 0 0;display:grid;gap:10px}
+.c-card{display:flex;align-items:center;gap:16px;width:100%;padding:13px 14px 13px 15px;border-radius:24px;text-align:left;color:var(--ink);
+  background:linear-gradient(115deg,hsla(var(--ch),92%,62%,.34),hsla(var(--ch),92%,62%,.08) 58%,rgba(255,255,255,.03)),var(--glass);border:1px solid hsla(var(--ch),92%,80%,.38);
+  box-shadow:0 18px 36px -20px rgba(0,0,0,.85),0 0 30px -14px hsla(var(--ch),95%,62%,.9),inset 0 1px 0 rgba(255,255,255,.2)}
+.c-card:active{background:linear-gradient(115deg,hsla(var(--ch),92%,62%,.46),hsla(var(--ch),92%,62%,.14) 58%,rgba(255,255,255,.05)),var(--glass-2)}
+.c-card.last{border-color:hsla(var(--ch),96%,84%,.85)}
+.c-mini{flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 34% 28%,hsl(var(--ch) 100% 93%),hsl(var(--ch) 94% 70%) 30%,hsl(var(--ch) 80% 44%) 68%,hsl(var(--ch) 70% 20%));
+  box-shadow:0 0 22px hsla(var(--ch),96%,66%,.85),inset -5px -7px 12px rgba(5,4,30,.5),inset 2px 3px 6px rgba(255,255,255,.45);animation:cMini var(--cd,10s) ease-in-out infinite}
+@keyframes cMini{0%,100%{transform:scale(.72)}44%,56%{transform:scale(1)}}
+.c-card span{flex:1;min-width:0}
+.c-card b{display:block;font:700 17px/1.15 var(--disp);letter-spacing:-.015em;color:#fff}
+.c-card small{display:block;margin-top:6px;font:600 12.5px/1.3 var(--text);color:var(--ink-2)}
+.c-chev{flex:none;font-size:18px;color:hsl(var(--ch) 96% 86%);transform:rotate(180deg)}
+.c-note{margin:18px 0 0;max-width:34ch;font:600 12.5px/1.5 var(--text);color:var(--ink-2);text-shadow:0 1px 3px rgba(5,6,25,.95),0 0 12px rgba(5,6,25,.9)}
+/* минута */
+.c-run{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;padding:0 max(22px,var(--sal)) calc(var(--sab) + 18px) max(22px,var(--sar));text-align:center}
+.c-run>.eyebrow{color:hsl(var(--ch) 96% 86%);text-shadow:0 2px 12px rgba(5,6,25,.95);text-wrap:balance;max-width:30em;letter-spacing:.14em;line-height:1.5}
+.c-run>.eyebrow b{display:block;margin-bottom:5px;font:700 15px/1.1 var(--disp);letter-spacing:.02em;text-transform:none;color:#fff}
+.c-orb{position:relative;flex:none;--od:min(72vw,38vh,310px);width:var(--od);height:var(--od);display:grid;place-items:center}
+.c-aura{position:absolute;inset:-34%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,hsla(var(--ch),98%,66%,.62),hsla(var(--ch),98%,62%,.26) 46%,hsla(var(--ch),98%,60%,0) 74%);transform:scale(.72);opacity:.45;will-change:transform,opacity}
+.c-track{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.c-tr{fill:none;stroke:rgba(255,255,255,.12);stroke-width:1.4}
+.c-seg{fill:none;stroke-width:3.4;stroke-linecap:round;opacity:.5;transition:opacity .5s ease}
+.c-seg.in,.c-seg.in2{stroke:hsl(var(--ch) 100% 88%)}
+.c-seg.hold{stroke:rgba(255,255,255,.92)}
+.c-seg.out{stroke:hsl(var(--ch) 70% 64%)}
+.c-seg.on{opacity:1;filter:drop-shadow(0 0 5px hsla(var(--ch),100%,72%,.95))}
+.c-dot{fill:#fff;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 13px hsl(var(--ch) 100% 72%))}
+.c-ball{position:absolute;left:14%;top:14%;width:72%;height:72%;border-radius:50%;overflow:hidden;transform:scale(.72);will-change:transform;
+  background:radial-gradient(circle at 34% 27%,hsl(var(--ch) 100% 94%),hsl(var(--ch) 96% 74%) 22%,hsl(var(--ch) 84% 50%) 54%,hsl(var(--ch) 78% 19%) 100%);
+  box-shadow:0 0 34px hsla(var(--ch),98%,68%,.7),inset -22px -30px 56px rgba(5,4,30,.52),inset 10px 12px 28px rgba(255,255,255,.42)}
+.c-ball i{position:absolute;inset:-12%;border-radius:50%;opacity:.55;background:conic-gradient(from 0deg,hsla(calc(var(--ch) + 22),100%,84%,0),hsla(calc(var(--ch) + 22),100%,84%,.7),hsla(calc(var(--ch) - 22),100%,72%,0),hsla(calc(var(--ch) - 22),100%,86%,.6),hsla(calc(var(--ch) + 22),100%,84%,0));filter:blur(14px);animation:spin 24s linear infinite}
+.c-ph{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;text-shadow:0 2px 14px rgba(5,4,30,.8),0 0 4px rgba(5,4,30,.5)}
+.c-ph b{font:700 clamp(19px,5.6vw,25px)/1 var(--disp);letter-spacing:-.01em;color:#fff}
+.c-ph span{font:800 16px/1 var(--text);color:rgba(255,255,255,.9);font-variant-numeric:tabular-nums}
+.c-stage{position:relative;flex:none;display:grid;place-items:center;width:min(100%,400px);min-height:clamp(92px,16vh,140px);cursor:default}
+.c-t{grid-area:1/1;font:800 clamp(21px,6.1vw,32px)/1.16 var(--text);letter-spacing:-.022em;color:#fff;text-wrap:balance;text-shadow:0 2px 24px rgba(5,6,25,.92),0 0 40px hsla(var(--ch),100%,70%,.5)}
+.c-t span{display:inline-block;animation:wordIn 1.1s var(--ease) both;animation-delay:calc(var(--k)*80ms + 200ms)}
+.c-how{grid-area:1/1;font:600 15.5px/1.5 var(--text);color:var(--ink);text-wrap:pretty;text-shadow:0 1px 3px rgba(5,6,25,.95),0 0 14px rgba(5,6,25,.9);animation:rise .7s var(--ease) both}
+.c-t.out,.c-how.out{animation:fadeOut .45s ease both}
+.c-bot{flex:none;display:grid;place-items:center;min-height:86px;width:100%}
+.c-go .btn{min-width:190px;background:linear-gradient(135deg,#fff,hsl(var(--ch) 100% 84%) 45%,hsl(var(--ch) 92% 66%));box-shadow:0 14px 34px -10px hsla(var(--ch),98%,62%,.85),inset 0 1px 0 rgba(255,255,255,.85);color:#170d33}
+.c-end{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;animation:rise .8s var(--ease) both}
+.c-other{flex-basis:100%;padding:8px 0 2px;font:700 13px/1.2 var(--text);color:hsl(var(--ch) 96% 86%);text-decoration:underline;text-underline-offset:4px;text-decoration-color:hsla(var(--ch),96%,86%,.45)}
+@media (orientation:landscape) and (max-height:520px){
+  .c-run{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto 1fr auto;column-gap:5vw;row-gap:0;align-items:center;justify-items:center}
+  .c-run>.eyebrow{grid-column:1/-1}.c-orb{grid-row:2/4;--od:min(42vw,62vh,260px)}.c-stage{min-height:0;align-self:end}.c-bot{min-height:70px;align-self:start}
+}
+/* небо под «Минутой»: сцена Земли, подкрашенная цветом дыхания; перед сном — приглушённая */
+#sky.calm #skyHero::before{opacity:1;background:linear-gradient(180deg,rgba(var(--calm-rgb),.7),rgba(var(--calm-rgb),.44) 40%,rgba(var(--calm-rgb),0) 68%)}
+#sky.calm.dim #skyHero::after{background:linear-gradient(180deg,rgba(5,7,24,.78),rgba(5,7,24,.56) 48%,rgba(5,7,24,.42))}
 
 /* ───────── тайная планета: настоящие созвездия ───────── */
 #game{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(var(--n1),.2),rgba(4,3,15,.6) 78%);-webkit-user-select:none;user-select:none;touch-action:manipulation}
@@ -531,7 +580,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
   .f-cap b{font-size:22px}.g-head{margin-top:6px}.g-head h2{font-size:22px}.g-field{width:min(54vh,60vw)}.g-bot{padding-top:6px;padding-bottom:calc(var(--sab) + 10px)}}
 
 @media (prefers-reduced-motion:reduce){
-  #skyHero i,.emblem .sp,.planet.now::after,.planet.lock::after,.c-ring,.eq[aria-pressed="true"] .bars i,.mir img,.sat,.sat b,.sat b u,.al-pl{animation:none}
+  #skyHero i,.emblem .sp,.planet.now::after,.planet.lock::after,.c-mini,.c-ball i,.eq[aria-pressed="true"] .bars i,.mir img,.sat,.sat b,.sat b u,.al-pl{animation:none}
   .aff-t span,.c-t span,#home.enter .rise,.f-frame.on .f-img,.f-frame.was .f-img{animation-duration:.01s;animation-delay:0s}
   .screen,.cell img,.sheet-box{transition-duration:.01s}
 }
@@ -723,11 +772,30 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 
 <!-- ═════ минута для себя ═════ -->
 <div id="calm" role="dialog" aria-modal="true" aria-label="Минута для себя" hidden>
-  <i class="c-ring b"></i><i class="c-ring"></i>
-  <div class="c-stage" id="cStage" aria-live="polite"></div>
-  <div class="c-top"><span style="width:44px"></span><div class="c-dots" id="cDots"></div><button class="ib" id="cClose" type="button" aria-label="Закрыть"><svg class="i" viewBox="0 0 24 24"><use href="#i-close"/></svg></button></div>
-  <p class="c-br" id="cBr"></p>
-  <div class="c-end" id="cEnd" hidden><button class="btn ghost sm" id="cMore" type="button">Ещё минута</button><button class="btn gold sm" id="cDone" type="button">Готово</button></div>
+  <canvas class="c-fx" id="cFx" aria-hidden="true"></canvas>
+  <div class="c-top"><button class="ib" id="cBack" type="button" aria-label="Выбрать другое дыхание" hidden><svg class="i" viewBox="0 0 24 24"><use href="#i-back"/></svg></button><span class="c-hole" id="cHole"></span><div class="c-dots" id="cDots"></div><button class="ib" id="cClose" type="button" aria-label="Закрыть"><svg class="i" viewBox="0 0 24 24"><use href="#i-close"/></svg></button></div>
+  <!-- выбор дыхания -->
+  <div class="c-pick" id="cPick">
+    <p class="eyebrow">минута для себя</p>
+    <h2>Что мне сейчас нужно?</h2>
+    <div class="c-list" id="cList"></div>
+    <p class="c-note">Дышу носом и без усилия. Закружилась голова — дышу как обычно.</p>
+  </div>
+  <!-- сама минута -->
+  <div class="c-run" id="cRun" hidden>
+    <p class="eyebrow" id="cName"></p>
+    <div class="c-orb" id="cOrb">
+      <i class="c-aura" id="cAura"></i>
+      <svg class="c-track" viewBox="0 0 200 200" aria-hidden="true"><path class="c-tr" id="cTr" d=""/><g id="cSegs"></g><circle class="c-dot" id="cDot" r="5.5" cx="100" cy="192"/></svg>
+      <div class="c-ball" id="cBall"><i></i></div>
+      <div class="c-ph"><b id="cPh"></b><span id="cCnt"></span></div>
+    </div>
+    <div class="c-stage" id="cStage" aria-live="polite"></div>
+    <div class="c-bot">
+      <div class="c-go" id="cGoBox"><button class="btn gold" id="cGo" type="button">Начать</button></div>
+      <div class="c-end" id="cEnd" hidden><button class="btn ghost sm" id="cMore" type="button">Ещё раз</button><button class="btn gold sm" id="cDone" type="button">Готово</button><button class="c-other" id="cOther" type="button">выбрать другое дыхание</button></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═════ игра «Созвездия» ═════ -->
@@ -759,7 +827,7 @@ const frame = () => new Promise(r => requestAnimationFrame(() => r()));
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const TOUCH = matchMedia("(hover: none)").matches;
-const BUILD = "20261112-1400";
+const BUILD = "20261112-1520";
 
 /* память устройства: не падает в приватном режиме и при переполнении */
 const LS = {
@@ -957,6 +1025,7 @@ const Sky = (() => {
   let hx = 0, hy2 = 0, hz = 0, thx = 0, thy = 0, thz = 0;               // «камера» сцены аффирмаций: чуть сдвигается на каждой
   let dvK = 0, dvT = 0, dvD = 0, dv3T = 0, dz = 0, dzc = 0;             // «влёт»: камера подлетает к сцене (вход, альбом)
   let gyro = false, tiltOff = false, q = 0, slow = 0, tuneFrom = 0;     // наклон телефона; запас по скорости
+  let staged = false, stg = 0;                                          // сцена под окном поверх главной («Минута для себя»)
   const QFIX = /[?&]q=hi/.test(location.search);                        // для проверки: качество не снижать
   const DVK = +((location.search.match(/[?&]dv=(\d+)/) || [])[1] || 1);  // для проверки: влёт во столько раз медленнее
   const S = 0.02, ZONE = { gate: 0, home: 0, album: -330 };          // сколько единиц сцены в одном пикселе прокрутки; где «живёт» каждый экран
@@ -1052,8 +1121,9 @@ const Sky = (() => {
   /* ── кадр: камера следует за прокруткой активного экрана, планы сдвигаются с разной скоростью ── */
   function tick(t) {
     requestAnimationFrame(tick); if (D.hidden || paused) { last = t; return; }
-    const scr = app.dataset.screen, sc = scr === "home" ? $("#home") : scr === "album" ? $("#album") : null, y = sc ? sc.scrollTop : 0;
-    const raw = t - last, want = (ZONE[scr] || 0) - y * S * (scr === "album" ? .45 : 1), dt = Math.min(.05, raw / 1000 || .016); last = t;
+    const scr = app.dataset.screen, sc = scr === "home" ? $("#home") : scr === "album" ? $("#album") : null;
+    const raw = t - last, sk = (staged ? 1 : 0) - stg; if (Math.abs(sk) > .002) { stg += sk * Math.min(1, Math.min(.05, raw / 1000 || .016) * 4); busyTill = Math.max(busyTill, t + 600); } else stg = staged ? 1 : 0;
+    const y = (sc ? sc.scrollTop : 0) * (1 - stg), want = (ZONE[scr] || 0) - y * S * (scr === "album" ? .45 : 1), dt = Math.min(.05, raw / 1000 || .016); last = t;
     if (scr !== lastScr) { if (lastScr === "home" && scr === "album") dive(.2); else if (lastScr === "album") dive(-.06); lastScr = scr; busyTill = t + 2500; }
     const dY = want - camY; if (Math.abs(dY) > .002 || Math.abs(tpx - px) > .02 || Math.abs(tpy - py) > .02) busyTill = Math.max(busyTill, t + 900);
     camY += dY * Math.min(1, dt * 7); px += (tpx - px) * Math.min(1, dt * 3); py += (tpy - py) * Math.min(1, dt * 3);
@@ -1114,7 +1184,14 @@ const Sky = (() => {
   function tiltCan() { const E = window.DeviceOrientationEvent; return !!(E && typeof E.requestPermission === "function"); }
   function tiltAsk() { tiltOff = false; try { return window.DeviceOrientationEvent.requestPermission().then(r => r === "granted", () => false); } catch (e) { return Promise.resolve(false); } }
   function tiltStop() { tiltOff = true; gyro = false; tpx = tpy = 0; }
-  return { init, theme, current, pause, resize: size, shot, dive, tiltCan, tiltAsk, tiltStop };
+  /* сцена под окном поверх главной: небо плавно возвращается к первому экрану (Земля с восходом), где бы ни стояла прокрутка;
+     rgb — цвет, которым окно подкрашивает туманность, dim — приглушить восход (перед сном) */
+  function stage(on, rgb, dim) {
+    const was = staged; staged = !!on; box.classList.toggle("calm", staged && !!rgb); box.classList.toggle("dim", staged && !!rgb && !!dim);
+    if (rgb) box.style.setProperty("--calm-rgb", rgb);
+    if (staged !== was && glOk) dive(staged ? .2 : -.06); busyTill = performance.now() + 2500;
+  }
+  return { init, theme, current, pause, resize: size, shot, dive, stage, tiltCan, tiltAsk, tiltStop };
 })();
 
 /* звёздная вспышка: любимое фото, собранное созвездие, день рождения */
@@ -2092,36 +2169,125 @@ const Film = (() => {
 })();
 
 /* ══════ 87_calm.js ══════ */
-/* «Минута для себя»: семь аффирмаций на весь экран под спокойное дыхание (круг растёт — вдох, сжимается — выдох),
-   в конце — «Благодарю». Касание — следующая. */
+/* «Минута для себя» (12.11.2026, Андрей: «про вдох-выдох это техника такая? сделай тогда несколько техник — на то, на это…
+   минутка для себя — там тускловато всё, а вот главная намного лучше»).
+   Сначала выбор: пять мягких дыхательных упражнений под разные случаи — без долгих задержек и без частого дыхания, это для
+   ребёнка. Потом минута: светящийся шар растёт на вдохе и сжимается на выдохе, огонёк идёт по дорожке — один круг на одно
+   дыхание, внутри шара подпись и счёт; на каждое дыхание — новая аффирмация; в конце — «Благодарю».
+   Всё идёт от одних часов (кадр за кадром), поэтому шар, огонёк, подпись и счёт не расходятся.
+   Про что сказано в подсказках: на выдохе сердце и правда бьётся чуть медленнее; два вдоха подряд и долгий выдох — так
+   человек вздыхает сам; 5 + 5 секунд — это шесть дыханий в минуту. Лечебных обещаний не давать. */
+const BREATH = [
+  { id: "vydoh", need: "Успокоиться", name: "Длинный выдох", r: "вдох 4 · выдох 6", hue: 205, rgb: "70,160,255", n: 7, ph: [["in", 4], ["out", 6]],
+    how: "Вдох носом на четыре счёта, выдох — на шесть. На выдохе сердце бьётся чуть медленнее, поэтому долгий выдох успокаивает." },
+  { id: "kvadrat", need: "Собраться", name: "Квадрат", r: "вдох · пауза · выдох · пауза — по 4", hue: 40, rgb: "255,186,90", n: 5, sq: 1, ph: [["in", 4], ["hold", 4], ["out", 4], ["hold", 4]],
+    how: "Вдох, пауза, выдох, пауза — всё по четыре счёта, как четыре стороны квадрата. Ровный счёт занимает голову, и мысли перестают разбегаться." },
+  { id: "vzdoh", need: "Отпустить", name: "Двойной вдох", r: "вдох 2 и ещё 1 · выдох 6", hue: 328, rgb: "255,110,190", n: 7, ph: [["in", 2], ["in2", 1], ["out", 6]],
+    how: "Вдох носом, сразу ещё один маленький сверху — и долгий выдох ртом. Так мы вздыхаем сами, когда устали или плакали." },
+  { id: "son", need: "Уснуть", name: "Тихая волна", r: "вдох 4 · выдох 7", hue: 238, rgb: "92,104,238", n: 6, dim: 1, ph: [["in", 4], ["out", 7]],
+    how: "Мягкий вдох на четыре счёта и очень долгий, тихий выдох — на семь. Тело понемногу замедляется." },
+  { id: "rovno", need: "Побыть с собой", name: "Ровное дыхание", r: "вдох 5 · выдох 5", hue: 262, rgb: "150,120,255", n: 7, ph: [["in", 5], ["out", 5]],
+    how: "Вдох на пять счётов и выдох на пять — как спокойные волны. Получается шесть дыханий в минуту." }
+];
+
 const Calm = (() => {
-  const root = $("#calm"), stage = $("#cStage"), N = 7, STEP = 10000; let list = [], i = -1, t = 0, bt = 0, open = false;
-  function show(text) { const old = $(".c-t:not(.out)", stage); if (old) { old.classList.add("out"); setTimeout(() => old.remove(), 470); } stage.append(el("p", "c-t", words(text))); }
-  function next() {
-    clearTimeout(t); if (!open) return; i++;
-    if (i >= N) { show("Благодарю"); $("#cEnd").hidden = false; $("#cBr").hidden = true; $$("svg", $("#cDots")).forEach(s => s.classList.add("on")); Music.tone(659.25, .7, .1); Music.tone(987.77, .9, .08, "sine", .18); return; }
-    show(list[i]); $$("svg", $("#cDots")).forEach((s, k) => s.classList.toggle("on", k <= i)); t = setTimeout(next, STEP);
+  const root = $("#calm"), pick = $("#cPick"), run = $("#cRun"), stage = $("#cStage"), orb = $("#cOrb"), ball = $("#cBall"), aura = $("#cAura"), dot = $("#cDot"), tr = $("#cTr"), segs = $("#cSegs"), fx = $("#cFx");
+  const LBL = { in: "Вдох", in2: "И ещё", hold: "Пауза", out: "Выдох" }, LV = { in: 1, in2: 1.09, out: .64 };
+  const CIRC = "M100 192A92 92 0 0 1 100 8A92 92 0 0 1 100 192Z", SQ = "M22 148V52Q22 22 52 22H148Q178 22 178 52V148Q178 178 148 178H52Q22 178 22 148Z";
+  const FAST = /[?&]calm=fast/.test(location.search) ? .12 : 1;       // для проверки: минута за несколько секунд
+  let open = false, mode = "pick", cur = null, plan = [], L = 0, T0 = 0, raf = 0, cyc = -1, phI = -1, cnt = -1, list = [], len = 0, hidAt = 0;
+  let segEls = [], parts = [], g2 = null, FW = 0, FH = 0, cx = 0, cy = 0, R = 0;
+
+  /* ── звёздная пыль вокруг шара: на вдохе собирается к нему, на выдохе разлетается ── */
+  function fit() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1); FW = root.clientWidth; FH = root.clientHeight; fx.width = Math.round(FW * dpr); fx.height = Math.round(FH * dpr);
+    g2 = fx.getContext("2d"); g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = orb.getBoundingClientRect(), b = root.getBoundingClientRect(); cx = r.left - b.left + r.width / 2; cy = r.top - b.top + r.height / 2; R = r.width / 2;
+    if (!parts.length) { const q = rng(77); parts = Array.from({ length: 58 }, () => ({ a: q() * 6.2832, out: 1.2 + q() * .8, inn: .76 + q() * .2, w: (q() - .5) * 1.6, z: .7 + q() * 1.7, o: .35 + q() * .65, c: q() })); }
+  }
+  function dust(now, lv) {
+    if (!g2) return; g2.clearRect(0, 0, FW, FH); if (mode === "pick" || RM || !R) return;
+    for (const p of parts) {
+      const rr = R * (p.out + (p.inn - p.out) * lv), a = p.a + now * .00009 * p.w, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+      g2.globalAlpha = p.o * (.2 + .7 * lv); g2.fillStyle = p.c < .3 ? "#fff" : `hsl(${cur ? cur.hue : 262} 100% ${72 + p.c * 20}%)`;
+      g2.beginPath(); g2.arc(x, y, p.z * (.8 + .5 * lv), 0, 6.2832); g2.fill();
+    }
+    g2.globalAlpha = 1;
+  }
+
+  /* ── шар и огонёк ── */
+  function paint(s, f, now) {
+    const lv = clamp((s - LV.out) / (LV.in2 - LV.out), 0, 1);
+    if (!RM) { ball.style.transform = `scale(${s.toFixed(4)})`; aura.style.transform = `scale(${(s * 1.02).toFixed(4)})`; aura.style.opacity = (.42 + .58 * lv).toFixed(3); }
+    if (f == null) dot.style.opacity = "0"; else { const P = tr.getPointAtLength(f * len); dot.setAttribute("cx", P.x.toFixed(2)); dot.setAttribute("cy", P.y.toFixed(2)); dot.style.opacity = "1"; }
+    dust(now, lv);
+  }
+  function frame(now) {
+    raf = requestAnimationFrame(frame); if (!open) return;
+    if (mode !== "run") { paint(mode === "end" ? .86 + .03 * Math.sin(now / 1100) : .72 + .03 * Math.sin(now / 1100), null, now); return; }
+    const e = now - T0, c = Math.floor(e / L); if (c >= cur.n) { finish(); return; }
+    const w = e - c * L; let k = 0; while (k < plan.length - 1 && w >= plan[k].t1) k++;
+    const p = plan[k], q = clamp((w - p.t0) / (p.t1 - p.t0), 0, 1), ez = p.type === "in2" ? 1 - (1 - q) * (1 - q) : .5 - .5 * Math.cos(Math.PI * q);
+    if (c !== cyc) { cyc = c; phI = -1; say(list[c]); $$("svg", $("#cDots")).forEach((s, i) => s.classList.toggle("on", i <= c)); }
+    if (k !== phI) {
+      phI = k; cnt = -1; $("#cPh").textContent = LBL[p.type]; segEls.forEach((s, i) => s.classList.toggle("on", i === k));
+      if (Music.on()) { if (p.type === "in") Music.tone(392, 1.5, .05); else if (p.type === "in2") Music.tone(494, .8, .045); else if (p.type === "out") Music.tone(294, 1.9, .045); }
+    }
+    const left = Math.max(1, Math.ceil((p.t1 - w) / (1000 * FAST))); if (left !== cnt) { cnt = left; $("#cCnt").textContent = left; }
+    paint(p.a + (p.b - p.a) * ez, w / L, now);
+  }
+
+  function say(text, cls) { const old = $(".c-t:not(.out),.c-how:not(.out)", stage); if (old) { old.classList.add("out"); setTimeout(() => old.remove(), 470); } stage.append(el("p", cls || "c-t", cls ? esc(text) : words(text))); }
+  function sky() { Sky.stage(open, open && mode !== "pick" && cur ? cur.rgb : "", open && mode !== "pick" && cur && cur.dim); }
+  function show(m) {
+    mode = m; root.dataset.mode = m; pick.hidden = m !== "pick"; run.hidden = m === "pick"; $("#cBack").hidden = m === "pick"; $("#cHole").hidden = m !== "pick";
+    $("#cDots").style.visibility = m === "pick" || m === "ready" ? "hidden" : ""; $("#cGoBox").hidden = m !== "ready"; $("#cEnd").hidden = m !== "end"; sky();
+  }
+  /* выбор дыхания */
+  function choose() {
+    const last = LS.get("mk2.calm", "");
+    $("#cList").innerHTML = BREATH.map(b => `<button type="button" class="c-card tilt${b.id === last ? " last" : ""}" data-b="${b.id}" style="--ch:${b.hue};--cd:${b.ph.reduce((s, p) => s + p[1], 0)}s"><i class="c-mini"></i><span><b>${b.need}</b><small>${b.name} · ${b.r}</small></span>${ico("back", "c-chev")}</button>`).join("");
+    root.style.setProperty("--ch", 262); stage.innerHTML = ""; show("pick"); pick.scrollTop = 0;
+  }
+  /* выбрано: дорожка под это дыхание, объяснение и кнопка «Начать» */
+  function ready(b) {
+    cur = b; LS.set("mk2.calm", b.id); root.style.setProperty("--ch", b.hue);
+    let t = 0, lv = LV.out; plan = b.ph.map(([type, s]) => { const a = lv; if (LV[type]) lv = LV[type]; const p = { type, t0: t, t1: t + s * 1000 * FAST, a, b: lv }; t = p.t1; return p; }); L = t;
+    tr.setAttribute("d", b.sq ? SQ : CIRC); len = tr.getTotalLength();
+    segs.innerHTML = plan.map(p => { const a = p.t0 / L * 1000 + 6, n = (p.t1 - p.t0) / L * 1000 - 12; return `<path class="c-seg ${p.type}" d="${b.sq ? SQ : CIRC}" pathLength="1000" stroke-dasharray="${n.toFixed(1)} 1000" stroke-dashoffset="${(-a).toFixed(1)}"/>`; }).join("");
+    segEls = $$(".c-seg", segs); $("#cName").innerHTML = `<b>${b.name}</b>${b.r}`; $("#cPh").textContent = ""; $("#cCnt").textContent = "";
+    $("#cDots").innerHTML = Array.from({ length: b.n }, () => '<svg viewBox="0 0 24 24"><use href="#i-spark"/></svg>').join("");
+    stage.innerHTML = ""; show("ready"); say(b.how, "c-how"); requestAnimationFrame(fit);
   }
   function start() {
-    list = shuffle(AFF).slice(0, N); i = -1; stage.innerHTML = ""; $("#cEnd").hidden = true; $("#cBr").hidden = false;
-    $("#cDots").innerHTML = Array.from({ length: N }, () => '<svg viewBox="0 0 24 24"><use href="#i-spark"/></svg>').join("");
-    /* круг заново начинает дышать с вдоха — подпись идёт с ним в ногу */
-    $$(".c-ring", root).forEach(r => { r.style.animation = "none"; void r.offsetWidth; r.style.animation = ""; });
-    clearInterval(bt); let inh = true; $("#cBr").textContent = "вдох"; bt = setInterval(() => { inh = !inh; $("#cBr").textContent = inh ? "вдох" : "выдох"; }, STEP / 2);
-    next();
+    if (!cur) return; list = shuffle(AFF).slice(0, cur.n); cyc = -1; phI = -1; cnt = -1; show("run"); fit(); T0 = performance.now(); buzz(8);
+  }
+  function finish() {
+    show("end"); say("Благодарю"); $("#cPh").textContent = ""; $("#cCnt").textContent = ""; segEls.forEach(s => s.classList.remove("on"));
+    $$("svg", $("#cDots")).forEach(s => s.classList.add("on")); Music.tone(659.25, .7, .1); Music.tone(987.77, .9, .08, "sine", .18);
   }
   function openCalm() {
     if (open) return; open = true; root.hidden = false; D.body.classList.add("veil"); if (!RM) root.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500 });
-    Layer.push("calm", shut); start();
+    Layer.push("calm", shut); choose(); fit(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
   function shut() {
-    if (!open) return; open = false; clearTimeout(t); clearInterval(bt); D.body.classList.remove("veil");
+    if (!open) return; open = false; cancelAnimationFrame(raf); D.body.classList.remove("veil"); sky();
     const fin = () => { root.hidden = true; stage.innerHTML = ""; };
     if (RM) fin(); else root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, fill: "forwards" }).onfinish = e => { fin(); e.target.cancel(); };
   }
-  root.addEventListener("click", e => { if (!open || e.target.closest("button") || i >= N) return; next(); });
+  $("#cList").addEventListener("click", e => { const c = e.target.closest("[data-b]"); if (c) ready(BREATH.find(b => b.id === c.dataset.b)); });
+  /* касание текста во время минуты — другая аффирмация (дыхание идёт своим чередом) */
+  stage.addEventListener("click", () => { if (mode !== "run" || cyc < 0) return; const now = $(".c-t:not(.out)", stage), rest = AFF.filter(a => !now || a !== now.textContent); say(rest[Math.floor(Math.random() * rest.length)]); });
+  D.addEventListener("visibilitychange", () => {             // вернулась на страницу — текущее дыхание начинается заново, с вдоха
+    if (!open || mode !== "run") return; if (D.hidden) { hidAt = performance.now(); return; }
+    const now = performance.now(); T0 += now - hidAt; T0 = now - Math.max(0, Math.floor((now - T0) / L)) * L; phI = -1;
+  });
+  addEventListener("resize", () => { if (open) setTimeout(fit, 250); });
   $("#cClose").onclick = () => Layer.pop();
   $("#cDone").onclick = () => Layer.pop();
+  $("#cBack").onclick = () => choose();
+  $("#cOther").onclick = () => choose();
+  $("#cGo").onclick = () => start();
   $("#cMore").onclick = () => start();
   return { open: openCalm };
 })();
