@@ -63,9 +63,9 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 
 /* ───────── небо: три плана ───────── */
 #sky{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;overflow:hidden;background:var(--bg0)}
-#skyBg{position:absolute;inset:-11% -5%;background:url("assets/space-bg-m.webp") 50% 50%/cover;filter:var(--sky-f);will-change:transform}
+#skyBg{position:absolute;inset:-11% -13%;background:url("assets/space-bg-m.webp") 50% 50%/cover;filter:var(--sky-f);will-change:transform}
 #skyBg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,24,.5),rgba(5,7,24,.62) 55%,rgba(5,7,24,.72))}
-#skyHero{position:absolute;left:-4%;top:0;width:108%;height:100%;background:url("assets/space-hero-tall.webp") 50% 100%/cover;will-change:transform,opacity;transform-origin:50% 80%;
+#skyHero{position:absolute;left:-10%;top:0;width:120%;height:100%;background:url("assets/space-hero-tall.webp") 50% 100%/cover;will-change:transform,opacity;transform-origin:50% 80%;
   -webkit-mask-image:linear-gradient(#000 76%,rgba(0,0,0,0));mask-image:linear-gradient(#000 76%,rgba(0,0,0,0))}
 #skyHero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,24,.6),rgba(5,7,24,.26) 38%,rgba(5,7,24,0) 62%)}
 /* другое небо красит и туманность над Землёй (сам восход остаётся настоящего цвета) */
@@ -150,7 +150,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ───────── главная: сцена аффирмаций во весь первый экран ───────── */
-.hero{position:relative;display:flex;flex-direction:column;min-height:520px;height:calc(100vh - 92px);height:calc(100svh - 92px);max-height:800px;padding:0 max(var(--gut),var(--sal)) 98px max(var(--gut),var(--sar))}   /* низ сцены свободен: там фото-планета встаёт над горизонтом Земли */
+.hero{position:relative;display:flex;flex-direction:column;min-height:520px;height:100vh;height:100svh;padding:0 max(var(--gut),var(--sal)) calc(var(--sab) + 8px) max(var(--gut),var(--sar))}   /* низ сцены свободен: там фото-планета встаёт над горизонтом Земли */
 .hbar{display:flex;align-items:center;gap:10px;padding:calc(var(--sat) + 14px) 0 4px}
 .brand{display:inline-flex;align-items:center;gap:9px;font:700 12px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;color:#fff;text-shadow:0 0 16px rgba(var(--ac-rgb),.95),0 2px 10px rgba(5,6,25,.8)}
 .brand svg{width:13px;height:13px;color:var(--sun)}
@@ -171,7 +171,11 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 .aff-t.out{animation:fadeOut .34s ease both}
 @keyframes wordIn{from{opacity:0;filter:blur(12px);transform:translate3d(0,.6em,0) scale(1.06)}to{opacity:1;filter:blur(0);transform:none}}
 @keyframes fadeOut{to{opacity:0;filter:blur(8px);transform:translate3d(0,-.35em,0) scale(.97)}}
-.hero-bot{display:flex;align-items:center;gap:10px;padding:0 0 16px;width:100%;max-width:720px;align-self:center}
+.hero-bot{display:flex;align-items:center;gap:10px;padding:0 0 6px;width:100%;max-width:720px;align-self:center}
+/* первый экран — только сцена (Андрей 13.11: «первый экран нужно без фото на телефоне»); стрелка показывает, что ниже есть ещё */
+.hero-dn{align-self:center;flex:none;width:52px;height:38px;display:grid;place-items:center;font-size:22px;color:rgba(255,255,255,.82);filter:drop-shadow(0 2px 8px rgba(5,6,25,.9));animation:dn 2.6s ease-in-out infinite}
+.hero-dn svg{transform:rotate(-90deg)}
+@keyframes dn{0%,100%{transform:translateY(-3px);opacity:.55}50%{transform:translateY(4px);opacity:1}}
 .aff-prog{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.22);overflow:hidden}
 .aff-prog i{display:block;width:100%;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--ac),#fff);box-shadow:0 0 10px var(--ac);transform-origin:0 50%;transform:scaleX(0)}
 .aff-prog i.run{animation:affFill var(--aff-ms,8500ms) linear forwards}
@@ -181,7 +185,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 #affPlay .pl,.hero.halt #affPlay .pa{display:none}.hero.halt #affPlay .pl{display:block}
 
 /* ───────── я сейчас: фото-планета на орбите, возраст ───────── */
-.me{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:-86px}
+.me{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:44px}
 .ava{position:relative;--d:156px;width:var(--d);height:var(--d);display:grid;place-items:center;border-radius:50%;isolation:isolate;transition:transform .35s var(--ease)}
 .ava-ph{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 32% 26%,rgba(var(--n1),.95),rgba(var(--n1),.3) 62%,rgba(10,8,40,.95));
   box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 0 7px rgba(8,8,32,.6),0 0 0 8px rgba(var(--ac-rgb),.4),0 0 60px rgba(var(--ac-rgb),.65),0 26px 50px -16px rgba(0,0,0,.9)}
@@ -402,6 +406,64 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 .f-end p:not(.eyebrow){max-width:24ch;font:700 18px/1.35 var(--text);color:var(--ink-2);text-wrap:balance}
 .f-end .row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
 
+/* ───────── мои полёты: «Орбита дня» и лента мест на главной ───────── */
+.orbd{position:relative;display:block;width:100%;min-height:172px;padding:18px 18px 16px;border-radius:26px;overflow:hidden;text-align:left;color:#fff;isolation:isolate;
+  background:radial-gradient(120% 150% at 84% 28%,rgba(var(--n1),.32),rgba(10,10,40,0) 62%),linear-gradient(160deg,#0c0e30,#05061a);border:1px solid var(--line-2);box-shadow:0 22px 46px -22px rgba(0,0,0,.9),0 0 40px -16px rgba(var(--ac-rgb),.55),inset 0 1px 0 rgba(255,255,255,.16)}
+.od-cv{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.od-cap{display:block;font:800 11px/1 var(--text);letter-spacing:.2em;text-transform:uppercase;color:var(--ac)}
+.od-t{display:block;max-width:60%;margin-top:12px;font:700 clamp(19px,5.4vw,26px)/1.1 var(--disp);letter-spacing:-.02em;text-wrap:balance;text-shadow:0 2px 16px rgba(5,6,25,.8)}
+.od-s{display:block;max-width:58%;margin-top:9px;font:600 13px/1.35 var(--text);color:var(--ink-2);text-shadow:0 1px 8px rgba(5,6,25,.9)}
+.od-go{display:inline-flex;align-items:center;gap:2px;margin-top:16px;height:34px;padding:0 8px 0 14px;border-radius:17px;font:800 12.5px/1 var(--text);color:var(--on-sun);background:linear-gradient(135deg,#fff5cf,var(--sun) 40%,var(--sun-2));box-shadow:0 10px 24px -8px rgba(var(--sun-rgb),.7)}
+.od-go svg{font-size:15px;transform:rotate(180deg)}
+.fly-strip{margin-top:12px}
+.fly-c{flex:none;width:132px;scroll-snap-align:start;text-align:left;color:var(--ink)}
+.fly-c img{display:block;width:132px;height:132px;border-radius:20px;object-fit:cover;background:#05061a;box-shadow:0 0 0 1px var(--line),0 18px 30px -18px rgba(0,0,0,.9)}
+.fly-c b{display:block;margin-top:9px;font:700 13px/1.22 var(--text);text-shadow:0 1px 3px rgba(5,6,25,.95),0 0 12px rgba(5,6,25,.9)}
+.fly-c small{display:block;margin-top:3px;font:600 12px/1.2 var(--text);color:var(--ink-3);text-shadow:0 1px 3px rgba(5,6,25,.95),0 0 12px rgba(5,6,25,.9)}
+.fly-b{display:flex;margin:14px auto 0}
+.fly-b svg{color:var(--sun)}
+/* ───────── сам полёт: снимок под пальцами, созвездие поверх, подписи снизу ───────── */
+.fl{position:fixed;inset:0;z-index:85;background:#02030c;color:#f1f2ff;opacity:0;transition:opacity .55s var(--ease);touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden}
+.fl.on{opacity:1}
+.fl-z{position:absolute;inset:0;cursor:grab;touch-action:none;transition:opacity .22s var(--ease)}
+.fl-z.drag{cursor:grabbing}
+.fl.sw .fl-z{opacity:0}
+.fl-z canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fl-w{position:absolute;left:0;top:0;width:1000px;height:1000px;transform-origin:0 0;will-change:transform}
+.fl-w img{position:absolute;display:block;pointer-events:none}
+.fl-b0{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity .9s ease;-webkit-mask-image:radial-gradient(closest-side,#000 78%,transparent 100%);mask-image:radial-gradient(closest-side,#000 78%,transparent 100%)}
+.fl-b0.on{opacity:1}
+.fl-dt{opacity:0;transition:opacity 1.1s var(--ease);-webkit-mask-image:radial-gradient(closest-side,#000 80%,transparent 100%);mask-image:radial-gradient(closest-side,#000 80%,transparent 100%)}
+.fl-dt.on{opacity:1}
+.fl-top{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;gap:12px;padding:calc(var(--sat) + 14px) max(14px,var(--sar)) 42px max(18px,var(--sal));background:linear-gradient(rgba(2,3,12,.88),rgba(2,3,12,0));pointer-events:none;transition:opacity .4s ease}
+.fl-top div{flex:1;min-width:0;padding-top:4px}
+.fl-top b{display:block;font:700 clamp(20px,5.6vw,27px)/1.12 var(--disp);letter-spacing:-.02em;text-wrap:balance}
+.fl-top small{display:block;margin-top:7px;font:600 13.5px/1.3 var(--text);color:#b9bdea}
+.fl-top .ib{pointer-events:auto}
+.fl-bot{position:absolute;left:0;right:0;bottom:0;padding:58px max(16px,var(--sar)) calc(var(--sab) + 14px) max(18px,var(--sal));background:linear-gradient(rgba(2,3,12,0),rgba(2,3,12,.93) 46%);pointer-events:none;transition:opacity .4s ease}
+.fl-bot p{margin:0 0 12px;max-width:660px;min-height:88px;font:600 15px/1.45 var(--text);text-shadow:0 1px 10px #000}
+.fl-pills{display:flex;gap:8px;overflow-x:auto;margin:0 -18px;padding:2px 18px;pointer-events:auto;scrollbar-width:none;touch-action:pan-x}
+.fl-pills::-webkit-scrollbar{display:none}
+.fl-pill{flex:none;height:36px;padding:0 15px;border-radius:18px;font:800 13px/1 var(--text);color:#e4e6ff;background:rgba(150,160,255,.2);border:1px solid rgba(170,180,255,.24);white-space:nowrap;transition:background .25s,color .25s}
+.fl-pill.on{background:var(--ac);color:#0b0a26;border-color:transparent}
+.fl-pls{margin-bottom:10px}
+.fl-pill.pl{height:30px;padding:0 12px;font-size:12.5px;background:transparent;border-color:rgba(170,180,255,.36);color:#c9cdf5}
+.fl-pill.pl.on{background:rgba(var(--ac-rgb),.26);color:#fff;border-color:var(--ac)}
+.fl-foot{display:flex;align-items:center;gap:12px;margin-top:12px;pointer-events:auto}
+.fl-mb{flex:none;height:34px;padding:0 14px;border-radius:17px;font:800 12.5px/1 var(--text);color:var(--on-sun);background:linear-gradient(135deg,#fff5cf,var(--sun) 40%,var(--sun-2));box-shadow:0 10px 22px -8px rgba(var(--sun-rgb),.7)}
+.fl-foot small{flex:1;min-width:0;font:600 10.5px/1.35 var(--text);color:#8a8fc4}
+.fl-load{position:absolute;inset:0;display:none;place-items:center}
+.fl.wait .fl-load{display:grid}
+.fl.wait .fl-top,.fl.wait .fl-bot{opacity:0}
+.fl-mbg{position:absolute;inset:0;background:rgba(2,3,12,.6);opacity:0;pointer-events:none;transition:opacity .35s ease}
+.fl-more{position:absolute;left:0;right:0;bottom:0;max-height:80%;overflow-y:auto;overscroll-behavior:contain;padding:22px 22px calc(var(--sab) + 22px);border-radius:30px 30px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 120px),var(--panel);border:1px solid var(--line-2);border-bottom:0;box-shadow:0 -20px 60px rgba(0,0,0,.6);transform:translateY(104%);transition:transform .46s var(--ease);touch-action:pan-y;-webkit-user-select:text;user-select:text}
+.fl.more .fl-mbg{opacity:1;pointer-events:auto}
+.fl.more .fl-more{transform:none}
+.fl-cr2{margin:16px 0 0;font:600 11px/1.4 var(--text);color:var(--ink-3);text-align:center}
+@media (min-width:700px){.fl-more{left:50%;right:auto;width:560px;margin-left:-280px}}
+@media (min-width:900px){.fl-top,.fl-bot{padding-left:30px;padding-right:30px}.fl-pills{margin:0;padding:2px 0}.fl-bot p{min-height:66px;font-size:16px}}
+@media (orientation:landscape) and (max-height:520px){.fl-bot p{min-height:0;font-size:14px;margin-bottom:8px}.fl-bot{padding-top:30px}.fl-pls{display:none}}
+
 /* ───────── минута для себя: выбор дыхания и светящийся шар (цвет у каждого дыхания свой — переменная --ch) ───────── */
 #calm{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;overflow:hidden;--ch:262;-webkit-user-select:none;user-select:none;touch-action:manipulation;
   background:radial-gradient(120% 62% at 50% 40%,hsla(var(--ch),95%,62%,.24),hsla(var(--ch),95%,62%,0) 70%),linear-gradient(180deg,rgba(5,7,24,.44),rgba(5,7,24,.08) 46%,rgba(5,7,24,.52))}
@@ -575,12 +637,12 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
 @media (min-width:640px){:root{--gut:28px;--rh:170px;--sh:250px}}
 @media (min-width:1000px){:root{--rh:215px;--sh:280px}
   .stop{height:180px;--d:136px}.stop-t b{font-size:20px}.cell{border-radius:14px}.grid{gap:6px}.hero{max-height:860px}}
-@media (max-width:359px){:root{--gut:16px;--rh:132px}.stop{--d:104px;gap:14px}.stop-t b{font-size:15.5px}.acts b{font-size:11.5px}.ava{--d:136px}.me{margin-top:-76px}}
+@media (max-width:359px){:root{--gut:16px;--rh:132px}.stop{--d:104px;gap:14px}.stop-t b{font-size:15.5px}.acts b{font-size:11.5px}.ava{--d:136px}}
 @media (max-height:520px) and (orientation:landscape){.hero{height:auto;min-height:0;max-height:none}.hero-mid{padding:8px 0 20px}.aff-stage{min-height:130px}.me{margin-top:10px}
   .f-cap b{font-size:22px}.g-head{margin-top:6px}.g-head h2{font-size:22px}.g-field{width:min(54vh,60vw)}.g-bot{padding-top:6px;padding-bottom:calc(var(--sab) + 10px)}}
 
 @media (prefers-reduced-motion:reduce){
-  #skyHero i,.emblem .sp,.planet.now::after,.planet.lock::after,.c-mini,.c-ball i,.eq[aria-pressed="true"] .bars i,.mir img,.sat,.sat b,.sat b u,.al-pl{animation:none}
+  #skyHero i,.emblem .sp,.planet.now::after,.planet.lock::after,.c-mini,.c-ball i,.hero-dn,.eq[aria-pressed="true"] .bars i,.mir img,.sat,.sat b,.sat b u,.al-pl{animation:none}
   .aff-t span,.c-t span,#home.enter .rise,.f-frame.on .f-img,.f-frame.was .f-img{animation-duration:.01s;animation-delay:0s}
   .screen,.cell img,.sheet-box{transition-duration:.01s}
 }
@@ -664,7 +726,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
         <button class="ib" id="bMenu" type="button" aria-label="Настройки"><svg class="i" viewBox="0 0 24 24"><use href="#i-tune"/></svg></button>
       </header>
       <div class="hero-mid">
-        <p class="eyebrow rise" id="heroHi" style="--i:1"></p>
+        <p class="eyebrow rise" id="heroHi" style="--i:1" hidden></p>
         <div class="aff-stage rise" id="affStage" style="--i:2" role="button" tabindex="0" aria-label="Следующая аффирмация"></div>
       </div>
       <div class="hero-bot rise" style="--i:3">
@@ -673,6 +735,7 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
         <button class="ib sm" id="affPlay" type="button" aria-label="Пауза или продолжить"><svg class="i pa" viewBox="0 0 24 24"><use href="#i-pause"/></svg><svg class="i pl" viewBox="0 0 24 24"><use href="#i-play"/></svg></button>
         <button class="ib sm" id="affBig" type="button" aria-label="Минута для себя: аффирмации на весь экран"><svg class="i" viewBox="0 0 24 24"><use href="#i-expand"/></svg></button>
       </div>
+      <button class="hero-dn" id="heroDn" type="button" aria-label="Дальше — мои фото"><svg class="i" viewBox="0 0 24 24"><use href="#i-back"/></svg></button>
     </section>
 
     <div class="wrap">
@@ -703,6 +766,12 @@ svg.i{width:1em;height:1em;display:block;flex:none;fill:none;stroke:currentColor
         <span class="mir-t"><i class="eyebrow">мир из кубиков</i><b>Моя<br>планета</b><em>остров, башня до Луны и мои фото</em></span>
         <span class="mir-go" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></span>
       </a>
+
+      <section class="sec" id="flySec">
+        <header class="sec-h"><div><p class="eyebrow">настоящий космос</p><h2>Мои полёты</h2><p class="sec-s">снимки телескопа «Хаббл» — туда можно слетать и всё рассмотреть</p></div></header>
+        <button class="orbd tilt" id="orbDay" type="button" aria-label="Орбита дня: полететь"></button>
+        <div class="strip fly-strip" id="flyStrip"></div>
+      </section>
 
       <div id="todayBox"></div>
 
@@ -827,7 +896,7 @@ const frame = () => new Promise(r => requestAnimationFrame(() => r()));
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const TOUCH = matchMedia("(hover: none)").matches;
-const BUILD = "20261112-1520";
+const BUILD = "20261112-2103";
 
 /* память устройства: не падает в приватном режиме и при переполнении */
 const LS = {
@@ -1126,7 +1195,8 @@ const Sky = (() => {
     const y = (sc ? sc.scrollTop : 0) * (1 - stg), want = (ZONE[scr] || 0) - y * S * (scr === "album" ? .45 : 1), dt = Math.min(.05, raw / 1000 || .016); last = t;
     if (scr !== lastScr) { if (lastScr === "home" && scr === "album") dive(.2); else if (lastScr === "album") dive(-.06); lastScr = scr; busyTill = t + 2500; }
     const dY = want - camY; if (Math.abs(dY) > .002 || Math.abs(tpx - px) > .02 || Math.abs(tpy - py) > .02) busyTill = Math.max(busyTill, t + 900);
-    camY += dY * Math.min(1, dt * 7); px += (tpx - px) * Math.min(1, dt * 3); py += (tpy - py) * Math.min(1, dt * 3);
+    camY += dY * Math.min(1, dt * 7); px += (tpx - px) * Math.min(1, dt * 5); py += (tpy - py) * Math.min(1, dt * 5);
+    const pg = gyro ? 1 : .4, qx = px * pg, qy = py * pg;                     // наклон телефона двигает небо в полную силу (Андрей 13.11: «небо оживает от наклона не работает» — было почти незаметно), мышь и палец — мягче
     const hk = Math.min(1, dt * .9); hx += (thx - hx) * hk; hy2 += (thy - hy2) * hk; hz += (thz - hz) * hk;
     if (dvK) {                                                               // влёт: быстро в начале, мягко в конце
       const out = k => Math.pow(1 - clamp(k, 0, 1), 3); dzc = dvK * out((t - dvT) / dvD); dz = dvK * out((t - dv3T) / dvD);
@@ -1136,17 +1206,17 @@ const Sky = (() => {
     if (busy && glOk && !QFIX && t > tuneFrom && raw < 250) tune(raw);
     /* фотопланы */
     const hy = scr === "album" ? heroH : y, fade = scr === "album" ? 0 : clamp(1 - (hy - heroH * .28) / (heroH * .8), 0, 1);
-    hero.style.opacity = fade.toFixed(3); if (fade > 0) hero.style.transform = `translate3d(${(-px * 10 + hx * W * .01).toFixed(1)}px,${(-hy * .62 - py * 6 + hy2 * H * .01).toFixed(1)}px,0) scale(${(1.05 + hy * .00012 + hz + dzc * .2).toFixed(4)})`;
-    bg.style.transform = `translate3d(${(-px * 12).toFixed(1)}px,${(Math.max(-H * .085, camY * 1.6) - py * 8).toFixed(1)}px,0) scale(${(1 + dzc * .14).toFixed(4)})`;
+    hero.style.opacity = fade.toFixed(3); if (fade > 0) hero.style.transform = `translate3d(${(-qx * 30 + hx * W * .01).toFixed(1)}px,${(-hy * .62 - qy * 16 + hy2 * H * .01).toFixed(1)}px,0) scale(${(1.05 + hy * .00012 + hz + dzc * .2).toFixed(4)})`;
+    bg.style.transform = `translate3d(${(-qx * 42).toFixed(1)}px,${(Math.max(-H * .085, camY * 1.6) - qy * 22).toFixed(1)}px,0) scale(${(1 + dzc * .14).toFixed(4)})`;
     if (!glOk) return;
-    cam.position.set(Math.sin(t * .00007) * .8 + px * 1.6, camY - py * .9, dz * 150); cam.rotation.set(py * .03, -px * .04, 0);
+    cam.position.set(Math.sin(t * .00007) * .8 + qx * 5.5, camY - qy * 2.8, dz * 150); cam.rotation.set(qy * .1, -qx * .13, 0);
     starMat.uniforms.uT.value = t * .001; starMat.uniforms.uY.value = camY;
     for (const b of bodies) b.userData.mesh.rotation.y += b.userData.spin * dt;
     R.render(scene, cam);
   }
   function size() {
     const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return; W = w; H = h;
-    const hs = $("#hero"); heroH = Math.max(420, hs && hs.offsetHeight ? hs.offsetHeight + 150 : H * .9); hero.style.height = heroH + "px";
+    const hs = $("#hero"); heroH = Math.max(420, hs && hs.offsetHeight ? hs.offsetHeight + 64 : H * .9); hero.style.height = heroH + "px";
     if (!glOk) drawFlat();
     if (R) { R.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix(); starMat.uniforms.uK.value = H / 844; place(); light(); }
     busyTill = performance.now() + 1500;
@@ -1162,7 +1232,12 @@ const Sky = (() => {
     size(); let rt = 0; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(size, 200); });
     addEventListener("pointermove", e => { if (e.pointerType === "mouse") { tpx = (e.clientX / innerWidth - .5) * 2; tpy = (e.clientY / innerHeight - .5) * 2; } }, { passive: true });
     /* наклон телефона двигает небо: Android отдаёт его сразу, iPhone — только с разрешения (настройки → «Небо оживает от наклона») */
-    addEventListener("deviceorientation", e => { if (e.gamma == null || e.beta == null || tiltOff) return; gyro = true; tpx = clamp(e.gamma / 26, -1, 1); tpy = clamp((e.beta - 42) / 26, -1, 1); }, { passive: true });
+    addEventListener("deviceorientation", e => {
+      if (e.gamma == null || e.beta == null || tiltOff) return; gyro = true;
+      const o = (screen.orientation && screen.orientation.angle) || window.orientation || 0; let gx = e.gamma, by = e.beta;      // телефон лёжа — оси меняются местами
+      if (o === 90) { gx = e.beta; by = -e.gamma; } else if (o === -90 || o === 270) { gx = -e.beta; by = e.gamma; }
+      tpx = clamp(gx / 20, -1, 1); tpy = clamp((by - (o ? 0 : 45)) / 20, -1, 1);
+    }, { passive: true });
     /* наклона нет — небо чуть поворачивается за пальцем */
     addEventListener("touchmove", e => { const p = e.touches && e.touches[0]; if (gyro || !p) return; tpx = (p.clientX / W - .5) * 1.1; tpy = (p.clientY / H - .5) * .9; }, { passive: true });
     if (tiltCan() && LS.get("mk2.tilt", "") === "1") D.addEventListener("click", function once() { D.removeEventListener("click", once, true); tiltAsk(); }, true);
@@ -1184,6 +1259,7 @@ const Sky = (() => {
   function tiltCan() { const E = window.DeviceOrientationEvent; return !!(E && typeof E.requestPermission === "function"); }
   function tiltAsk() { tiltOff = false; try { return window.DeviceOrientationEvent.requestPermission().then(r => r === "granted", () => false); } catch (e) { return Promise.resolve(false); } }
   function tiltStop() { tiltOff = true; gyro = false; tpx = tpy = 0; }
+  const tiltLive = () => gyro;                             // наклон и правда приходит от телефона
   /* сцена под окном поверх главной: небо плавно возвращается к первому экрану (Земля с восходом), где бы ни стояла прокрутка;
      rgb — цвет, которым окно подкрашивает туманность, dim — приглушить восход (перед сном) */
   function stage(on, rgb, dim) {
@@ -1191,7 +1267,7 @@ const Sky = (() => {
     if (rgb) box.style.setProperty("--calm-rgb", rgb);
     if (staged !== was && glOk) dive(staged ? .2 : -.06); busyTill = performance.now() + 2500;
   }
-  return { init, theme, current, pause, resize: size, shot, dive, stage, tiltCan, tiltAsk, tiltStop };
+  return { init, theme, current, pause, resize: size, shot, dive, stage, tiltCan, tiltAsk, tiltStop, tiltLive };
 })();
 
 /* звёздная вспышка: любимое фото, собранное созвездие, день рождения */
@@ -1515,7 +1591,6 @@ const AFF = [
   "Я в безопасности",
   "Вселенная любит меня",
   "Жизнь моя полна чудес",
-  "Деньги сыплются с небес",
   "Я притягиваю изобилие легко и с радостью",
   "Всё, что мне нужно, приходит ко мне вовремя",
   "Каждый новый день приносит мне подарки",
@@ -1562,7 +1637,6 @@ const Home = (() => {
   const scr = $("#home"), heroEl = $("#hero"), stage = $("#affStage"), bar = $("#affBar");
   let deck = [], affI = 0, facts = [], factI = 0, factT = 0, ro = null, heroSeen = true;
   const isBday = () => { const n = new Date(); return n.getMonth() === BIRTH.getMonth() && n.getDate() === BIRTH.getDate(); };
-  function hi() { const h = new Date().getHours(); return (h >= 5 && h < 11 ? "доброе утро" : h >= 11 && h < 17 ? "добрый день" : h >= 17 && h < 23 ? "добрый вечер" : "доброй ночи") + ", мой космос"; }
 
   /* ── сцена аффирмаций: сама листается, пальцем — влево-вправо, касание — следующая ── */
   const AFF_MS = 8500;
@@ -1596,7 +1670,7 @@ const Home = (() => {
 
   function hero() {
     const now = new Date(), a = ageAt(now), days = a.days;
-    $("#heroHi").textContent = isBday() ? "сегодня мой день рождения" : hi();
+    $("#heroHi").textContent = isBday() ? "сегодня мой день рождения" : ""; $("#heroHi").hidden = !isBday();   // Андрей 13.11: «доброй ночи мой космос слова убери» — приветствия нет, строка есть только в день рождения
     $("#heroAge").textContent = "Мне " + tY(a.y);
     $("#heroSub").textContent = isBday() ? "с днём рождения меня!" : [a.m ? tM(a.m) : "", a.d ? tD(a.d) : ""].filter(Boolean).join(" и ") || "ровно сегодня";
     let nb = new Date(now.getFullYear(), BIRTH.getMonth(), BIRTH.getDate()); if (nb < new Date(now.getFullYear(), now.getMonth(), now.getDate())) nb = new Date(now.getFullYear() + 1, BIRTH.getMonth(), BIRTH.getDate());
@@ -1723,9 +1797,10 @@ const Home = (() => {
   function paintMusic() { const b = $("#bMusic"); b.setAttribute("aria-pressed", Music.on()); b.setAttribute("aria-label", Music.on() ? "Музыка играет — выключить" : "Музыка выключена — включить"); }
 
   function init() {
-    hero(); affInit(); today(); fav(); path();
+    hero(); affInit(); today(); fav(); path(); Polet.home();
     $("#footT").innerHTML = `Мой космос · ${new Date().getFullYear()}`;
     $("#affBig").onclick = () => Calm.open();
+    $("#heroDn").onclick = () => $("#home").scrollTo({ top: $("#hero").offsetHeight - 8, behavior: RM ? "auto" : "smooth" });
     $("#aCalm").onclick = () => Calm.open();
     $("#aFilm").onclick = () => Film.open();
     $("#aRandom").onclick = randomPhoto;
@@ -2460,8 +2535,10 @@ const Game = (() => {
     const sh = sheet(`<div class="story"><p class="eyebrow" style="text-align:center">${mine ? "моё созвездие" : "созвездие"}</p><h2>${s.name}</h2><p class="lat">${s.lat}</p><p class="lead">${esc(lead)}</p>
       <ul>${s.facts.map(f => `<li>${ico("spark")}${esc(f)}</li>`).join("")}</ul>
       <button class="btn ghost sm more-b" type="button">Узнать больше</button><div class="more-t"><div>${more.map(f => `<p>${esc(f)}</p>`).join("")}</div></div>
+      ${Polet.has(s.id) ? `<button class="btn ghost sm fly-b" type="button">${ico("spark")}Полететь: ${esc(Polet.brief(s.id)[1])}</button>` : ""}
       <div class="sh-row"><button class="btn gold" type="button" data-close>Дальше</button></div></div>`, () => { if (then) then(); });
     $(".more-b", sh.box).onclick = () => { $(".story", sh.box).classList.add("open"); buzz(6); };
+    const fb = $(".fly-b", sh.box); if (fb) fb.onclick = () => Polet.open(s.id);          // настоящий снимок этого места — полёт поверх рассказа
   }
   function introPanel(html) { intro.hidden = false; root.classList.add("intro"); intro.innerHTML = html; run++; phase = "idle"; }
   function showIntro() {
@@ -2512,6 +2589,169 @@ const Game = (() => {
   $("#gList").onclick = () => atlas();
   $("#gClose").onclick = () => Layer.pop();
   return { open: openGame };
+})();
+
+/* ══════ 89_polet.js ══════ */
+/* «Мои полёты»: созвездие → настоящий снимок телескопа «Хаббл», куда можно слететь, осмотреться и приблизить.
+   Сделано в «Панели» (чат «Панель: 3D-Космос…», модуль ORI) и передано сюда по слову Андрея 13.11.2026: «…лучше предложить
+   на сайт дочи и там уже открывать и переход обучения астрономии красиво… орбита дня также подойдёт туда… андромеда обрезана
+   квадратами. + больше инфы если нажмёшь». Здесь: карточка «Орбита дня» на главной (живое созвездие, каждый день новое место),
+   лента из шести мест, сам полёт и «Узнать больше» по каждому месту.
+   Мир полёта: снимок — квадрат [0..1], север вверху, восток слева; звёзды созвездия — в тех же единицах (у мелких туманностей
+   созвездие в сотни раз больше снимка). Камера: x, y — середина экрана в этих единицах, s — пикселей в единице.
+   Снимки, участки «крупно», звёзды и тексты — assets/astro (готовит astro_make.py; подписи авторов показываются под снимком). */
+const FLY = [["ori", "Туманность Ориона", "Орион", "там рождаются звёзды"], ["tau", "Крабовидная туманность", "Телец", "остаток взорвавшейся звезды"],
+  ["lyr", "Туманность Кольцо", "Лира", "так закончит жизнь Солнце"], ["cas", "Туманность Пузырь", "Кассиопея", "пузырь, который надула звезда"],
+  ["and", "Галактика Андромеды", "Андромеда", "соседняя галактика"], ["uma", "Глубокое поле «Хаббла»", "Большая Медведица", "тысячи галактик в пустом месте"]];
+
+const Polet = (() => {
+  const A = "assets/astro/", cam = { x: .47, y: .47, s: 800 }, ptrs = new Map();
+  let places = [], lp = null, P = null, box = null, cz, cw, cv, cx, w = 0, h = 0, d = 1, anim = null, cur = "", raf = 0, isOpen = false, more = false, pinch = null, lastTap = 0, down = null, autoT = 0, fbH = 0, dayT = 0;
+  const brief = id => FLY.find(f => f[0] === id), has = id => !!brief(id);
+  /* место → всё для рисования: звёзды, фоновые звёзды (для глубины, не каталог), границы; W — «встречные» звёзды кольцами вокруг места,
+     чтобы в долгом приближении экран не был пустым */
+  const prep = p => {
+    const c = p.cst; p.T = p.T || [.5, .5]; p.S = p.stars.map(a => ({ n: a[0], x: a[1], y: a[2], m: a[3], c: a[4] }));
+    p.fld = p.fld || [c[0] - .95 * c[2], 1.89 * c[2], c[1] - .71 * c[3], 1.44 * c[3]]; p.far = p.far || [c[0] - .55 * c[2], c[0] + .565 * c[2], c[1] - .47 * c[3], c[1] + .45 * c[3]];
+    let seed = p.seed || (20261113 + p.id.charCodeAt(0) * 131 + p.id.charCodeAt(1) * 17); const rnd = () => (seed = seed * 48271 % 2147483647) / 2147483647;
+    p.F = Array.from({ length: 520 }, () => ({ x: p.fld[0] + rnd() * p.fld[1], y: p.fld[2] + rnd() * p.fld[3], m: rnd(), p: rnd() * 6.28 }));
+    const R = Math.max(c[2], c[3]);
+    p.W = p.id === "ori" ? [] : Array.from({ length: 300 }, () => { const a = rnd() * 6.283, r = Math.exp(Math.log(.72) + rnd() * Math.log(R / .72)); return { x: p.T[0] + Math.cos(a) * r, y: p.T[1] + Math.sin(a) * r, m: rnd(), p: rnd() * 6.28 }; });
+    return p;
+  };
+  const load = () => lp || (lp = fetch(A + "mesta.json").then(r => { if (!r.ok) throw new Error("mesta"); return r.json(); }).then(a => (places = a.map(prep))).catch(e => { lp = null; throw e; }));
+  const pick = id => places.find(p => p.id === id) || places[0];
+  const meas = () => { fbH = P && P.id !== "ori" && box ? box.querySelector(".fl-bot").offsetHeight : 0; }, free = () => fbH ? [84, Math.max(160, h - fbH + 30 - 84)] : null;   // созвездие вписывается в полосу между заголовком и нижней панелью
+  const cover = () => Math.max(w, h), sC = () => { const f = free(); return Math.min(w / P.cst[2], f ? f[1] / (P.cst[3] * .78) : h / P.cst[3]); }, smin = () => sC() * .8, smax = () => cover() * P.zmax;
+  const tgt = k => { if (k === "const") { const s = sC(), f = free(); return { x: P.cst[0], y: P.cst[1] + (f ? (h / 2 - f[0] - f[1] / 2) / s : 0), s }; } const t = P.tg[k] || P.tg.neb; return { x: t[0], y: t[1], s: cover() * t[2] }; };
+
+  /* небо: фоновые звёзды, линии и звёзды созвездия, отметка места. c — камера, k — пикселей холста в пикселе экрана, fa — мы ещё «у созвездия» (1 … 0) */
+  function sky(ctx, W, H, c, t, k, fa, mini, p) {
+    ctx.clearRect(0, 0, W, H); const X = x => W / 2 + (x - c.x) * c.s * k, Y = y => H / 2 + (y - c.y) * c.s * k, T = p.T, S = p.S, tx0 = X(T[0]), ty0 = Y(T[1]);
+    for (const f of p.F) { const x = X(f.x), y = Y(f.y); if (x < -4 || y < -4 || x > W + 4 || y > H + 4) continue; const a = (.18 + .5 * f.m) * (.6 + .4 * Math.sin(t * .0011 + f.p)) * (.3 + .7 * fa);
+      ctx.fillStyle = "rgba(215,222,255," + a.toFixed(3) + ")"; ctx.beginPath(); ctx.arc(x, y, (.45 + f.m * .75) * k * (mini ? .8 : 1), 0, 6.283); ctx.fill(); }
+    if (!mini) for (const f of p.W) { const x = X(f.x), y = Y(f.y); if (x < -4 || y < -4 || x > W + 4 || y > H + 4) continue;   // встречные звёзды: у самого места не видны, проявляются, разлетаясь к краям
+      const a = (.16 + .5 * f.m) * (.6 + .4 * Math.sin(t * .0011 + f.p)) * Math.min(1, Math.max(0, (Math.hypot(x - tx0, y - ty0) / k - 30) / 110)); if (a < .012) continue;
+      ctx.fillStyle = "rgba(215,222,255," + a.toFixed(3) + ")"; ctx.beginPath(); ctx.arc(x, y, (.45 + f.m * .75) * k, 0, 6.283); ctx.fill(); }
+    if (fa > .02) { ctx.lineWidth = k; ctx.strokeStyle = "rgba(170,182,255," + (.34 * fa).toFixed(3) + ")"; ctx.beginPath();
+      for (const [a, b] of p.lines) { ctx.moveTo(X(S[a].x), Y(S[a].y)); ctx.lineTo(X(S[b].x), Y(S[b].y)); } ctx.stroke();
+      const q = p.dash; if (q && q.length) { ctx.setLineDash([2 * k, 4 * k]); ctx.beginPath(); ctx.moveTo(X(S[q[0]].x), Y(S[q[0]].y)); ctx.lineTo(tx0, ty0); if (q[1] != null) ctx.lineTo(X(S[q[1]].x), Y(S[q[1]].y)); ctx.stroke(); ctx.setLineDash([]); } }
+    for (const s of S) { const x = X(s.x), y = Y(s.y); if (x < -40 || y < -40 || x > W + 40 || y > H + 40) continue; const r = Math.max(1.1, 3.9 - s.m * .72) * k * (mini ? .72 : 1), tw = .82 + .18 * Math.sin(t * .0017 + s.x);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4.2); g.addColorStop(0, "rgba(" + s.c + "," + (.55 * tw).toFixed(3) + ")"); g.addColorStop(1, "rgba(" + s.c + ",0)"); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 4.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255," + (.95 * tw).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
+    const fm = p.id === "ori" || mini ? fa : Math.max(fa, 1 - Math.min(1, Math.max(0, (c.s - 18) / 60)));   // место издалека — розовая искра и расходящееся кольцо: туда и летим
+    if (fm > .02) { const ph = (t % 2600) / 2600, rr = (mini ? 5 : 7) * k;
+      const g = ctx.createRadialGradient(tx0, ty0, 0, tx0, ty0, rr * 2.4); g.addColorStop(0, "rgba(255,150,205," + (.9 * fm).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,150,205,0)"); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tx0, ty0, rr * 2.4, 0, 6.283); ctx.fill();
+      ctx.strokeStyle = "rgba(255,190,225," + ((1 - ph) * .7 * fm).toFixed(3) + ")"; ctx.lineWidth = 1.2 * k; ctx.beginPath(); ctx.arc(tx0, ty0, rr * (1 + ph * 2.6), 0, 6.283); ctx.stroke(); }
+    if (mini || fm <= .35) return;
+    ctx.font = "600 " + (11.5 * k) + 'px Manrope,-apple-system,"Segoe UI",Roboto,sans-serif'; ctx.textBaseline = "middle";
+    if (fa > .35) { ctx.fillStyle = "rgba(200,206,255," + Math.min(1, (fa - .35) * 1.4).toFixed(3) + ")";
+      for (const [i, dx, tx] of p.lab) { const x = X(S[i].x), y = Y(S[i].y), tw = ctx.measureText(tx).width;   // подпись не уходит за край экрана
+        if (dx === 0) { ctx.textAlign = "left"; ctx.fillText(tx, Math.max(8 * k, Math.min(W - tw - 8 * k, x - tw / 2)), y - 17 * k); }
+        else if (dx > 0 && x + 13 * k + tw > W - 6 * k || dx < 0 && x - 13 * k - tw > 6 * k) { ctx.textAlign = "right"; ctx.fillText(tx, x - 13 * k, y); }
+        else { ctx.textAlign = "left"; ctx.fillText(tx, x + 13 * k, y); } } }
+    const tx = p.obj, tw = ctx.measureText(tx).width; ctx.fillStyle = "rgba(255,190,225," + Math.min(1, (fm - .35) * 1.6).toFixed(3) + ")";
+    if (tx0 + 17 * k + tw > W - 6 * k) { ctx.textAlign = "right"; ctx.fillText(tx, tx0 - 17 * k, ty0 + k); } else { ctx.textAlign = "left"; ctx.fillText(tx, tx0 + 17 * k, ty0 + k); }
+    ctx.textAlign = "left";
+  }
+
+  function ui() {
+    if (!box || !P) return; const v = P.V[cur]; if (v) { $("#flT", box).textContent = v[0]; $("#flS", box).textContent = v[1]; $("#flTx", box).textContent = v[2]; }
+    $$("[data-fv]", box).forEach(b => b.classList.toggle("on", b.dataset.fv === cur)); $$("[data-fp]", box).forEach(b => b.classList.toggle("on", b.dataset.fp === P.id)); box.dataset.pl = P.id; box.dataset.cur = cur;
+  }
+  function fill() {   // снимок, участки крупно, кнопки и подпись автора — для выбранного места
+    $$(".fl-dt", cw).forEach(i => i.remove()); const im = $("#flImg", box); im.classList.remove("on"); im.removeAttribute("src"); im.onload = () => im.classList.add("on"); im.src = A + P.img + ".webp";
+    cw.insertAdjacentHTML("beforeend", P.det.map(([n, x, y, hf]) => `<img class="fl-dt" data-n="${n}" alt="" draggable="false" style="left:${((x - hf) * 100).toFixed(2)}%;top:${((y - hf) * 100).toFixed(2)}%;width:${(hf * 200).toFixed(2)}%;height:${(hf * 200).toFixed(2)}%">`).join(""));
+    $("#flGo", box).innerHTML = P.pills.map(([k, t]) => `<button class="fl-pill" type="button" data-fv="${k}">${esc(t)}</button>`).join("");
+    $("#flPl", box).innerHTML = places.map(p => `<button class="fl-pill pl" type="button" data-fp="${p.id}">${esc(p.name)}</button>`).join("");
+    $("#flCr", box).textContent = "Двигай и приближай пальцами или выбери, куда посмотреть. " + P.credit;
+  }
+  function size() { w = innerWidth; h = innerHeight; d = Math.min(2, window.devicePixelRatio || 1); cv.width = Math.round(w * d); cv.height = Math.round(h * d); meas(); }
+  function lim() { cam.s = Math.max(smin(), Math.min(smax(), cam.s)); const far = cam.s < cover() * .5, f = P.far; cam.x = Math.max(far ? f[0] : -.15, Math.min(far ? f[1] : 1.15, cam.x)); cam.y = Math.max(far ? f[2] : -.15, Math.min(far ? f[3] : 1.15, cam.y)); }
+  function zoomAt(px, py, s) { s = Math.max(smin(), Math.min(smax(), s)); const wx = cam.x + (px - w / 2) / cam.s, wy = cam.y + (py - h / 2) / cam.s; cam.s = s; cam.x = wx - (px - w / 2) / s; cam.y = wy - (py - h / 2) / s; }
+  function fly(k, ms, to) {
+    const a = { x: cam.x, y: cam.y, s: cam.s }, b = to || tgt(k); if (!to) { cur = k; ui(); }
+    anim = { a, b, zin: b.s >= a.s, t0: performance.now(), ms: ms || Math.max(1100, Math.min(3800, 600 + Math.abs(Math.log(b.s / a.s)) * 820)) };
+  }
+  function frame(t) {
+    if (!isOpen) return; raf = requestAnimationFrame(frame);
+    if (anim) { const u = Math.min(1, (t - anim.t0) / anim.ms), e = u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, s = anim.a.s * Math.pow(anim.b.s / anim.a.s, e);   // цель плавно съезжает в центр, пока меняется масштаб
+      if (anim.zin) { cam.x = anim.b.x - (anim.b.x - anim.a.x) * anim.a.s * (1 - e) / s; cam.y = anim.b.y - (anim.b.y - anim.a.y) * anim.a.s * (1 - e) / s; }
+      else { cam.x = anim.a.x - (anim.a.x - anim.b.x) * anim.b.s * e / s; cam.y = anim.a.y - (anim.a.y - anim.b.y) * anim.b.s * e / s; }
+      cam.s = s; if (u >= 1) anim = null; }
+    const idle = !anim && !ptrs.size && !RM, s = cam.s * (idle ? 1 + .012 * Math.sin(t / 6500) : 1), x = cam.x + (idle ? Math.sin(t / 11000) * 9 / s : 0), y = cam.y + (idle ? Math.cos(t / 13000) * 7 / s : 0);   // без рук вид чуть дышит и плывёт
+    cw.style.transform = "translate(" + (w / 2 - x * s).toFixed(2) + "px," + (h / 2 - y * s).toFixed(2) + "px) scale(" + (s / 1000).toFixed(6) + ")";
+    sky(cx, cv.width, cv.height, { x, y, s }, t, d, Math.max(0, Math.min(1, 1 - Math.log(s / sC()) / Math.log(14))), false, P);
+    if (s > cover() * 1.6) for (const im of $$(".fl-dt:not([src])", cw)) { const n = P.det.find(q => q[0] === im.dataset.n);   // подлетели близко — подгружается этот участок снимка крупно
+      if (n && Math.abs(n[1] - x) < n[3] + w / s / 2 && Math.abs(n[2] - y) < n[3] + h / s / 2) { im.onload = () => im.classList.add("on"); im.src = A + P.img + "-" + n[0] + ".webp"; } }
+  }
+  /* «Узнать больше»: панель с подробностями о месте (Андрей: «+ больше инфы если нажмёшь») */
+  function moreOpen() {
+    if (!P || more) return; more = true; const v = P.V.neb;
+    $("#flMore", box).innerHTML = `<div class="story"><p class="eyebrow" style="text-align:center">больше об этом месте</p><h2>${esc(v[0])}</h2><p class="lat">${esc(v[1])}</p><p class="lead">${esc(v[2])}</p>
+      <ul>${P.more.map(f => `<li>${ico("spark")}${esc(f)}</li>`).join("")}</ul><p class="fl-cr2">${esc(P.credit)}</p><div class="sh-row"><button class="btn gold" type="button" data-mx>Понятно</button></div></div>`;
+    $("#flMore", box).scrollTop = 0; box.classList.add("more"); clearTimeout(autoT); Layer.push("polet-more", moreShut); buzz(6);
+  }
+  function moreShut() { more = false; if (box) box.classList.remove("more"); }
+  function build() {
+    box = el("div", "fl"); box.id = "polet"; box.hidden = true; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Полёт к настоящему месту в космосе");
+    box.innerHTML = `<div class="fl-z" id="flZ"><div class="fl-w" id="flW"><img class="fl-b0" id="flImg" alt="" draggable="false"></div><canvas id="flCv"></canvas></div>
+<div class="fl-top"><div><b id="flT"></b><small id="flS"></small></div><button class="ib" id="flX" type="button" aria-label="Закрыть">${ico("close")}</button></div>
+<div class="fl-bot"><div class="fl-pills fl-pls" id="flPl"></div><p id="flTx"></p><div class="fl-pills" id="flGo"></div><div class="fl-foot"><button class="fl-mb" id="flMoreB" type="button">Узнать больше</button><small id="flCr"></small></div></div>
+<div class="fl-load"><span class="loader"></span></div><div class="fl-mbg" id="flMbg"></div><div class="fl-more" id="flMore"></div>`;
+    D.body.append(box); cz = $("#flZ", box); cw = $("#flW", box); cv = $("#flCv", box); cx = cv.getContext("2d");
+    box.addEventListener("click", e => {
+      const b = e.target.closest("[data-fv]"); if (b) { fly(b.dataset.fv); return; } const q = e.target.closest("[data-fp]"); if (q) { go(q.dataset.fp); return; }
+      if (e.target.closest("#flX")) Layer.pop(); else if (e.target.closest("#flMoreB")) moreOpen(); else if (e.target.closest("[data-mx]") || e.target.id === "flMbg") Layer.pop();
+    });
+    cz.addEventListener("pointerdown", e => { try { cz.setPointerCapture(e.pointerId); } catch (q) {} ptrs.set(e.pointerId, [e.clientX, e.clientY]); anim = null; cz.classList.add("drag"); down = { x: e.clientX, y: e.clientY, t: Date.now(), m: 0 };
+      if (ptrs.size === 2) { const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]) || 1, s: cam.s }; } });
+    cz.addEventListener("pointermove", e => { const p = ptrs.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; p[0] = e.clientX; p[1] = e.clientY; if (down) down.m += Math.abs(dx) + Math.abs(dy);
+      if (ptrs.size === 1) { cam.x -= dx / cam.s; cam.y -= dy / cam.s; }
+      else if (pinch) { const [a, b] = [...ptrs.values()]; zoomAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d); }
+      lim(); if (down && down.m > 8 && cur) { cur = ""; ui(); } });
+    const up = e => { if (!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (ptrs.size) return; cz.classList.remove("drag");
+      if (down && down.m < 8 && Date.now() - down.t < 320) { const now = Date.now();   // двойное касание — приблизить это место
+        if (now - lastTap < 340) { const s = Math.min(smax(), cam.s * 2.3); fly("", 900, { x: cam.x + (e.clientX - w / 2) / cam.s, y: cam.y + (e.clientY - h / 2) / cam.s, s }); cur = ""; ui(); lastTap = 0; } else lastTap = now; } };
+    cz.addEventListener("pointerup", up); cz.addEventListener("pointercancel", up);
+    cz.addEventListener("wheel", e => { e.preventDefault(); anim = null; zoomAt(e.clientX, e.clientY, cam.s * Math.exp(-e.deltaY * .0016)); lim(); if (cur) { cur = ""; ui(); } }, { passive: false });
+    addEventListener("resize", () => { if (isOpen && P) { size(); lim(); } });
+    D.addEventListener("visibilitychange", () => { if (!isOpen || !P) return; cancelAnimationFrame(raf); if (!D.hidden) raf = requestAnimationFrame(frame); });
+  }
+  /* секунду смотрим на созвездие — и летим к месту; чем мельче место, тем дольше полёт */
+  const arm = () => { clearTimeout(autoT); autoT = setTimeout(() => { if (isOpen && cur === "const" && !ptrs.size && !anim && !more) fly("neb", 3600 + Math.min(1600, Math.max(0, (Math.log(cover() / sC()) - 4.2) * 520))); }, 1100); };
+  function show(id) { P = pick(id); cur = "const"; fill(); meas(); Object.assign(cam, tgt("const")); anim = null; ui(); arm(); }
+  async function open(id) {
+    if (isOpen) return; if (!box) build(); isOpen = true; box.hidden = false; box.classList.add("wait"); requestAnimationFrame(() => box.classList.add("on"));
+    Layer.push("polet", shut); setTimeout(() => { if (isOpen) Sky.pause(true); }, 650);
+    try { await load(); } catch (e) { if (isOpen) { toast("Не загрузилось. Проверь интернет и попробуй ещё раз."); Layer.pop(); } return; }
+    if (!isOpen) return; box.classList.remove("wait"); size(); show(id || FLY[0][0]); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
+  }
+  function go(id) { if (!isOpen || !P || P.id === id) return; box.classList.add("sw"); clearTimeout(autoT); setTimeout(() => { if (!isOpen) return; show(id); box.classList.remove("sw"); }, 230); }   // другое место, не закрывая полёт
+  function shut() {
+    if (!isOpen) return; isOpen = false; more = false; box.classList.remove("on", "sw", "more", "wait"); cancelAnimationFrame(raf); clearTimeout(autoT); anim = null; ptrs.clear(); Sky.pause(false);
+    setTimeout(() => { if (!isOpen) box.hidden = true; }, 520);
+  }
+
+  /* главная: карточка «Орбита дня» (живое созвездие сегодняшнего места) и лента всех мест */
+  function home() {
+    const sec = $("#flySec"); if (!sec) return; const today = FLY[dayNo() % FLY.length], card = $("#orbDay");
+    card.dataset.fly = today[0];
+    card.innerHTML = `<canvas class="od-cv" aria-hidden="true"></canvas><span class="od-cap">орбита дня</span><b class="od-t">${today[1]}</b><span class="od-s">созвездие ${today[2]} · ${today[3]}</span><span class="od-go">Полететь${ico("back")}</span>`;
+    $("#flyStrip").innerHTML = FLY.map(f => `<button class="fly-c tilt" type="button" data-fly="${f[0]}"><img src="${A}t-${f[0]}.webp" alt="" loading="lazy" width="132" height="132"><b>${f[1]}</b><small>${f[2]}</small></button>`).join("");
+    sec.addEventListener("click", e => { const b = e.target.closest("[data-fly]"); if (b) open(b.dataset.fly); });
+    if (!("IntersectionObserver" in window)) return;
+    let seen = false, last = 0; const cvs = $(".od-cv", card);
+    const loop = t => {                                       // созвездие в карточке живое, чуть дышит; рисуется, только пока карточка на экране
+      dayT = requestAnimationFrame(loop); if (t - last < 60 || D.hidden || isOpen || !seen || Layer.depth() || !places.length) return; last = t;
+      const p = pick(today[0]), r = cvs.getBoundingClientRect(), k = Math.min(2, window.devicePixelRatio || 1), W = Math.round(r.width * k), H = Math.round(r.height * k); if (!W || !H) return;
+      if (cvs.width !== W || cvs.height !== H) { cvs.width = W; cvs.height = H; }
+      const c = p.cst, s = Math.min(r.height / (c[3] * .94), c[4] ? r.width * .4 / c[4] : 1e9), off = Math.min(.31, .5 - (c[4] * s * .5 + 12) / r.width);   // широкое созвездие сдвигается левее, чтобы не упереться в край
+      sky(cvs.getContext("2d"), W, H, { x: c[0] - r.width * off / s + (RM ? 0 : Math.sin(t / 7000) * .3 * c[2] / 27), y: c[1] + (RM ? 0 : Math.cos(t / 9000) * .25 * c[3] / 50), s }, t, k, 1, true, p);
+    };
+    new IntersectionObserver(es => { seen = es[0].isIntersecting; if (seen) { load().catch(() => {}); if (!dayT) dayT = requestAnimationFrame(loop); } }, { root: $("#home"), rootMargin: "200px 0px" }).observe(card);
+  }
+  return { open, home, has, brief };
 })();
 
 /* ══════ 90_admin.js ══════ */
@@ -2609,7 +2849,11 @@ const Settings = (() => {
     if (tl) tl.onclick = async () => {
       if (tl.getAttribute("aria-checked") === "true") { LS.set("mk2.tilt", "0"); Sky.tiltStop(); tl.setAttribute("aria-checked", "false"); return; }
       const ok = await Sky.tiltAsk(); LS.set("mk2.tilt", ok ? "1" : "0"); tl.setAttribute("aria-checked", ok);
-      if (!ok) toast("Телефон не разрешил. Можно попробовать ещё раз позже");
+      if (!ok) { toast("Телефон не дал доступ к наклону. Если вопрос «Разрешить?» не появился — закрой страницу и открой сайт заново в Safari, потом включи ещё раз", null, null, 9000); return; }
+      sh.close(() => {                                  // настройки закрываются — сразу видно, как небо плывёт
+        toast("Готово. Наклони телефон — небо поплывёт", null, null, 5000);
+        setTimeout(() => { if (!Sky.tiltLive()) toast("Телефон разрешил, но наклон не приходит. Попробуй открыть сайт в Safari, а не внутри другого приложения", null, null, 9000); }, 2600);
+      });
     };
     const paint = () => { $("#setMus", box).setAttribute("aria-checked", Music.on()); $$("[data-tr]", box).forEach(x => x.setAttribute("aria-pressed", +x.dataset.tr === Music.index())); };
     $("#setMus", box).onclick = () => { Music.toggle(); paint(); };

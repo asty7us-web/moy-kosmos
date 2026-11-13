@@ -57,7 +57,7 @@ self.addEventListener("fetch", e => {
     e.respondWith(caches.open(SHELL).then(x => x.match(p).then(hit => hit || fetch(req).then(r => { if (r.ok) x.put(p, r.clone()); return r; }))));
     return;
   }
-  if (/\/assets\/(mir\/[^/]+|kosmos\/[^/]+|space-[^/]+\.webp)$/.test(p)) {   // «Моя планета» и картинки неба: из памяти сразу, а свежие подтягиваются к следующему разу
+  if (/\/assets\/(mir\/[^/]+|kosmos\/[^/]+|astro\/[^/]+|space-[^/]+\.webp)$/.test(p)) {   // «Моя планета», картинки неба и «Мои полёты» (снимки «Хаббла» — те, что уже открывала): из памяти сразу, а свежие подтягиваются к следующему разу
     const got = caches.open(SHELL).then(x => x.match(p).then(hit => {
       const net = fetch(req).then(r => { if (r.ok) x.put(p, r.clone()); return r; });
       if (!hit) return net;
