@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-1539. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-2142. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -471,6 +471,11 @@ button.row:active,button.s-it:active{transform:translateY(2px)}
 }
 /* кольцо жестов открыто — подсказка не лежит поверх него */
 body:has(#wheel:not([hidden])) #hint{opacity:0}
+
+/* ───────── день: класс day на body ставит 32_day.js, когда небо светлое, — название и джойстик читаются и на светлом ───────── */
+body.day #title h1{color:#fff;text-shadow:var(--o3),0 6px 0 var(--out)}
+body.day #title p{color:#fff;font-weight:800;text-shadow:var(--o2)}
+body.day #joy{background:radial-gradient(circle at 50% 50%,rgba(40,28,120,.14),rgba(40,28,120,.08) 62%,rgba(40,28,120,.3) 64%,rgba(40,28,120,.12));box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 0 0 1.5px rgba(40,28,120,.35)}
 </style>
 </head>
 <body>
@@ -634,7 +639,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-1539";
+const BUILD = "20261112-2142";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -1074,7 +1079,7 @@ const col = h => new THREE.Color(h);
 /* Мир из кубиков. Весь неподвижный мир — одна сетка блоков (остров, порталы, башня, островки). Из неё один раз
    строится общая поверхность: рисуются только видимые грани, в углах — мягкая тень (она «запечена» в цвет, настоящих
    теней нет). Столкновения человечка считаются по этой же сетке. */
-const VX0 = -46, VX1 = 134, VY0 = -30, VY1 = 66, VZ0 = -70, VZ1 = 42;      // на востоке (x от 88) — остров трёх ключей
+const VX0 = -46, VX1 = 134, VY0 = -30, VY1 = 66, VZ0 = -70, VZ1 = 136;     // на востоке (x от 88) — остров трёх ключей, на юге (z от 46) — остров «Мой дом»
 const NX = VX1 - VX0, NY = VY1 - VY0, NZ = VZ1 - VZ0;
 const vox = new Uint8Array(NX * NY * NZ);
 const vin = (i, j, k) => i >= VX0 && i < VX1 && j >= VY0 && j < VY1 && k >= VZ0 && k < VZ1;
@@ -1083,46 +1088,100 @@ const vget = (i, j, k) => vin(i, j, k) ? vox[vidx(i, j, k)] : 0;
 const vset = (i, j, k, t) => { if (vin(i, j, k)) vox[vidx(i, j, k)] = t; };
 const fill = (x0, y0, z0, x1, y1, z1, t) => { for (let j = y0; j < y1; j++) for (let k = z0; k < z1; k++) for (let i = x0; i < x1; i++) vset(i, j, k, t); };
 
-/* виды блоков: цвет сверху / сбоку / снизу; glow — светится сам; lava — горячо; cam:false — камера сквозь него смотрит (листва) */
+/* виды блоков: цвет сверху / сбоку / снизу; tex — рисунок грани (texS — свой для боков и низа); glow — светится сам; lava — горячо;
+   cam:false — камера сквозь него смотрит (листва); glass — полупрозрачный; own — блок отдельной постройки (дом, участок стройки):
+   в общую поверхность мира не входит — его рисует сама постройка, чтобы уметь прятать крышу и перестраиваться */
 const BT = [null], B = {};
-const IS_LAVA = new Uint8Array(256), CAM_HIT = new Uint8Array(256);
+const IS_LAVA = new Uint8Array(256), CAM_HIT = new Uint8Array(256), IS_OWN = new Uint8Array(256);
 function defBlock(name, o) {
   const id = BT.length; B[name] = id;
-  BT.push({ name, top: col(o.top ?? o.c), side: col(o.side ?? o.c), bot: col(o.bot ?? o.side ?? o.c), glow: !!o.glow, lava: !!o.lava, jit: o.jit ?? .07 });
-  IS_LAVA[id] = o.lava ? 1 : 0; CAM_HIT[id] = o.cam === false ? 0 : 1;
+  const tx = o.tex || "bevel", pre = o.lava ? "" : o.glass ? "t:" : o.glow ? "g:" : "l:";
+  BT.push({ name, top: col(o.top ?? o.c), side: col(o.side ?? o.c), bot: col(o.bot ?? o.side ?? o.c), glow: !!o.glow, lava: !!o.lava, glass: !!o.glass, jit: o.jit ?? .07,
+    kt: o.lava ? "lava" : pre + tx, ks: o.lava ? "lava" : pre + (o.texS || tx) });
+  IS_LAVA[id] = o.lava ? 1 : 0; CAM_HIT[id] = o.cam === false ? 0 : 1; IS_OWN[id] = o.own ? 1 : 0;
   return id;
 }
-defBlock("GRASS", { top: 0x4fd3a2, side: 0x7b5a8c, bot: 0x5a4470 });
-defBlock("GRASS2", { top: 0x67e2b6, side: 0x7b5a8c, bot: 0x5a4470 });
-defBlock("GRASS3", { top: 0x45c2b4, side: 0x7b5a8c, bot: 0x5a4470 });
-defBlock("DIRT", { c: 0x7b5a8c });
-defBlock("STONE", { c: 0x5d6796 });
-defBlock("DEEP", { c: 0x3d4374 });
-defBlock("PATH", { top: 0xecd9b0, side: 0xc4ae86, jit: .05 });
-defBlock("PATH2", { top: 0xdcc497, side: 0xc4ae86, jit: .05 });
-defBlock("TILE_A", { top: 0xf6ead0, side: 0xcdbd9c, jit: .03 });
-defBlock("TILE_B", { top: 0xcbb8f5, side: 0xa893d6, jit: .03 });
-defBlock("TILE_C", { top: 0xf7b3d3, side: 0xd18fb0, jit: .03 });
-defBlock("WOOD", { c: 0x8d6a58 });
-defBlock("PLANK", { top: 0xd6a878, side: 0xb88a5e });
-defBlock("LEAF_P", { c: 0xff9fd0, jit: .12, cam: false });
-defBlock("LEAF_V", { c: 0xb99bff, jit: .12, cam: false });
-defBlock("LEAF_T", { c: 0x7cf0d8, jit: .12, cam: false });
-defBlock("LEAF_G", { c: 0xffe08a, jit: .1, cam: false });
+defBlock("GRASS", { top: 0x4fd3a2, side: 0x7b5a8c, bot: 0x5a4470, tex: "grass", texS: "dirt" });
+defBlock("GRASS2", { top: 0x67e2b6, side: 0x7b5a8c, bot: 0x5a4470, tex: "grass", texS: "dirt" });
+defBlock("GRASS3", { top: 0x45c2b4, side: 0x7b5a8c, bot: 0x5a4470, tex: "grass", texS: "dirt" });
+defBlock("DIRT", { c: 0x7b5a8c, tex: "dirt" });
+defBlock("STONE", { c: 0x5d6796, tex: "stone" });
+defBlock("DEEP", { c: 0x3d4374, tex: "stone" });
+defBlock("PATH", { top: 0xecd9b0, side: 0xc4ae86, jit: .05, tex: "path", texS: "dirt" });
+defBlock("PATH2", { top: 0xdcc497, side: 0xc4ae86, jit: .05, tex: "path", texS: "dirt" });
+defBlock("TILE_A", { top: 0xf6ead0, side: 0xcdbd9c, jit: .03, tex: "tile" });
+defBlock("TILE_B", { top: 0xcbb8f5, side: 0xa893d6, jit: .03, tex: "tile" });
+defBlock("TILE_C", { top: 0xf7b3d3, side: 0xd18fb0, jit: .03, tex: "tile" });
+defBlock("WOOD", { c: 0x8d6a58, tex: "ring", texS: "bark" });
+defBlock("PLANK", { top: 0xd6a878, side: 0xb88a5e, tex: "plank" });
+defBlock("LEAF_P", { c: 0xff9fd0, jit: .12, cam: false, tex: "leaf" });
+defBlock("LEAF_V", { c: 0xb99bff, jit: .12, cam: false, tex: "leaf" });
+defBlock("LEAF_T", { c: 0x7cf0d8, jit: .12, cam: false, tex: "leaf" });
+defBlock("LEAF_G", { c: 0xffe08a, jit: .1, cam: false, tex: "leaf" });
 defBlock("MOON", { top: 0xefecfb, side: 0xcfc9e8, jit: .04 });
 defBlock("DARK", { c: 0x1d1740, jit: .03 });
-defBlock("CR_C", { c: 0x8af6ff, glow: true, jit: .1 });
-defBlock("CR_P", { c: 0xff93e6, glow: true, jit: .1 });
-defBlock("CR_G", { c: 0xffe28a, glow: true, jit: .06 });
-defBlock("LAMP", { c: 0xffefb8, glow: true, jit: .02 });
-defBlock("GOLD", { top: 0xffe07a, side: 0xf0c04e, jit: .04 });
-defBlock("SAND", { c: 0xe8dcc0 });
+defBlock("CR_C", { c: 0x8af6ff, glow: true, jit: .1, tex: "crystal" });
+defBlock("CR_P", { c: 0xff93e6, glow: true, jit: .1, tex: "crystal" });
+defBlock("CR_G", { c: 0xffe28a, glow: true, jit: .06, tex: "crystal" });
+defBlock("LAMP", { c: 0xffefb8, glow: true, jit: .02, tex: "lamp" });
+defBlock("GOLD", { top: 0xffe07a, side: 0xf0c04e, jit: .04, tex: "gold" });
+defBlock("SAND", { c: 0xe8dcc0, tex: "sand" });
 defBlock("LAVA", { c: 0xff8a3a, glow: true, lava: true, jit: .0 });
-defBlock("CLOUD", { top: 0xffffff, side: 0xdcd8f6, jit: .02 });
-defBlock("WALL", { c: 0xf4e6cb, jit: .03 });
-defBlock("ROOF_P", { c: 0xf08fb5, jit: .05 });
-defBlock("ROOF_V", { c: 0x9d8cf0, jit: .05 });
-defBlock("GLASS", { c: 0xfff0b8, glow: true, jit: .02 });
+defBlock("CLOUD", { top: 0xffffff, side: 0xdcd8f6, jit: .02, tex: "cloud" });
+defBlock("WALL", { c: 0xf4e6cb, jit: .03, tex: "wall" });
+defBlock("ROOF_P", { c: 0xf08fb5, jit: .05, tex: "roof" });
+defBlock("ROOF_V", { c: 0x9d8cf0, jit: .05, tex: "roof" });
+defBlock("GLASS", { c: 0xfff0b8, glow: true, jit: .02, tex: "pane" });
+/* остров «Мой дом»: настоящая зелёная трава, дорога, дом, бассейн, огород. Блоки с own рисует сама постройка */
+defBlock("LAWN", { top: 0x63cf48, side: 0x94643f, bot: 0x6e4630, tex: "grass", texS: "dirt" });
+defBlock("LAWN2", { top: 0x78dc56, side: 0x94643f, bot: 0x6e4630, tex: "grass", texS: "dirt" });
+defBlock("LAWN3", { top: 0x4fbd42, side: 0x94643f, bot: 0x6e4630, tex: "grass", texS: "dirt" });
+defBlock("EARTH", { c: 0x94643f, tex: "dirt" });
+defBlock("ROCK", { c: 0x8d919e, tex: "stone" });
+defBlock("ROCK2", { c: 0x6a6e7c, tex: "stone" });
+defBlock("SOIL", { top: 0x7a4c2c, side: 0x6b4428, jit: .05, tex: "soil", texS: "dirt" });
+defBlock("ROAD", { top: 0xffffff, side: 0x6c7083, jit: .02, tex: "asph", texS: "stone" });
+defBlock("ROAD_X", { top: 0xffffff, side: 0x6c7083, jit: .0, tex: "asphx", texS: "stone" });
+defBlock("ROAD_Z", { top: 0xffffff, side: 0x6c7083, jit: .0, tex: "asphz", texS: "stone" });
+defBlock("WALK", { top: 0xe9e6f0, side: 0xc4c0d0, jit: .03, tex: "tile" });
+defBlock("POOL_T", { c: 0xffffff, jit: .0, tex: "pool" });
+defBlock("POOL_E", { top: 0xfff4de, side: 0xe6d6b8, jit: .03, tex: "tile" });
+defBlock("HEDGE", { c: 0x3fae4a, jit: .1, tex: "leaf" });
+defBlock("LEAF_N", { c: 0x4cc45a, jit: .12, cam: false, tex: "leaf" });
+defBlock("LEAF_N2", { c: 0x7bd85a, jit: .12, cam: false, tex: "leaf" });
+defBlock("LEAF_N3", { c: 0xffb7d9, jit: .1, cam: false, tex: "leaf" });
+defBlock("TRUNK", { c: 0x9a6a45, tex: "ring", texS: "bark" });
+defBlock("FENCE", { c: 0xffffff, jit: .02, tex: "plank" });
+defBlock("BRICK", { c: 0xd9806a, jit: .05, tex: "brick" });
+defBlock("H_WALL", { c: 0xfdf8ee, jit: .015, tex: "wall", own: true, cam: false });
+defBlock("H_WALL2", { c: 0xffe3a6, jit: .015, tex: "wall", own: true, cam: false });
+defBlock("H_WALL3", { c: 0xffc4de, jit: .015, tex: "wall", own: true, cam: false });
+defBlock("H_FRAME", { c: 0x565b70, jit: .02, own: true, cam: false });
+defBlock("H_WOOD", { c: 0xc98f5e, jit: .04, tex: "plank", own: true, cam: false });
+defBlock("H_FLOOR", { top: 0xe9bf90, side: 0xc79a6a, jit: .03, tex: "parq", own: true, cam: false });
+defBlock("H_TILE", { top: 0xf4f6fb, side: 0xd0d4e0, jit: .02, tex: "tile", own: true, cam: false });
+defBlock("H_RUG", { top: 0xffa9cf, side: 0xe98ab4, jit: .02, tex: "rug", own: true, cam: false });
+defBlock("H_RUG2", { top: 0x9fdcff, side: 0x7fbfe6, jit: .02, tex: "rug", own: true, cam: false });
+defBlock("H_ROOF", { c: 0xf2776a, jit: .04, tex: "roof", own: true, cam: false });
+defBlock("H_ROOF2", { c: 0x5b6076, jit: .03, tex: "roof", own: true, cam: false });
+defBlock("H_DECK", { top: 0xd9a877, side: 0xb98758, jit: .04, tex: "plank", own: true, cam: false });
+defBlock("H_GLASS", { c: 0xbfe9ff, jit: .0, tex: "pane", glass: true, own: true, cam: false });
+defBlock("H_LAMP", { c: 0xfff3c4, glow: true, jit: .02, tex: "lamp", own: true, cam: false });
+/* кубики для стройки: 16 ярких цветов и особые (их кладёт режим стройки на её участке) */
+const KUB = [0xff5b6e, 0xff8a3a, 0xffd23a, 0x8bdc4a, 0x2fc98a, 0x3ad6e6, 0x4a9bff, 0x7a6bff, 0xb96bff, 0xff7ad0, 0xffffff, 0xbfc4d6, 0x6a7088, 0x2e2f42, 0x9a6a45, 0xffc9a0]
+  .map((c, n) => defBlock("K" + n, { c, jit: .03, tex: "kub", own: true }));
+defBlock("K_GLASS", { c: 0xcdeeff, jit: .0, tex: "pane", glass: true, own: true });
+defBlock("K_LAMP", { c: 0xfff0a8, glow: true, jit: .02, tex: "lamp", own: true });
+defBlock("K_NEON", { c: 0xff7ae0, glow: true, jit: .02, tex: "crystal", own: true });
+defBlock("K_NEON2", { c: 0x7af6ff, glow: true, jit: .02, tex: "crystal", own: true });
+defBlock("K_GOLD", { top: 0xffe07a, side: 0xf0c04e, jit: .04, tex: "gold", own: true });
+defBlock("K_GRASS", { top: 0x63cf48, side: 0x94643f, bot: 0x6e4630, tex: "grass", texS: "dirt", own: true });
+defBlock("K_PLANK", { top: 0xd6a878, side: 0xb88a5e, tex: "plank", own: true });
+defBlock("K_BRICK", { c: 0xd9806a, jit: .05, tex: "brick", own: true });
+defBlock("K_STONE", { c: 0x8d919e, tex: "stone", own: true });
+defBlock("K_ROOF", { c: 0xf2776a, jit: .04, tex: "roof", own: true });
+defBlock("K_LEAF", { c: 0x4cc45a, jit: .12, tex: "leaf", own: true });
+defBlock("K_ICE", { c: 0xd8f4ff, jit: .0, tex: "crystal", glass: true, own: true });
 /* краски этажей башни: основной блок и светлая отделка */
 defBlock("T1", { top: 0x9ff3d8, side: 0x6fcdb4 }); defBlock("T1B", { top: 0xf6fffb, side: 0xcdeee4, jit: .03 });
 defBlock("T2", { top: 0xffa9d1, side: 0xe07fae }); defBlock("T2B", { top: 0xffe1ee, side: 0xf0bdd4, jit: .03 });
@@ -1451,27 +1510,27 @@ function fbm3(x, y, z, s, oct) { let v = 0, a = .5, n = 0; for (let o = 0; o < o
 
 function glowMaterial(fog) {
   return new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uProj: { value: 800 }, uFog: { value: fog } },
+    uniforms: { uTime: { value: 0 }, uProj: { value: 800 }, uFog: { value: fog }, uSolid: { value: 0 } },      // uSolid: 0 — ночь (свет складывается), больше — день (искры плотнее, см. 32_day.js)
     vertexShader: `attribute vec3 tint; attribute float size; attribute float phase; uniform float uTime, uProj, uFog; varying vec3 vC;
       void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; float d = max(-mv.z, 0.1);
         float tw = 0.8 + 0.2 * sin(uTime * 2.3 + phase); gl_PointSize = clamp(size * uProj / d, 0.0, 240.0) * tw;
         vC = tint * tw * exp(-d * d * uFog * uFog); }`,
-    fragmentShader: `varying vec3 vC;
+    fragmentShader: `uniform float uSolid; varying vec3 vC;
       void main() { float r = length(gl_PointCoord - 0.5) * 2.0; float a = max(0.0, 1.0 - r); a = a * a * (0.55 + 0.45 * a);
-        gl_FragColor = vec4(vC * a, 1.0);
+        gl_FragColor = vec4(vC * a, min(1.0, a * max(vC.r, max(vC.g, vC.b))) * uSolid);
         #include <colorspace_fragment>
       }`,
-    blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+    blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, depthWrite: false, transparent: true
   });
 }
 /* звёзды неба: размер задан в точках экрана и от расстояния не зависит — поэтому они всегда чёткие. Крупные — с ореолом и лучиками */
 function starMaterial() {
   return new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uPr: { value: 1 } },
-    vertexShader: `attribute vec3 tint; attribute float size; attribute float phase; uniform float uTime, uPr; varying vec3 vC; varying float vBig;
+    uniforms: { uTime: { value: 0 }, uPr: { value: 1 }, uDim: { value: 1 } },      // uDim: 1 — ночь, 0 — день (32_day.js)
+    vertexShader: `attribute vec3 tint; attribute float size; attribute float phase; uniform float uTime, uPr, uDim; varying vec3 vC; varying float vBig;
       void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv;
         float big = step(2.6, size), tw = 1.0 + 0.26 * sin(uTime * (1.1 + fract(phase) * 1.8) + phase * 9.0) * step(1.45, size);
-        gl_PointSize = max(1.0, size * uPr * mix(1.0, 4.2, big)); vC = tint * tw; vBig = big; }`,
+        gl_PointSize = max(1.0, size * uPr * mix(1.0, 4.2, big)); vC = tint * tw * uDim; vBig = big; }`,
     fragmentShader: `varying vec3 vC; varying float vBig;
       void main() { vec2 p = (gl_PointCoord - 0.5) * 2.0; float r = length(p), a;
         if (vBig > 0.5) { float core = smoothstep(0.30, 0.15, r), halo = pow(max(0.0, 1.0 - r), 3.0) * 0.5;
@@ -1565,9 +1624,10 @@ const GEO_UNIT = new THREE.BoxGeometry(1, 1, 1);
 function buildSky() {
   scene.fog = new THREE.FogExp2(SKY.fog, SKY.fogD);
   renderer.setClearColor(SKY.fog, 1);
-  scene.add(new THREE.HemisphereLight(0xc4ccff, 0x54438a, 2.3));
+  const hemi = new THREE.HemisphereLight(0xc4ccff, 0x54438a, 2.3); scene.add(hemi);
   const key = new THREE.DirectionalLight(0xfff1de, 2.1); key.position.set(-.5, .9, -.3); scene.add(key);
   const fil = new THREE.DirectionalLight(0xd0b0ff, 1.0); fil.position.set(.55, .3, .8); scene.add(fil);
+  Object.assign(SKY, { hemi, key, fil });                    // это ночной свет; днём его меняет 32_day.js
 
   /* купол неба */
   const SW = LOW ? 512 : 1024, tex = new THREE.CanvasTexture(skyCanvas(SW, SW / 2)); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.RepeatWrapping; tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;
@@ -1612,7 +1672,7 @@ function buildSky() {
   const moon = new THREE.Mesh(mg.lit, new THREE.MeshBasicMaterial({ vertexColors: true, map: TEX.bevel, fog: false }));
   moon.scale.setScalar(2.5); moon.position.copy(MOON_POS); moon.rotation.set(.12, -.2, .08); scene.add(moon); SKY.moon = moon;
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(256, 256, (g, w) => { const q = g.createRadialGradient(w / 2, w / 2, w * .2, w / 2, w / 2, w / 2); q.addColorStop(0, "rgba(255,236,196,.34)"); q.addColorStop(.35, "rgba(240,200,255,.1)"); q.addColorStop(1, "rgba(200,170,255,0)"); g.fillStyle = q; g.fillRect(0, 0, w, w); }), blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
-  halo.scale.setScalar(170); halo.position.copy(MOON_POS).add(new THREE.Vector3(0, 0, -6)); scene.add(halo);
+  halo.scale.setScalar(170); halo.position.copy(MOON_POS).add(new THREE.Vector3(0, 0, -6)); scene.add(halo); SKY.halo = halo;
 
   /* далёкие планеты из кубиков: у космоса появляется глубина — при прилёте и в полёте они плывут мимо */
   const PLN = [
@@ -1636,7 +1696,7 @@ function buildSky() {
   }
   const cl = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xe9e4ff, emissive: 0x4a3d94, emissiveIntensity: .55 }), puffs.length), m4 = new THREE.Matrix4();
   puffs.forEach((p, i) => { m4.makeScale(p[3], p[4], p[5]); m4.setPosition(p[0], p[1], p[2]); cl.setMatrixAt(i, m4); });
-  cl.instanceMatrix.needsUpdate = true; cl.frustumCulled = false; scene.add(cl);
+  cl.instanceMatrix.needsUpdate = true; cl.frustumCulled = false; scene.add(cl); SKY.cl = cl;
 
   glowMatP = glowMaterial(SKY.fogD);
   VIS.push(dt => {
@@ -1699,6 +1759,243 @@ const FX = (() => {
     gp.flush();
   }
   return { init, one, burst };
+})();
+
+/* ══════ 32_day.js ══════ */
+/* День и ночь. Время суток в мире — как сейчас в Москве: считаю, где над ней настоящее Солнце (высота и сторона света),
+   и по нему ставлю небо и свет. Ночью мир ровно такой, каким был: звёзды, туманности, луна, огни фонарей. Днём — синее небо,
+   солнце, белые облака и тени от солнца; на рассвете и закате небо теплеет. Восход и закат — минута в минуту как в Москве,
+   а высота солнца своя: зимой оно над Москвой едва поднимается, поэтому в мире я веду его повыше — чтобы день был светлым.
+   В настройках небо можно оставить всегда дневным или всегда ночным. (Андрей 13.11.2026: «согласно времени мск и заходу
+   солнца… когда день — облака, синее небо, солнце, тени; ночью — то, что сейчас».)
+   Файл подключается сам: ждёт первого кадра (мир к нему уже собран) и дальше работает раз в кадр, последним из всех.
+   Ночной свет, туман и цвета неба он берёт из мира такими, какими их построил 30_sky.js, — поменяли там, изменилась и «ночь».
+   Тени ставятся всем обычным предметам сцены сами; предмету, которому тень вредна, — userData.noShadow = true. */
+const Day = (() => {
+  const RAD = Math.PI / 180, LAT = 55.7558 * RAD, LON = 37.6173, MSK = 108e5;
+  const MODES = ["auto", "day", "night"], NAMES = { auto: "как в Москве", day: "всегда день", night: "всегда ночь" };
+  const opt = Save.d.opt;
+  let mode = MODES.includes(opt.sky) ? opt.sky : "auto", fixed = null;                    // fixed — «застывшее» время для проверок
+  if (DEV) { const f = LS.get("mir.sky", ""); if (MODES.includes(f)) mode = f; else if (f) fixed = Date.parse(f + ":00+03:00") || null; }
+  /* дневные краски */
+  const C = { zen: col(0x3b8ee8), hor: col(0xc2e5ff), low: col(0x9ccdf5), deep: col(0x4a55b0), warm: col(0xff8f4f), rose: col(0xff8db4), sunHi: col(0xfff6dc), sunLo: col(0xffb070),
+    fog: col(0xc2e5ff), fogWarm: col(0xffb893), hemiC: col(0xe8f0ff), hemiG: col(0xb9c3cf), duskAmb: col(0xffc7a6), filC: col(0xbcd6ff),
+    white: col(0xffffff), clE: col(0xdfe9f8), clDusk: col(0xffb4a4), clNight: col(0x4a3d94), peach: col(0xffcfb0), quest: col(0x3a1642) };
+  /* к чему идём (по солнцу) и что на экране сейчас (плавно догоняет): sky — небо светлое, amb — рассеянный дневной свет,
+     sun — прямой свет солнца и тени, dusk — заря, hi — солнце высоко (белое) или низко (тёплое), dir — где солнце */
+  const tgt = { sky: 0, amb: 0, sun: 0, dusk: 0, hi: 1, E: -90, dir: new THREE.Vector3(0, -1, 0) }, cur = { sky: 0, amb: 0, sun: 0, dusk: 0, hi: 1, dir: new THREE.Vector3(0, -1, 0) };
+  const SH = { ok: !LOW, off: false, size: TOUCH ? 30 : 44, map: TOUCH ? 1024 : 2048, skip: TOUCH ? 2 : 1, n: 0, t0: 0, fr: 0, slow: 0, strike: 0, locked: false, keep: DEV && LS.get("mir.shadow") === "1" };
+  if (opt.shOff === dayNo() && !SH.keep) SH.off = true;                                   // сегодня тени уже оказались этому телефону не по силам
+  const fogNow = new THREE.Color(), skyC = { value: new THREE.Color() }, bodies = [], seen = new WeakSet(), skip = new Set();
+  const _d = new THREE.Vector3(), _r = new THREE.Vector3(), _u = new THREE.Vector3(), _c = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+  let ready = false, N = null, hemi = null, key = null, fil = null, sunL = null, dome = null, dayCl = null, nightCl = null, nextCalc = 0, lastRig = null, sweepT = 0, wasDay = null, lampK = -1, artN = -1, dirty = true;
+
+  /* где сейчас Солнце над Москвой: высота над горизонтом (в градусах), сторона света (от севера по часовой), склонение.
+     Формулы — из астрономического ежегодника, точность — доли градуса; восход и закат сходятся с календарём до минуты */
+  function sunAt(ms) {
+    const d = ms / 864e5 - 10957.5, g = (357.529 + .98560028 * d) * RAD, L = (280.459 + .98564736 * d + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * RAD, e = (23.439 - 3.6e-7 * d) * RAD;
+    const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L)), H = ((18.697374558 + 24.06570982441908 * d) * 15 + LON) * RAD - ra;
+    return { E: Math.asin(Math.sin(LAT) * Math.sin(dec) + Math.cos(LAT) * Math.cos(dec) * Math.cos(H)) / RAD, az: Math.atan2(-Math.sin(H), Math.tan(dec) * Math.cos(LAT) - Math.sin(LAT) * Math.cos(H)), dec: dec / RAD };
+  }
+  const clock = () => fixed ?? Date.now();
+  const hhmm = ms => { const d = new Date(ms + MSK); return String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0"); };
+  /* восход и закат в Москве в эти сутки (край солнца на горизонте: −0,833°) */
+  function riseSet(ms) {
+    const t0 = Math.floor((ms + MSK) / 864e5) * 864e5 - MSK; let prev = null, rise = 0, set = 0;
+    for (let k = 0; k <= 288; k++) { const t = t0 + k * 3e5, e = sunAt(t).E + .833; if (prev !== null && (prev < 0) !== (e < 0)) { const x = t - 3e5 + 3e5 * -prev / (e - prev); if (e > 0) rise = x; else set = x; } prev = e; }
+    return { rise, set };
+  }
+  function calc() {
+    let E, Ed, az;                                                                         // E — настоящая высота солнца, Ed — та, что рисуем
+    if (mode === "night") { E = Ed = -40; az = 0; }
+    else if (mode === "day") { E = Ed = 50; az = 152 * RAD; }
+    else { const s = sunAt(clock()); E = s.E; az = s.az; Ed = E > 0 ? Math.min(72, E * clamp(46 / Math.max(6, 34.2442 + s.dec), 1, 3.4)) : E; }      // в полдень солнце не ниже 37–46° даже в декабре
+    const x = E > 0 ? Ed : E, c = Math.cos(Ed * RAD);
+    tgt.E = E; tgt.sky = smooth(clamp((E + 7) / 8, 0, 1)); tgt.amb = smooth(clamp((E + 5) / 8, 0, 1)); tgt.sun = smooth(clamp((E + 2) / 5, 0, 1));
+    tgt.dusk = mode === "auto" ? Math.exp(-(((x - 1) / 7) ** 2)) : 0; tgt.hi = smooth(clamp((Ed - 3) / 25, 0, 1));
+    tgt.dir.set(Math.sin(az) * c, Math.sin(Ed * RAD), -Math.cos(az) * c);               // север — туда, где башня (−z), восток — +x
+  }
+
+  /* купол неба: ночью — прежняя картинка туманностей (и тот же цвет material.color, которым небо красит остров ключей),
+     днём — синева от горизонта к зениту, солнце с сиянием, на заре — тёплая полоса у горизонта со стороны солнца */
+  function domeMaterial(map) {
+    const m = new THREE.ShaderMaterial({
+      uniforms: { uMap: { value: map }, uTint: { value: new THREE.Color(1, 1, 1) }, uDay: { value: 0 }, uDusk: { value: 0 }, uDisc: { value: 0 }, uSun: { value: new THREE.Vector3(0, 1, 0) },
+        uZen: { value: C.zen }, uDeep: { value: C.deep }, uHor: { value: C.hor }, uLow: { value: C.low }, uWarm: { value: C.warm }, uRose: { value: C.rose }, uSunC: { value: C.sunHi.clone() } },
+      vertexShader: `varying vec2 vUv; varying vec3 vDir; void main() { vUv = uv; vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform sampler2D uMap; uniform vec3 uTint, uSun, uZen, uDeep, uHor, uLow, uWarm, uRose, uSunC; uniform float uDay, uDusk, uDisc; varying vec2 vUv; varying vec3 vDir;
+        void main() { vec3 c = texture2D(uMap, vUv).rgb * uTint;
+          if (uDay > 0.001) { vec3 d = normalize(vDir); float h = d.y;
+            vec3 day = h > 0.0 ? mix(uHor, mix(uZen, uDeep, uDusk * 0.75), pow(h, 0.55)) : mix(uHor, uLow, smoothstep(0.0, 0.7, -h));
+            float toSun = max(dot(normalize(d.xz + vec2(1e-5)), normalize(uSun.xz + vec2(1e-5))), 0.0), band = exp(-abs(h) * 3.0);
+            day = mix(day, mix(uRose, uWarm, toSun * toSun), uDusk * band * (0.42 + 0.58 * toSun));
+            float s = max(dot(d, uSun), 0.0);
+            day += uSunC * (pow(s, 600.0) * 0.5 + pow(s, 60.0) * 0.22 + pow(s, 7.0) * 0.1) * uDisc;
+            day = mix(day, min(uSunC * 1.3, vec3(1.0)), smoothstep(0.99945, 0.9996, s) * uDisc);
+            c = mix(c, day * mix(vec3(1.0), uTint, 0.5), uDay); }
+          gl_FragColor = vec4(c, 1.0);
+          #include <colorspace_fragment>
+        }`,
+      side: THREE.BackSide, depthWrite: false
+    });
+    m.color = m.uniforms.uTint.value; return m;
+  }
+  /* далёкое тело (луна, планеты) днём бледнеет в голубизне неба, как дневная луна; вблизи цвета настоящие */
+  function pale(root) {
+    const k = { value: 0 }; let radius = 1;
+    root.traverse(o => {
+      const m = o.material; if (!m || !m.isMeshBasicMaterial) return;
+      if (o.geometry && o.geometry.boundingSphere) radius = Math.max(radius, o.geometry.boundingSphere.radius * o.scale.x * (o === root ? 1 : root.scale.x));
+      m.onBeforeCompile = s => { s.uniforms.uSkyC = skyC; s.uniforms.uSkyK = k; s.fragmentShader = "uniform vec3 uSkyC; uniform float uSkyK;\n" + s.fragmentShader.replace("#include <opaque_fragment>", "#include <opaque_fragment>\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, uSkyC, uSkyK );"); };
+      m.needsUpdate = true;
+    });
+    bodies.push({ root, radius, k }); skip.add(root);
+  }
+  /* дневные облака: белые, из кубиков — высоко над островом и крупные у горизонта. На пути прилёта камеры их нет */
+  function makeClouds() {
+    const r = rng(4107), list = [], PATH = [[86, 96, 236], [54, 62, 148], [18, 36, 74], [2, 14, 32], [0, 4, 18]];
+    const onPath = (x, y, z) => { for (let i = 0; i < PATH.length - 1; i++) { const a = PATH[i], b = PATH[i + 1], vx = b[0] - a[0], vy = b[1] - a[1], vz = b[2] - a[2], t = clamp(((x - a[0]) * vx + (y - a[1]) * vy + (z - a[2]) * vz) / (vx * vx + vy * vy + vz * vz), 0, 1); if (Math.hypot(x - a[0] - vx * t, y - a[1] - vy * t, z - a[2] - vz * t) < 48) return true; } return false; };
+    const puff = (cx, cy, cz, k) => { for (let q = 0, m = 4 + Math.floor(r() * 5); q < m; q++) list.push([cx + (r() - .5) * 17 * k, cy + (r() - .5) * 3.2 * k, cz + (r() - .5) * 11 * k, (7 + r() * 9) * k, (2.2 + r() * 2.4) * k, (5 + r() * 6) * k]); };
+    for (let n = 0, made = 0, want = LOW ? 11 : 22; made < want && n < 200; n++) { const a = r() * TAU, d = 72 + r() * 200, x = Math.cos(a) * d, y = 46 + r() * 72, z = Math.sin(a) * d - 10, k = 1 + r() * .8; if (onPath(x, y, z) || Math.hypot(x - MOON_POS.x, y - MOON_POS.y, z - MOON_POS.z) < 62) continue; puff(x, y, z, k); made++; }
+    for (let n = 0; n < (LOW ? 5 : 10); n++) { const a = n / (LOW ? 5 : 10) * TAU + r() * .5, d = 280 + r() * 150; puff(Math.cos(a) * d, 4 + r() * 52, Math.sin(a) * d - 10, 2.1 + r() * 1.5); }
+    dayCl = new THREE.InstancedMesh(GEO_UNIT, new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xdfe9f8, emissiveIntensity: .62, transparent: true, opacity: 0 }), list.length);
+    const m4 = new THREE.Matrix4(); list.forEach((p, i) => { m4.makeScale(p[3], p[4], p[5]); m4.setPosition(p[0], p[1], p[2]); dayCl.setMatrixAt(i, m4); });
+    dayCl.instanceMatrix.needsUpdate = true; dayCl.frustumCulled = false; dayCl.visible = false; scene.add(dayCl); skip.add(dayCl);
+  }
+  /* кому положена тень: всем обычным непрозрачным предметам (свои и новые — обход раз в секунду); небо, облака и свечение — без неё */
+  function walk(o) {
+    if (skip.has(o) || o.userData.noShadow) return;
+    if (o.isMesh && !seen.has(o)) { seen.add(o); const m = o.material; if (m && !Array.isArray(m) && !m.transparent && m.blending === THREE.NormalBlending && m.depthWrite) { o.castShadow = true; if (m.isMeshLambertMaterial) o.receiveShadow = true; } }
+    for (let i = 0; i < o.children.length; i++) walk(o.children[i]);
+  }
+
+  function init() {
+    ready = true;
+    hemi = SKY.hemi || scene.children.find(o => o.isHemisphereLight); const dl = scene.children.filter(o => o.isDirectionalLight); key = SKY.key || dl[0]; fil = SKY.fil || dl[1];
+    nightCl = SKY.cl || SKY.clouds || null; const cm = nightCl && nightCl.material;      // прежние облака (под островом и вокруг)
+    N = { hemiC: hemi.color.clone(), hemiG: hemi.groundColor.clone(), hemiI: hemi.intensity, keyI: key.intensity, filC: fil.color.clone(), filI: fil.intensity, filP: fil.position.clone(), fog: new THREE.Color(SKY.fog), fogD: SKY.fogD,
+      clC: cm && cm.color.clone(), clE: cm && cm.emissive.clone(), clEI: cm && cm.emissiveIntensity };       // всё это — «ночь»: такой мир построен
+    const old = skyDome.material; dome = domeMaterial(old.map); dome.color.copy(old.color); skyDome.material = dome; old.dispose();
+    sunL = new THREE.DirectionalLight(0xfff6dc, 0); sunL.visible = false; scene.add(sunL, sunL.target);
+    if (SH.ok) {
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;      // карту теней обновляю сам (на телефоне — через кадр)
+      const s = sunL.shadow, c = s.camera; s.mapSize.set(SH.map, SH.map); c.left = c.bottom = -SH.size; c.right = c.top = SH.size; c.near = 1; c.far = 420; c.updateProjectionMatrix(); s.bias = -.0003; s.normalBias = .025; s.intensity = .8;
+      Bus.on("quality", () => { if (sunL.castShadow && !SH.keep) shadowsOff(); });        // телефон не успевает — сначала отдаём тени, а не чёткость
+    }
+    skip.add(skyDome); if (SKY.moon) pale(SKY.moon); for (const p of SKY.planets || []) pale(p);
+    for (const o of [SKY.art, nightCl, SKY.halo]) if (o) skip.add(o);
+    makeClouds();
+    if (DEV && W.__mir) W.__mir.Day = api;
+    snap(); VIS.push(late);                                                                // дальше — раз в кадр, после всех (туман у острова ключей и тень-пятно уже посчитаны)
+  }
+  function shadowsOff() { SH.off = true; opt.shOff = dayNo(); Save.put(); dirty = true; if (SH.locked) { SH.locked = false; View.lock = false; } }
+
+  /* всё, что зависит только от времени суток (меняется редко) */
+  function paint() {
+    const { sky, amb, sun: sk, dusk, hi } = cur, U = dome.uniforms, st = (1 - sky) ** 2;
+    dirty = false; D.body.classList.toggle("day", sky > .5);                             // на светлом небе надписи и джойстик рисуются контрастнее (style.css)
+    U.uDay.value = sky; U.uDusk.value = dusk; U.uSun.value.copy(cur.dir); U.uDisc.value = sstep(-.035, .012, cur.dir.y) * sky; U.uSunC.value.lerpColors(C.sunLo, C.sunHi, hi);
+    skyC.value.lerpColors(C.hor, C.zen, .35);
+    if (glowMatS && glowMatS.uniforms.uDim) glowMatS.uniforms.uDim.value = st;
+    if (SKY.tw) SKY.tw.pts.visible = sky < .995;
+    if (SKY.art) { SKY.art.visible = sky < .995; artN = SKY.art.children.length; for (const m of SKY.art.children) { if (m.userData.k0 == null) m.userData.k0 = m.material.color.r; m.material.color.setScalar(m.userData.k0 * st); } }
+    if (SKY.halo) SKY.halo.material.color.setScalar(1 - .85 * sky);
+    /* свет: ночной (луна и подсветка) уходит, приходит небо и солнце */
+    hemi.color.lerpColors(N.hemiC, C.hemiC, amb).lerp(C.duskAmb, dusk * amb * .6); hemi.groundColor.lerpColors(N.hemiG, C.hemiG, amb); hemi.intensity = lerp(N.hemiI, 2.3, amb);
+    key.intensity = N.keyI * (1 - amb);
+    fil.color.lerpColors(N.filC, C.filC, amb); fil.intensity = lerp(N.filI, .45, amb); fil.position.lerpVectors(N.filP, _c.set(-cur.dir.x, .35, -cur.dir.z), amb);      // днём подсветка — со стороны тени
+    const on = sk > .003, sh = on && SH.ok && !SH.off && sk > .02;
+    sunL.visible = on; sunL.intensity = 2.3 * sk; sunL.color.lerpColors(C.sunLo, C.sunHi, hi);
+    if (sunL.castShadow !== sh) {
+      sunL.castShadow = sh; SH.n = -1; SH.t0 = performance.now(); SH.fr = SH.slow = SH.strike = 0;
+      if (sh) { if (!SH.keep && !View.lock) { View.lock = true; SH.locked = true; } }      // пока меряю, по силам ли тени, чёткость картинки не трогаем
+      else if (SH.locked) { SH.locked = false; View.lock = false; }
+    }
+    if (!sh) { sunDir(_d); sunL.target.position.set(0, 0, 0); sunL.position.copy(_d).multiplyScalar(190); sunL.target.updateMatrixWorld(); sunL.updateMatrixWorld(); }
+    /* туман и облака */
+    fogNow.copy(N.fog).lerp(C.fog, sky).lerp(C.fogWarm, dusk * sky * .4); SKY.fogD = lerp(N.fogD, .0018, sky);
+    if (N.clC) { const m = nightCl.material; m.color.lerpColors(N.clC, C.white, amb).lerp(C.peach, dusk * amb * .5); m.emissive.lerpColors(N.clE, C.clE, amb).lerp(C.clDusk, dusk * amb * .5); m.emissiveIntensity = lerp(N.clEI, .62, amb); }
+    { const m = dayCl.material; dayCl.visible = sky > .01; m.opacity = smooth(clamp(sky * 1.5, 0, 1)); m.color.lerpColors(C.white, C.peach, dusk * .6); m.emissive.lerpColors(C.clNight, C.clE, amb).lerp(C.clDusk, dusk * .5); m.emissiveIntensity = lerp(.5, .62, amb); }
+    /* огни фонарей днём почти не видны, а искры — плотнее, чтобы не тонули в светлом небе */
+    const q = Math.round(amb * 20) / 20;
+    if (q !== lampK && WORLD.glow) { lampK = q; const L = WORLD.lamps, n = Math.min(L.length, WORLD.glow.n), dim = 1 - .9 * q; for (let i = 0; i < n; i++) { const l = L[i]; WORLD.glow.set(i, l.x, l.y, l.z, l.s, l.c, (l.k || .34) * dim); } WORLD.glow.flush(); }
+    if (glowMatP && glowMatP.uniforms.uSolid) glowMatP.uniforms.uSolid.value = .6 * sky;
+  }
+  const sunDir = v => { v.copy(cur.dir); if (v.y < .16) { v.y = .16; v.normalize(); } return v; };      // у самого горизонта свет идёт чуть сверху — иначе тени бесконечные
+  /* тень идёт за человечком: квадрат вокруг него (чуть вперёд по взгляду камеры), сдвигается ровно на точки карты — края теней не дрожат */
+  function aim() {
+    const S = SH.size, tex = 2 * S / SH.map;
+    sunDir(_d);
+    _r.crossVectors(UP, _d).normalize(); _u.crossVectors(_d, _r);
+    _c.set(PL.x, PL.y, PL.z); if (Cam.mode === "orbit") { _c.x -= Math.sin(Cam.yaw) * S * .4; _c.z -= Math.cos(Cam.yaw) * S * .4; }
+    const a = _c.dot(_r), b = _c.dot(_u); _c.addScaledVector(_r, Math.round(a / tex) * tex - a).addScaledVector(_u, Math.round(b / tex) * tex - b);
+    sunL.target.position.copy(_c); sunL.position.copy(_c).addScaledVector(_d, 190); sunL.target.updateMatrixWorld(); sunL.updateMatrixWorld();
+    renderer.shadowMap.needsUpdate = true;
+  }
+  /* то, что нужно каждый кадр */
+  function each(dt) {
+    if (scene.fog) { const zf = SKY.warmK != null ? SKY.warmK : Math.round(sstep(52, 78, PL.x) * 40) / 40; scene.fog.color.copy(fogNow); if (zf) scene.fog.color.lerp(C.quest, zf * (1 - .55 * cur.sky)); }      // у острова ключей туман теплеет, как и раньше
+    for (const b of bodies) b.k.value = cur.sky > .002 ? cur.sky * .5 * sstep(40, 160, camera.position.distanceTo(b.root.position) - b.radius) : 0;
+    if (SKY.art && SKY.art.children.length !== artN) dirty = true;                         // картинки космоса догрузились
+    if (SH.ok) {
+      if (AV.rig !== lastRig) { lastRig = AV.rig; walk(AV.root); }
+      sweepT -= dt; if (sweepT <= 0) { sweepT = .9; walk(scene); }
+      if (sunL.castShadow) {
+        if (++SH.n % SH.skip === 0) aim();
+        if (blob) blob.material.opacity *= 1 - .92 * cur.sun;                              // есть настоящая тень — пятно под ногами не нужно
+        if (!SH.keep && dt > 0) {                                                          // по силам ли тени: считаю медленные кадры (один рывок не в счёт); два медленных отрезка подряд — тени выключаю
+          const age = performance.now() - SH.t0;
+          if (age > 900) { SH.fr++; if (dt > .0245) SH.slow++; }
+          if (SH.fr >= 40) {
+            SH.strike = SH.slow > 26 && Cam.mode !== "intro" ? SH.strike + 1 : 0; SH.fr = SH.slow = 0;
+            if (SH.strike >= 2) shadowsOff(); else if (SH.locked && !SH.strike && age > 2600) { SH.locked = false; View.lock = false; }
+          }
+        }
+      }
+    }
+    const d = cur.sun > .5;                                                                // рассвет и закат прямо во время игры
+    if (wasDay === null) wasDay = d;
+    else if (d !== wasDay) { wasDay = d; if (mode === "auto" && fixed == null && Cam.mode === "orbit" && !PL.frozen) UI.toast(d ? "Над островом встаёт солнце" : "На остров опускается ночь", 3800); }
+  }
+  function late(dt) {
+    const now = performance.now(); if (now >= nextCalc) { nextCalc = now + 15000; calc(); }
+    const k = dt > 0 ? 1 - Math.exp(-2.2 * dt) : 0;
+    for (const f of ["sky", "amb", "sun", "dusk", "hi"]) { const d = tgt[f] - cur[f]; if (d) { cur[f] = Math.abs(d) < 5e-4 ? tgt[f] : cur[f] + d * k; dirty = true; } }
+    if (cur.dir.distanceToSquared(tgt.dir) > 1e-9) { if (cur.sun < .01 || k === 0) { if (k) cur.dir.copy(tgt.dir); } else cur.dir.lerp(tgt.dir, k).normalize(); dirty = true; }
+    if (dirty) paint();
+    each(dt);
+  }
+  /* сразу, без плавности: при входе и при смене в настройках (мир там стоит на паузе) */
+  function snap() {
+    calc(); nextCalc = performance.now() + 15000; for (const f of ["sky", "amb", "sun", "dusk", "hi"]) cur[f] = tgt[f]; cur.dir.copy(tgt.dir); wasDay = null;
+    paint(); each(0); if (sunL.castShadow) aim();
+  }
+  function set(m) { if (!MODES.includes(m)) return; mode = m; opt.sky = m; Save.put(); if (ready) { snap(); renderOnce(); } }
+  /* строка в настройках: «Небо — как в Москве / всегда день / всегда ночь» */
+  function note() {
+    if (mode !== "auto") return mode === "day" ? "солнце не заходит" : "звёзды, луна и туманности";
+    const now = clock(), r = riseSet(now);
+    return `в Москве ${hhmm(now)} — ${sunAt(now).E > -.833 ? "день" : "ночь"} · восход ${hhmm(r.rise)}, закат ${hhmm(r.set)}`;
+  }
+  function row(box) {
+    const r = el("button", "row", `<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Небо<small style="display:block;font-size:12px;color:var(--ink3)"></small></span><span class="v"></span>`);
+    const draw = () => { $(".v", r).textContent = NAMES[mode]; $("small", r).textContent = note(); };
+    r.type = "button"; r.id = "optSky"; r.onclick = () => { set(MODES[(MODES.indexOf(mode) + 1) % MODES.length]); Snd.play("click"); draw(); }; draw(); box.append(r);
+  }
+  const api = {
+    row, set, setMode: set, sunAt, riseSet, hhmm,
+    next() { set(MODES[(MODES.indexOf(mode) + 1) % MODES.length]); return NAMES[mode]; }, label: () => NAMES[mode],      // для кнопок в мире (например, кровать в доме): следующий режим неба и его название
+    get k() { return cur.sky; },                                                           // сколько сейчас «дня»: 0 — ночь, 1 — день
+    get mode() { return mode; },
+    get night() { return N && { hemi: N.hemiI, hemiC: N.hemiC.getHexString(), key: N.keyI, fil: N.filI, fog: N.fog.getHexString(), fogD: N.fogD }; },      // каким мир построен ночью (для проверок)
+    /* проверка: застывшее московское время «2026-06-21T13:00», режим «day» / «night» / «auto» или null — настоящее время */
+    test(v) { if (MODES.includes(v)) mode = v; else { mode = "auto"; fixed = v ? Date.parse(v + ":00+03:00") || null : null; } if (ready) { snap(); renderOnce(); } return api.state(); },
+    state() { const r3 = v => Math.round(v * 1000) / 1000; return { mode, msk: hhmm(clock()), E: r3(tgt.E), sky: r3(cur.sky), amb: r3(cur.amb), sun: r3(cur.sun), dusk: r3(cur.dusk), dir: cur.dir.toArray().map(r3), shadows: !!(sunL && sunL.castShadow), shOk: SH.ok && !SH.off,
+      hemi: hemi && r3(hemi.intensity), key: key && r3(key.intensity), sunI: sunL && r3(sunL.intensity), fogD: SKY.fogD, fog: scene.fog ? scene.fog.color.getHexString() : "", clouds: !!(dayCl && dayCl.visible), stars: !!(SKY.tw && SKY.tw.pts.visible),
+      shMap: !!(sunL && sunL.shadow.map), casters: (() => { let n = 0; scene.traverse(o => { if (o.isMesh && o.castShadow) n++; }); return n; })() }; }
+  };
+  VIS.push(() => { if (!ready) init(); });                                                 // первый кадр: мир собран — подключаюсь
+  return api;
 })();
 
 /* ══════ 35_player.js ══════ */
@@ -4126,6 +4423,7 @@ const Game = (() => {
     const row = (icon, text, on, f) => { const r = el("button", "row" + (on ? " on" : ""), `${ico(icon)}<span>${text}</span><i class="sw"></i>`); r.type = "button"; r.onclick = () => { const v = !r.classList.contains("on"); r.classList.toggle("on", v); f(v); }; box.append(r); };
     row("sound", "Звуки", Snd.sfx, v => Snd.setSfx(v));
     row("note", "Музыка", Snd.music, v => Snd.setMusic(v));
+    Day.row(box);                                              // небо: как в Москве, всегда день или всегда ночь
     const b = el("button", "row", `${ico("rocket")}<span>Вернуться в Мой космос</span>`); b.type = "button"; b.onclick = () => { Save.now(); location.href = "./"; }; box.append(b);
     const h = el("button", "row", `${ico("home")}<span>На площадь</span>`); h.type = "button"; h.onclick = () => { Menu.close(); home(); }; box.append(h);
     box.append(el("div", "note", TOUCH ? "Слева — джойстик, справа — прыжок. Води пальцем по экрану, чтобы смотреть вокруг; двумя пальцами — ближе и дальше." : "Ходить — WASD или стрелки, прыжок — пробел, осмотреться — мышь с зажатой кнопкой, колёсико — ближе и дальше, E — действие."));
