@@ -14,7 +14,7 @@
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <link rel="icon" href="assets/ic192.webp" type="image/webp">
 <link rel="modulepreload" href="assets/mir/three.module.min.js">
-<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-2232. Вход — тот же, что на основной странице:
+<!-- «Моя планета» — кубический 3D-мир сайта «Мой космос». Сборка 20261112-2311. Вход — тот же, что на основной странице:
      ключ лежит в памяти устройства; нет ключа — сразу на основную страницу, там вводится кодовое слово. -->
 <script>try{if(!localStorage.getItem("doch.k"))location.replace("./")}catch(e){location.replace("./")}</script>
 <style>
@@ -528,6 +528,15 @@ body:has(#wheel:not([hidden])) #hint{opacity:0}
 body.day #title h1{color:#fff;text-shadow:var(--o3),0 6px 0 var(--out)}
 body.day #title p{color:#fff;font-weight:800;text-shadow:var(--o2)}
 body.day #joy{background:radial-gradient(circle at 50% 50%,rgba(40,28,120,.14),rgba(40,28,120,.08) 62%,rgba(40,28,120,.3) 64%,rgba(40,28,120,.12));box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 0 0 1.5px rgba(40,28,120,.35)}
+
+/* строка гонки по кольцам — как строка «Ключи» */
+#hRing{gap:9px;height:auto;min-height:46px;padding:5px 14px 5px 10px;line-height:1.15}
+#hRing svg{flex:none;font-size:24px;color:var(--gold2);transition:transform .12s linear}
+#hRing div{display:flex;flex-direction:column;align-items:flex-start}
+#hRing b{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
+#hRing span{font-size:14px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (max-width:620px){#hRing{order:3}}
+body.racing #hTask{display:none}                      /* в гонке вверху только её строка — на телефоне иначе тесно */
 </style>
 </head>
 <body>
@@ -575,6 +584,7 @@ body.day #joy{background:radial-gradient(circle at 50% 50%,rgba(40,28,120,.14),r
   <button class="chip" id="hTask" type="button" aria-label="Задания" hidden><span id="hTaskT"></span></button>
   <div class="chip" id="hRun" hidden><b id="hRunF">Этаж 1</b><span id="hRunT">0:00.0</span><small id="hRunB"></small></div>
   <div class="chip" id="hQuest" hidden><b id="hQuestT"></b><span id="hQuestS"></span></div>
+  <div class="chip" id="hRing" hidden><svg class="i" style="stroke-width:2.8"><use href="#i-up"/></svg><div><b id="hRingT"></b><span id="hRingS"></span></div></div>
   <div class="chip" id="compass" hidden><svg class="i" style="stroke-width:2.8"><use href="#i-up"/></svg><b></b></div>
   <div class="hud-r">
     <button class="rbtn gold" id="hFlag" type="button" hidden aria-label="Вернуться к флажку"><svg class="i"><use href="#i-flag"/></svg></button>
@@ -704,7 +714,7 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));      // п�
 const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 const angDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
-const BUILD = "20261112-2232";
+const BUILD = "20261112-2311";
 const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
 /* память устройства: не падает в приватном режиме и при переполнении */
@@ -5046,6 +5056,7 @@ const Home = (() => {
     row("🏡", "Мой дом", "дом, бассейн, машина, огород, стройка", () => Game.jump(s.x, s.y, s.z, s.yaw, () => { Tower.leave(); Bus.emit("visit", "home"); }));
     row("⛲", "Площадь", "аллея воспоминаний, музей, подарок дня", () => Game.home());
     row("🗼", "Башня до Луны", "пять этажей и сундук наверху", () => Game.jump(.5, 0, -40, Math.PI, () => Tower.leave()));
+    row("🏁", "Небесные кольца", Rings.best ? "гонка по воздуху · лучшее время " + fmtTime(Rings.best) : "гонка по воздуху: нужен летун или крылья", () => Rings.go());
     row("🚗", "Позвать машину к дому", "если оставила её далеко", () => Car.home());
     row("🗝", "Остров трёх ключей", "три испытания и подарок от папы", () => Quest.enter(), !!Save.d.seen.quest);
     row("🌙", "Луна", "лунные камни и прыжки до неба", () => { const b = Bodies.find(q => q.id === "moon"); Game.jump(b.x + 1.2, b.y + b.R * b.s + .2, b.z + 1.2, 0, () => { Tower.leave(); }); }, !!Save.d.seen.moon);
@@ -5195,9 +5206,9 @@ const Game = (() => {
     };
     introStart(!first); startLoop();
   }
-  function step(dt) { Alley.step(dt); Stars.step(dt); Tower.step(dt); Quest.step(dt); Home.step(dt); Car.step(dt); }
+  function step(dt) { Alley.step(dt); Stars.step(dt); Tower.step(dt); Quest.step(dt); Home.step(dt); Car.step(dt); Rings.step(dt); }
   function vis(dt) {
-    Tower.vis(dt); Stars.vis(dt); Chest.vis(dt); Town.vis(dt); Quest.vis(dt); Home.vis(dt); Mount.vis(dt); Pet.vis(dt); Powers.vis(dt); Eco.vis(dt); Build.vis();
+    Tower.vis(dt); Stars.vis(dt); Chest.vis(dt); Town.vis(dt); Quest.vis(dt); Home.vis(dt); Mount.vis(dt); Pet.vis(dt); Powers.vis(dt); Eco.vis(dt); Build.vis(); Rings.vis(dt);
     for (const l of labels) { const d = camera.position.distanceTo(l.sp.position); l.sp.material.opacity = clamp((d - 15) / 9, 0, 1) * clamp((120 - d) / 40, 0, 1); l.sp.visible = l.sp.material.opacity > .01 && Cam.mode !== "intro"; }
   }
   return { build, start, step, vis, home, jump, label };
@@ -5374,6 +5385,7 @@ const Eco = (() => {
     { id: "farm", e: "👩‍🌾", t: "Фермер", d: "Собери урожай с грядок 20 раз", get: () => E.q.harv || 0, need: 20, rw: { egg: 2 } },
     { id: "keys", e: "🗝", t: "Три ключа", d: "Добудь три ключа на острове испытаний", get: () => Quest.have(), need: 3, rw: { c: 300 } },
     { id: "moon", e: "🌙", t: "Лунатик", d: "Долети до Луны и собери 5 лунных камней", ev: "rock", need: 5, rw: { c: 250, i: { s_star: 1 } } },
+    { id: "rings", e: "🏁", t: "Небесная гонка", d: "Пролети сквозь все 12 колец над островом — нужен летун или крылья (старт — в меню «Карта»)", ev: "rings", need: 1, rw: { c: 200 } },
     { id: "planets", e: "🪐", t: "Космонавтка", d: "Высадись на три планеты", get: () => ["p1", "p2", "p3"].filter(k => Save.d.seen[k]).length, need: 3, rw: { c: 400 } },
     { id: "chest", e: "👑", t: "До самой Луны", d: "Открой сундук на вершине башни", get: () => Save.d.chest ? 1 : 0, need: 1, rw: { pet: "dragon" } },
     { id: "rich", e: "💰", t: "Копилка", d: "Накопи 1000 монеток", get: () => E.coins, need: 1000, rw: { i: { s_pumpkin: 2 } } },
@@ -5388,7 +5400,7 @@ const Eco = (() => {
     { id: "d_build", e: "🧱", t: "Поставь 20 кубиков на стройке", ev: "block", need: 20, rw: { c: 40 } }, { id: "d_water", e: "💧", t: "Полей 4 грядки", ev: "water", need: 4, rw: { c: 30 } },
     { id: "d_flag", e: "🚩", t: "Дойди до любого флажка башни", ev: "flag", need: 1, rw: { c: 60 } }, { id: "d_rock", e: "🌑", t: "Собери 3 лунных камня", ev: "rock", need: 3, rw: { c: 60 } },
     { id: "d_jump", e: "🤸", t: "Попрыгай на батуте 10 раз", ev: "bounce", need: 10, rw: { c: 30 } }, { id: "d_gift", e: "🎁", t: "Открой подарок дня на площади", ev: "gift", need: 1, rw: { c: 30 } },
-    { id: "d_plant", e: "🌱", t: "Посади 4 грядки", ev: "plant", need: 4, rw: { c: 30 } }
+    { id: "d_plant", e: "🌱", t: "Посади 4 грядки", ev: "plant", need: 4, rw: { c: 30 } }, { id: "d_rings", e: "🏁", t: "Пролети гонку по кольцам", ev: "rings", need: 1, rw: { c: 50 } }
   ];
   const DAY = Object.fromEntries(DAILY.map(q => [q.id, q]));
   function newDay() {
@@ -5463,7 +5475,7 @@ const Eco = (() => {
     Spots.add({ x: HOME.nest.x, y: .8, z: HOME.nest.z, r: 2.2, text: () => E.egg ? `${EGGS[E.egg.t].e} Яйцо гуляет с тобой: ${Math.floor(E.egg.got)} из ${EGGS[E.egg.t].need} м` : "Гнездо: яйца продаёт лавка", act: () => { if (E.egg) UI.toast("Яйцо греется, пока ты ходишь, бегаешь и плаваешь. На машине — медленнее."); else if ([1, 2, 3].some(t => has("egg" + t))) eggStart(); else UI.hint("Купи яйцо в <b>лавке</b> у дороги — и из него выйдет питомец, которого у тебя ещё нет.", 7000); } });
     Menu.tab("tasks", "Задания", menu, -1); Menu.tab("bag", "Сумка", bagMenu, .5);
     chip.onclick = () => Menu.open("bag"); task.onclick = () => { const r = ready(); if (r.length && !UI.top() && !PL.frozen) claim(r[0]); else Menu.open("tasks"); };
-    for (const ev of ["plant", "harvest", "water", "hatch", "slide", "block", "care", "flag", "rock", "bounce", "gift", "avatar", "swing"]) Bus.on(ev, () => bump(ev));
+    for (const ev of ["plant", "harvest", "water", "hatch", "slide", "block", "care", "flag", "rock", "bounce", "gift", "avatar", "swing", "rings"]) Bus.on(ev, () => bump(ev));
     Bus.on("sell", n => { bump("sell", n); bump("sell1"); }); Bus.on("drive", n => bump("drive", n)); Bus.on("visit", w => bump("visit:" + w)); Bus.on("swim", v => { if (v > 5) bump("swim"); });
     for (const ev of ["star", "key", "chest", "pet", "coins", "land"]) Bus.on(ev, () => setTimeout(check, 50));
     Bus.on("gift", () => { const n = 20 + Math.min(7, Save.d.gift.streak || 1) * 5; add(n, true); UI.toast(`Подарок дня: <b>+${n}</b> 🪙`, 3600); });
@@ -5503,6 +5515,65 @@ const Sheet = (() => {
   function close() { UI.close("shop"); }
   $("#shopX").onclick = close; $("#shop").addEventListener("click", e => { if (e.target.id === "shop") close(); }); Bus.on("esc", () => { if (UI.top() === "shop") close(); });
   return { open, close, redraw };
+})();
+
+/* ══════ 87_rings.js ══════ */
+/* Небесные кольца: гонка по воздуху вокруг главного острова — для крыльев, летунов, джетпака и шарика (заготовка третьего
+   этапа, доделана 13.11). Двенадцать колец висят в небе; пролетела сквозь золотое (над южной стеной) — пошло время, следующее
+   кольцо загорается золотом, стрелка в строке вверху показывает, куда лететь. Лучшее время запоминается; за круг — монетки
+   (первый за день — больше); это и задание дня, и большое задание. Каждое кольцо — одна поверхность (16 кубиков слиты),
+   цвет меняется сменой материала. В «Карте» — строка «Небесные кольца»: ставит на землю перед золотым кольцом, лицом к нему. */
+const Rings = (() => {
+  const N = 12, R = 2.7, list = [], chip = $("#hRing"), arrow = chip.firstElementChild, cT = $("#hRingT"), cS = $("#hRingS");
+  const HY = [11, 15, 21, 17, 25, 36, 46, 32, 22, 13, 17, 11], RR = [24, 34, 40, 44, 50, 58, 62, 54, 44, 38, 32, 26];
+  const START = { x: -21, z: 20, yaw: Math.atan2(21, 4) };          // на земле западнее золотого кольца: оно впереди и выше, видно целиком
+  const run = { on: false, i: 0, t: 0, idle: 0 }; let racing = false, hT = 0;
+  function build() {
+    for (let i = 0; i < N; i++) {
+      const a = i / N * TAU, x = Math.sin(a) * RR[i], z = Math.cos(a) * RR[i] - (i > 3 && i < 9 ? 10 : 0), y = HY[i], g = new THREE.Group();
+      g.position.set(x, y, z); g.rotation.y = a + Math.PI / 2; g.userData.noShadow = true;      // кольцо стоит поперёк пути: лететь по кругу, от золотого — на восток
+      for (let q = 0; q < 16; q++) { const b = q / 16 * TAU; bx(g, .5, .5, .5, 0x8af6ff, Math.cos(b) * R, Math.sin(b) * R, 0, true); }
+      scene.add(g); bake(g); list.push({ g, x, y, z, nx: Math.cos(a), nz: -Math.sin(a), s: 0, k: 0 });
+    }
+    paint();
+  }
+  function paint() { list.forEach((r, i) => { const c = !run.on ? (i === 0 ? GOLD2 : 0x8af6ff) : i === run.i ? GOLD2 : i < run.i ? 0x7ff0c4 : 0x6f7bd6; r.g.children[0].material = matOf(c, true); }); }
+  function step(dt) {
+    if (run.on) { run.t += dt; run.idle += dt; if (run.idle > 45) { run.on = false; paint(); UI.toast("Гонка по кольцам остановлена — начни снова с золотого кольца"); } }      // время идёт всегда, даже если упала
+    if (PL.frozen || PL.dead > 0) return;
+    const r = list[run.on ? run.i : 0], dx = PL.x - r.x, dy = PL.y + .9 + AV.seat * .5 - r.y, dz = PL.z - r.z, s = dx * r.nx + dz * r.nz, rad = Math.hypot(dx - r.nx * s, dy, dz - r.nz * s);
+    const hit = rad < R + .4 && Math.abs(s) < 3 && ((r.s < 0 && s >= 0) || (r.s > 0 && s <= 0) || Math.abs(s) < .35);
+    r.s = Math.abs(s) < 3 && rad < R + 2 ? s : 0;
+    if (!hit) return;
+    if (!run.on) { run.on = true; run.i = 1; run.t = 0; run.idle = 0; Snd.play("flag"); UI.banner("Небесные кольца!", "лети сквозь золотое кольцо — стрелка вверху покажет путь", 2800); }
+    else { run.i++; run.idle = 0; Snd.play("star"); }
+    r.k = 1; FX.burst(r.x, r.y, r.z, 30, { speed: 6, life: .8, grav: 0, colors: [0xffe28a, 0xffffff, 0x8af6ff] }); buzz(15);
+    if (run.i >= N) finish(); paint();
+  }
+  function finish() {
+    const ms = Math.round(run.t * 1000), old = Save.d.rings || 0, first = Save.d.ringsDay !== dayNo(), coins = first ? 60 : 10; run.on = false; Save.d.ringsDay = dayNo();
+    if (!old || ms < old) Save.d.rings = ms; Save.put(); Eco.add(coins, true);
+    Snd.play("fanfare"); mood("joy", 3); Powers.salut(7, 9, 4);
+    UI.banner("Все кольца!", fmtTime(ms) + (!old ? "" : ms < old ? " — новый рекорд!" : " · лучшее " + fmtTime(old)) + " · +" + coins + " 🪙", 4600); Bus.emit("rings", ms);
+  }
+  function vis(dt) {
+    const t = Loop.t;
+    for (let i = 0; i < N; i++) { const r = list[i], active = run.on ? i === run.i : i === 0; r.k = Math.max(0, r.k - dt * 2); const s = 1 + r.k * .5 + (active ? Math.sin(t * 4) * .06 : 0); r.g.scale.set(s, s, 1); r.g.rotation.z = t * (active ? .8 : .2); }
+    if (run.on !== racing) { racing = run.on; chip.hidden = !racing; document.body.classList.toggle("racing", racing); hT = 0; }
+    if (!racing) return;
+    hT -= dt; if (hT > 0) return; hT = .1;                    // строка гонки: стрелка к следующему кольцу, счёт, время, сколько до кольца
+    const r = list[run.i], dx = r.x - PL.x, dz = r.z - PL.z, dy = r.y - PL.y - .9;
+    arrow.style.transform = `rotate(${(Cam.yaw + Math.PI - Math.atan2(dx, dz)).toFixed(3)}rad)`;
+    cT.textContent = `Кольца ${run.i}/${N}`; cS.textContent = `${fmtTime(run.t * 1000)} · ${Math.round(Math.hypot(dx, dy, dz))} м${dy > 3 ? " ▲" : dy < -3 ? " ▼" : ""}`;
+  }
+  /* к старту: на землю перед золотым кольцом, лицом к нему, камера снизу — кольцо в кадре */
+  function go() {
+    Game.jump(START.x, groundTop(START.x, START.z, 8) ?? 0, START.z, START.yaw, () => {
+      Tower.leave(); Cam.pitch = -.2; camSnap();
+      UI.hint(Mod.fly || Mod.jet || Mod.lift ? "Золотое кольцо — впереди и выше. Взлетай и лети сквозь него: дальше загорится следующее." : "Золотое кольцо — впереди и выше. Нужны <b>крылья</b> или <b>летун</b>: гардероб → «Спина» или «Летуны».", 9000);
+    });
+  }
+  return { build, step, vis, run, list, paint, go, START, get best() { return Save.d.rings || 0; } };
 })();
 
 /* ══════ 88_build.js ══════ */
@@ -5607,7 +5678,7 @@ async function boot() {
   buildSky(); buildWorldMesh();
   Alley.build(); Stars.build(); Chest.build(); Game.build();
   if (typeof Town !== "undefined") Town.after();
-  Quest.after(); Home.after(); Car.build(); Build.after(); Eco.build();
+  Quest.after(); Home.after(); Car.build(); Build.after(); Eco.build(); Rings.build();
   buildDecor(); buildLampGlows(); FX.init(); initAvatar();
   loadMsg(92, "Почти прилетели…"); await nextFrame();
   SIM.push(dynStep, playerStep, Game.step);
@@ -5674,7 +5745,7 @@ if (DEV) {
   Bus.on("respawn", () => { if (Ctl.bot) Bot.reset = true; });
   Object.assign(W.__mir, {
     Tower, Stars, Chest, Alley, Bot, Album, Viewer, Menu, Spots, Fav, M, Town, Ward, Pet, Gifts, LOOK, buildAvatar, UI, Back, SLOTS,
-    Mount, Powers, Mod, Photo, AV, Quest, Prize, ITEMS, ITEM, CAT, TOPI, BOTI, PETS, MOUNTS, POWERS, wearItem, hasAcc, emote, FX, Snd, Looks, AVATARS, AVATAR, Bodies, WATER, TEX, MAT, Bus, Eco, Home, HOME, Car, Build, Day, Sheet, CROPS, EGGS, Game, floorUnder, waterAt, Input,
+    Mount, Powers, Mod, Photo, AV, Quest, Prize, ITEMS, ITEM, CAT, TOPI, BOTI, PETS, MOUNTS, POWERS, wearItem, hasAcc, emote, FX, Snd, Looks, AVATARS, AVATAR, Bodies, WATER, TEX, MAT, Bus, Eco, Home, HOME, Car, Build, Day, Sheet, CROPS, EGGS, Game, Rings, floorUnder, waterAt, Input,
     /* идти в сторону (dx, dz) столько секунд — без отрисовки; jump — прыгать на ходу */
     walk(dx, dz, sec, jump) { const n = Math.round(sec / STEP); Ctl.on = true; PL.frozen = false; Ctl.bot = () => { Ctl.wx = dx; Ctl.wz = dz; if (jump && (PL.grounded || PL.swim)) Ctl.jumpTap = true; }; for (let i = 0; i < n; i++) { for (let q = 0; q < SIM.length; q++) SIM[q](STEP); Loop.t += STEP; } Ctl.bot = null; Ctl.wx = Ctl.wz = 0; return [+PL.x.toFixed(2), +PL.y.toFixed(2), +PL.z.toFixed(2)]; },
     /* слои одежды, которые лежат почти в одной плоскости друг с другом (такие на телефоне «дерутся» и мигают): человечек собирается
